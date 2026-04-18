@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import NotificationPanel from './pages/NotificationPanel';
@@ -20,6 +21,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
     <>
       <Navbar />
       <main className="main-content">{children}</main>
+      <Footer />
     </>
   );
 };
@@ -36,7 +38,7 @@ const AppRoutes = () => {
     <Routes>
       <Route
         path="/login"
-        element={user ? <Navigate to={homeRoute} /> : <LoginPage />}
+        element={user ? <Navigate to={homeRoute} /> : <><LoginPage /><Footer /></>}
       />
       <Route path="/oauth2/redirect" element={<OAuth2Redirect />} />
 
