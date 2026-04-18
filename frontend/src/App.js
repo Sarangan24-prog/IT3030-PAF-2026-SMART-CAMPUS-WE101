@@ -8,6 +8,7 @@ import DashboardPage from './pages/DashboardPage';
 import NotificationPanel from './pages/NotificationPanel';
 import AdminDashboard from './pages/AdminDashboard';
 import OAuth2Redirect from './pages/OAuth2Redirect';
+import BookingPage from './pages/BookingPage';
 import './App.css';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -59,6 +60,14 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+  path="/bookings"
+  element={
+    <ProtectedRoute>
+      <BookingPage />
+    </ProtectedRoute>
+  }
+/>
 
       {/* Admin pages */}
       <Route
@@ -84,5 +93,6 @@ function App() {
     </BrowserRouter>
   );
 }
+
 
 export default App;

@@ -21,8 +21,21 @@ public class Booking {
     private String referenceId;
     private BookingStatus status = BookingStatus.PENDING;
     private LocalDateTime createdAt = LocalDateTime.now();
+// Additional fields for admin view(sarangan)
+    private String userName;
+    private String resourceId;
+    private String resourceName;
+    private String location;
+    private String startTime;
+    private String endTime;
+    private int expectedAttendees;
+    private String adminReason;
+    private String approvedBy;
+    private LocalDateTime updatedAt;
 
     public Booking() {}
+
+
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -56,4 +69,36 @@ public class Booking {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    // new getters/setters (Saru)
+    public String getUserName() { return userName; }
+    public void setUserName(String userName) { this.userName = userName; }
+
+    public String getResourceId() { return resourceId; }
+    public void setResourceId(String resourceId) { this.resourceId = resourceId; }
+
+    public String getResourceName() { return resourceName; }
+    public void setResourceName(String resourceName) { this.resourceName = resourceName; }
+
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+
+    public String getStartTime() { return startTime; }
+    public void setStartTime(String startTime) { this.startTime = startTime; }
+
+    public String getEndTime() { return endTime; }
+    public void setEndTime(String endTime) { this.endTime = endTime; }
+
+    public int getExpectedAttendees() { return expectedAttendees; }
+    public void setExpectedAttendees(int expectedAttendees) { this.expectedAttendees = expectedAttendees; }
+
+    public String getAdminReason() { return adminReason; }
+    public void setAdminReason(String adminReason) { this.adminReason = adminReason; }
+
+    public String getApprovedBy() { return approvedBy; }
+    public void setApprovedBy(String approvedBy) { this.approvedBy = approvedBy; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }
+
