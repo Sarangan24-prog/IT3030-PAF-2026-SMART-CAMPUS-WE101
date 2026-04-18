@@ -1,0 +1,77 @@
+.dashboard-page {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.dashboard-page h2 {
+  color: #1a1a2e;
+  margin-bottom: 20px;
+}
+
+.welcome-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 28px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+}
+
+.welcome-card h3 {
+  margin: 0 0 6px;
+  color: #1a1a2e;
+  font-size: 20px;
+}
+
+.welcome-card > p {
+  color: #666;
+  margin: 0 0 20px;
+  font-size: 14px;
+}
+
+.info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-label {
+  font-size: 13px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 14px;
+  color: #333;
+}
+
+.role-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.role-user {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.role-admin {
+  background: #fce4ec;
+  color: #c62828;
+}
+
+.role-technician {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
