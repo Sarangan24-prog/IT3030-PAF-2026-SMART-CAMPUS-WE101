@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
@@ -13,36 +12,43 @@ import './App.css';
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, loading } = useAuth();
 
-  if (loading) return <div className="loading">Loading...</div>;
+  if (loading) return <div className="loading"><span>Loading...</span></div>;
   if (!user) return <Navigate to="/login" />;
   if (adminOnly && user.role !== 'ADMIN') return <Navigate to="/dashboard" />;
 
   return (
-    <>
+    <div className="app-shell">
       <Navbar />
       <main className="main-content">{children}</main>
       <Footer />
-    </>
+    </div>
   );
 };
 
 const AppRoutes = () => {
   const { user, loading } = useAuth();
 
-  if (loading) return <div className="loading">Loading...</div>;
+  if (loading) return <div className="loading"><span>Loading...</span></div>;
 
-  // Determine where to redirect after login based on role
   const homeRoute = user?.role === 'ADMIN' ? '/admin' : '/dashboard';
 
   return (
     <Routes>
       <Route
         path="/login"
-        element={user ? <Navigate to={homeRoute} /> : <><LoginPage /><Footer /></>}
+        element={
+          user ? (
+            <Navigate to={homeRoute} />
+          ) : (
+            <div className="app-shell login-shell">
+              <LoginPage />
+              <Footer />
+            </div>
+          )
+        }
       />
       <Route path="/oauth2/redirect" element={<OAuth2Redirect />} />
 
-      {/* User pages */}
       <Route
         path="/dashboard"
         element={
@@ -59,8 +65,6 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-
-      {/* Admin pages */}
       <Route
         path="/admin"
         element={

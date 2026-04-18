@@ -1,5 +1,5 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
+import { GraduationCapIcon, MailIcon, MapPinIcon } from './Icons';
 import './Footer.css';
 
 const Footer = () => {
@@ -8,10 +8,14 @@ const Footer = () => {
   return (
     <footer className="footer" id="main-footer">
       <div className="footer-inner">
-        {/* Top Section */}
         <div className="footer-top">
           <div className="footer-brand">
-            <span className="footer-logo">🏫 Smart Campus</span>
+            <div className="footer-logo">
+              <span className="footer-logo-icon">
+                <GraduationCapIcon size={18} color="#ffffff" />
+              </span>
+              <span className="footer-logo-text">Smart Campus</span>
+            </div>
             <p className="footer-tagline">
               Simplifying campus operations with smart booking, ticketing, and real-time notifications.
             </p>
@@ -37,22 +41,30 @@ const Footer = () => {
           <div className="footer-links-group">
             <h4>Contact</h4>
             <ul>
-              <li><span>📧 support@smartcampus.com</span></li>
-              <li><span>📍 University of Colombo</span></li>
+              <li>
+                <span className="footer-contact-item">
+                  <MailIcon size={13} color="#64748b" />
+                  support@smartcampus.com
+                </span>
+              </li>
+              <li>
+                <span className="footer-contact-item">
+                  <MapPinIcon size={13} color="#64748b" />
+                  University of Colombo
+                </span>
+              </li>
             </ul>
           </div>
         </div>
 
-        {/* Divider */}
         <div className="footer-divider" />
 
-        {/* Bottom Section */}
         <div className="footer-bottom">
           <p className="footer-copy">
-            © {currentYear} Smart Campus Operations Hub. All rights reserved.
+            &copy; {currentYear} Smart Campus Operations Hub. All rights reserved.
           </p>
           <p className="footer-credit">
-            Built with ❤️ for PAF 2026
+            Built for PAF 2026
           </p>
         </div>
       </div>
