@@ -1,23 +1,11 @@
-/* ═══════════════════════════════════════════════
-   Admin Dashboard — Professional Clean Design
-   ═══════════════════════════════════════════════ */
-
 .admin-dashboard {
-  max-width: 960px;
+  max-width: 900px;
   margin: 0 auto;
-  animation: fadeInUp 0.4s ease;
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .admin-dashboard h2 {
   color: #1a1a2e;
   margin-bottom: 20px;
-  font-size: 22px;
-  font-weight: 700;
 }
 
 /* ─── Tabs ─── */
@@ -25,35 +13,33 @@
   display: flex;
   gap: 4px;
   background: #fff;
-  border-radius: 12px;
-  padding: 5px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  border: 1px solid #f0f0f0;
-  margin-bottom: 24px;
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
 }
 
 .tab-btn {
   flex: 1;
-  padding: 10px 14px;
+  padding: 10px 12px;
   border: none;
   background: transparent;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 500;
-  color: #6b7280;
+  color: #666;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 }
 
 .tab-btn:hover {
-  background: #f5f6f8;
-  color: #1a1a2e;
+  background: #f5f5f5;
+  color: #333;
 }
 
 .tab-btn.active {
   background: #4361ee;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
 }
 
 .tab-content {
@@ -64,32 +50,24 @@
   text-align: center;
   padding: 40px;
   color: #888;
-  font-size: 14px;
 }
 
 /* ─── Overview Tab ─── */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 14px;
   margin-bottom: 24px;
 }
 
 .stat-card {
   background: #fff;
-  border-radius: 12px;
-  padding: 22px;
+  border-radius: 10px;
+  padding: 20px;
   display: flex;
   align-items: center;
-  gap: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  border: 1px solid #f0f0f0;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  gap: 14px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
 }
 
 .stat-icon {
@@ -101,51 +79,44 @@
   font-weight: 700;
   color: #1a1a2e;
   margin: 0;
-  line-height: 1.2;
 }
 
 .stat-label {
-  font-size: 12px;
+  font-size: 13px;
   color: #888;
-  margin: 2px 0 0;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  font-weight: 500;
+  margin: 0;
 }
 
 .role-breakdown {
   background: #fff;
-  border-radius: 12px;
-  padding: 22px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
 }
 
 .role-breakdown h3 {
-  margin: 0 0 18px;
+  margin: 0 0 16px;
   font-size: 15px;
   color: #1a1a2e;
-  font-weight: 600;
 }
 
 .role-bars {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .role-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .role-label {
-  width: 100px;
+  width: 90px;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
 }
 
 .role-color-user { color: #1565c0; }
@@ -154,24 +125,24 @@
 
 .role-bar-bg {
   flex: 1;
-  height: 22px;
-  background: #f5f6f8;
-  border-radius: 11px;
+  height: 20px;
+  background: #f5f5f5;
+  border-radius: 10px;
   overflow: hidden;
 }
 
 .role-bar {
   height: 100%;
-  border-radius: 11px;
-  transition: width 0.6s ease;
+  border-radius: 10px;
+  transition: width 0.5s ease;
 }
 
-.role-bar-user { background: linear-gradient(90deg, #42a5f5, #1e88e5); }
-.role-bar-admin { background: linear-gradient(90deg, #ef5350, #e53935); }
-.role-bar-technician { background: linear-gradient(90deg, #66bb6a, #43a047); }
+.role-bar-user { background: #42a5f5; }
+.role-bar-admin { background: #ef5350; }
+.role-bar-technician { background: #66bb6a; }
 
 .role-count {
-  width: 32px;
+  width: 30px;
   text-align: right;
   font-size: 14px;
   font-weight: 600;
@@ -181,9 +152,8 @@
 /* ─── Table Styles (shared) ─── */
 .table-wrapper {
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
   overflow: hidden;
 }
 
@@ -194,20 +164,19 @@
 
 .data-table th {
   text-align: left;
-  padding: 14px 18px;
-  background: #fafbfc;
+  padding: 12px 16px;
+  background: #fafafa;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #888;
-  border-bottom: 1px solid #edf0f4;
-  font-weight: 600;
+  border-bottom: 1px solid #eee;
 }
 
 .data-table td {
-  padding: 14px 18px;
+  padding: 12px 16px;
   font-size: 14px;
-  color: #374151;
+  color: #333;
   border-bottom: 1px solid #f5f5f5;
 }
 
@@ -223,14 +192,14 @@
 .user-name-cell {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .avatar {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4361ee, #3a0ca3);
+  background: #4361ee;
   color: #fff;
   display: flex;
   align-items: center;
@@ -241,19 +210,14 @@
 }
 
 .role-select {
-  padding: 6px 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   outline: none;
   text-transform: uppercase;
-  transition: border-color 0.2s;
-}
-
-.role-select:focus {
-  border-color: #4361ee;
 }
 
 .role-sel-user { color: #1565c0; background: #e3f2fd; border-color: #bbdefb; }
@@ -276,9 +240,8 @@
 .status-dot {
   font-size: 12px;
   font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 20px;
-  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
 }
 
 .status-dot.read {
@@ -296,23 +259,21 @@
   padding: 50px;
   color: #999;
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
 }
 
 /* ─── Send Tab ─── */
 .send-form {
   background: #fff;
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 28px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  border: 1px solid #f0f0f0;
-  max-width: 520px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  max-width: 500px;
 }
 
 .form-group {
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .form-group label {
@@ -326,26 +287,24 @@
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 10px 14px;
-  border: 1px solid #e5e7eb;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 14px;
   font-family: inherit;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  background: #fff;
+  transition: border-color 0.2s;
 }
 
 .form-group select:focus,
 .form-group textarea:focus {
   border-color: #4361ee;
-  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
 }
 
 .toggle-label {
   display: flex !important;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   cursor: pointer;
 }
 
@@ -353,20 +312,19 @@
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #4361ee;
 }
 
 .toggle-label span {
   font-size: 14px;
-  color: #374151;
+  color: #333;
 }
 
 .send-result {
   font-size: 14px;
-  margin-bottom: 14px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  background: #f5f6f8;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #f5f5f5;
 }
 
 .send-btn {
@@ -375,42 +333,34 @@
   background: #4361ee;
   color: #fff;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s;
 }
 
 .send-btn:hover {
   background: #3a56d4;
-  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
 }
 
 .send-btn:disabled {
   background: #a0a0a0;
   cursor: not-allowed;
-  box-shadow: none;
 }
 
 /* ─── Admin Items (Bookings & Tickets) ─── */
 .admin-items-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .admin-item-card {
   background: #fff;
-  border-radius: 12px;
-  padding: 18px 22px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  border: 1px solid #f0f0f0;
-  transition: box-shadow 0.2s;
-}
-
-.admin-item-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  border-radius: 10px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
 }
 
 .admin-item-header {
@@ -434,9 +384,8 @@
 
 .admin-item-desc {
   font-size: 13px;
-  color: #6b7280;
+  color: #666;
   margin: 4px 0 8px;
-  line-height: 1.5;
 }
 
 .admin-item-footer {
@@ -456,10 +405,9 @@
 .status-badge {
   font-size: 11px;
   font-weight: 700;
-  padding: 4px 12px;
-  border-radius: 20px;
+  padding: 3px 10px;
+  border-radius: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
 }
 
 /* Action buttons */
@@ -470,13 +418,13 @@
 
 .approve-btn,
 .reject-btn {
-  padding: 7px 16px;
+  padding: 6px 14px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 }
 
 .approve-btn {
@@ -486,7 +434,6 @@
 
 .approve-btn:hover {
   background: #c8e6c9;
-  box-shadow: 0 2px 6px rgba(46, 125, 50, 0.2);
 }
 
 .reject-btn {
@@ -496,40 +443,33 @@
 
 .reject-btn:hover {
   background: #f8bbd0;
-  box-shadow: 0 2px 6px rgba(198, 40, 40, 0.2);
 }
 
 /* Ticket status select */
 .ticket-status-select {
-  padding: 6px 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   outline: none;
   text-transform: uppercase;
-  transition: border-color 0.2s;
-}
-
-.ticket-status-select:focus {
-  border-color: #4361ee;
 }
 
 /* Ticket comments */
 .ticket-comments {
-  background: #fafbfc;
-  border-radius: 8px;
-  padding: 10px 14px;
-  margin: 10px 0;
-  border: 1px solid #f0f0f0;
+  background: #f9f9f9;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 8px 0;
 }
 
 .ticket-comment {
   font-size: 13px;
   color: #444;
-  padding: 6px 0;
-  border-bottom: 1px solid #edf0f4;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
 }
 
 .ticket-comment:last-child {
@@ -546,48 +486,33 @@
 .add-comment {
   display: flex;
   gap: 8px;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .add-comment input {
   flex: 1;
-  padding: 9px 14px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
   font-size: 13px;
   outline: none;
-  transition: border-color 0.2s;
 }
 
 .add-comment input:focus {
   border-color: #4361ee;
-  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
 }
 
 .add-comment button {
-  padding: 9px 16px;
+  padding: 8px 14px;
   background: #4361ee;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 13px;
-  font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.2s;
 }
 
 .add-comment button:hover {
   background: #3a56d4;
-}
-
-/* ─── Responsive ─── */
-@media (max-width: 768px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-tabs {
-    flex-wrap: wrap;
-  }
 }
