@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUnreadCount } from '../services/api';
@@ -10,6 +10,8 @@ import {
   LogOutIcon,
   MenuIcon,
   CloseIcon,
+  CalendarIcon,
+  TagIcon,
 } from './Icons';
 import './Navbar.css';
 
@@ -75,13 +77,29 @@ const Navbar = () => {
               </Link>
             </>
           ) : (
-            <Link
-              to="/dashboard"
-              className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
-            >
-              <GridIcon size={15} />
-              <span>Dashboard</span>
-            </Link>
+            <>
+              <Link
+                to="/dashboard"
+                className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
+              >
+                <GridIcon size={15} />
+                <span>Dashboard</span>
+              </Link>
+              <Link
+                to="/bookings"
+                className={`nav-link ${isActive('/bookings') ? 'active' : ''}`}
+              >
+                <CalendarIcon size={15} />
+                <span>Bookings</span>
+              </Link>
+              <Link
+                to="/tickets"
+                className={`nav-link ${isActive('/tickets') ? 'active' : ''}`}
+              >
+                <TagIcon size={15} />
+                <span>Tickets</span>
+              </Link>
+            </>
           )}
 
           <Link

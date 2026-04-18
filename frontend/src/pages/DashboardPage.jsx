@@ -19,6 +19,8 @@ import {
   CalendarIcon,
   CheckIcon,
   XIcon,
+  TagIcon,
+  ChevronRightIcon,
 } from '../components/Icons';
 import './DashboardPage.css';
 
@@ -33,7 +35,7 @@ const typeColors = {
   BOOKING_APPROVED: '#10b981',
   BOOKING_REJECTED: '#ef4444',
   TICKET_STATUS_CHANGED: '#f59e0b',
-  NEW_COMMENT: '#4361ee',
+  NEW_COMMENT: '#77A365',
 };
 
 const typeLabels = {
@@ -88,11 +90,31 @@ const DashboardPage = () => {
 
   return (
     <div className="dashboard-page" id="dashboard-page">
+
       {/* Hero */}
       <div className="dash-hero">
-        <div className="dash-hero-text">
-          <h1>{getGreeting()}, {user?.name || 'User'}</h1>
-          <p>Welcome to your Smart Campus Operations Hub</p>
+        <div className="dash-hero-left">
+          <div className="hero-avatar">
+            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+          </div>
+          <div className="dash-hero-text">
+            <h1>{getGreeting()}, {user?.name || 'User'}</h1>
+            <p>Welcome to your Smart Campus Operations Hub</p>
+            <div className="hero-pills">
+              <span className="hero-pill">
+                <BellIcon size={11} color="#77A365" />
+                {notifications.length} Notifications
+              </span>
+              <span className="hero-pill hero-pill-accent">
+                <InboxIcon size={11} color="#fff" />
+                {unreadCount} Unread
+              </span>
+              <span className="hero-pill">
+                <ShieldIcon size={11} color="#77A365" />
+                {user?.role || 'N/A'}
+              </span>
+            </div>
+          </div>
         </div>
         <div className="dash-hero-date">
           <span className="date-display">
@@ -103,44 +125,49 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="dash-stats">
-        <div className="dash-stat-card" id="stat-notifications">
-          <div className="stat-icon-wrap">
-            <BellIcon size={20} color="#ffffff" />
-          </div>
-          <div className="stat-info">
-            <p className="stat-number">{notifications.length}</p>
-            <p className="stat-label">Notifications</p>
+      {/* Campus Services - Hidden for Admins */}
+      {user?.role !== 'ADMIN' && (
+        <div className="campus-services">
+          <h3 className="services-label">Campus Services</h3>
+          <div className="services-grid">
+            <div className="service-card" onClick={() => navigate('/bookings')} role="button" tabIndex={0}>
+              <div className="service-icon-wrap">
+                <CalendarIcon size={24} color="#77A365" />
+              </div>
+              <div className="service-body">
+                <h4>Common Booking</h4>
+                <p>Lecture halls, Labs, Sports facilities, Auditorium</p>
+                <span className="service-cta">
+                  Browse &amp; Book
+                  <ChevronRightIcon size={13} color="#77A365" />
+                </span>
+              </div>
+            </div>
+            <div className="service-card" onClick={() => navigate('/tickets')} role="button" tabIndex={0}>
+              <div className="service-icon-wrap">
+                <TagIcon size={24} color="#77A365" />
+              </div>
+              <div className="service-body">
+                <h4>Ticket Raising</h4>
+                <p>Network, Equipment, Facility, Academic Support</p>
+                <span className="service-cta">
+                  Raise a Ticket
+                  <ChevronRightIcon size={13} color="#77A365" />
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="dash-stat-card" id="stat-unread">
-          <div className="stat-icon-wrap">
-            <InboxIcon size={20} color="#ffffff" />
-          </div>
-          <div className="stat-info">
-            <p className="stat-number">{unreadCount}</p>
-            <p className="stat-label">Unread</p>
-          </div>
-        </div>
-        <div className="dash-stat-card" id="stat-role">
-          <div className="stat-icon-wrap">
-            <ShieldIcon size={20} color="#ffffff" />
-          </div>
-          <div className="stat-info">
-            <p className="stat-number">{user?.role || 'N/A'}</p>
-            <p className="stat-label">Your Role</p>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Main Grid */}
       <div className="dash-main-grid">
+
         {/* Notifications Feed */}
         <div className="dash-primary">
           <div className="section-header">
             <div className="section-title-row">
-              <BellIcon size={16} color="#4361ee" />
+              <BellIcon size={16} color="#77A365" />
               <h3 className="section-title">Notifications</h3>
             </div>
             {unreadCount > 0 && (
@@ -155,7 +182,7 @@ const DashboardPage = () => {
           ) : notifications.length === 0 ? (
             <div className="empty-feed">
               <div className="empty-feed-icon">
-                <BellIcon size={28} color="#475569" />
+                <BellIcon size={28} color="#94a3b8" />
               </div>
               <p>No notifications yet</p>
               <span>You will see updates here when activity occurs</span>
@@ -236,8 +263,8 @@ const DashboardPage = () => {
                   <span className="detail-text">
                     Joined {user?.createdAt
                       ? new Date(user.createdAt).toLocaleDateString('en-US', {
-                          month: 'short', day: 'numeric', year: 'numeric',
-                        })
+                        month: 'short', day: 'numeric', year: 'numeric',
+                      })
                       : 'N/A'}
                   </span>
                 </div>
@@ -250,8 +277,20 @@ const DashboardPage = () => {
               <h3>Quick Access</h3>
             </div>
             <div className="quick-body">
+              {user?.role !== 'ADMIN' && (
+                <>
+                  <button className="quick-link-btn" onClick={() => navigate('/bookings')}>
+                    <CalendarIcon size={14} color="#77A365" />
+                    <span>Common Booking</span>
+                  </button>
+                  <button className="quick-link-btn" onClick={() => navigate('/tickets')}>
+                    <TagIcon size={14} color="#77A365" />
+                    <span>Raise a Ticket</span>
+                  </button>
+                </>
+              )}
               <button className="quick-link-btn" onClick={() => navigate('/notifications')}>
-                <BellIcon size={15} color="#4361ee" />
+                <BellIcon size={14} color="#77A365" />
                 <span>All Notifications</span>
               </button>
             </div>

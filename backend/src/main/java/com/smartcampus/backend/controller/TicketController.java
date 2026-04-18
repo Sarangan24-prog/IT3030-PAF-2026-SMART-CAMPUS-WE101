@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,56 +30,55 @@ public class TicketController {
         this.notificationService = notificationService;
     }
 
-    /**
-     * POST /api/tickets — user raises a new ticket
-     */
     @PostMapping
     public ResponseEntity<Ticket> createTicket(@AuthenticationPrincipal User user,
                                                 @RequestBody Map<String, String> body) {
         Ticket ticket = new Ticket();
         ticket.setUserId(user.getId());
-        ticket.setTitle(body.get("title"));
-        ticket.setDescription(body.get("description"));
+        ticket.setTitle(body.getOrDefault("title", ""));
+        ticket.setDescription(body.getOrDefault("description", ""));
+        ticket.setCategory(body.getOrDefault("category", ""));
+        ticket.setLocation(body.getOrDefault("location", ""));
+        ticket.setPriority(body.getOrDefault("priority", "MEDIUM"));
         ticket.setStatus(TicketStatus.OPEN);
         ticket.setCreatedAt(LocalDateTime.now());
+
         Ticket saved = ticketRepository.save(ticket);
+        saved.setReferenceId("TK-" + saved.getId().substring(saved.getId().length() - 6).toUpperCase());
+        ticketRepository.save(saved);
+
         return ResponseEntity.ok(saved);
     }
 
-    /**
-     * GET /api/tickets — get current user's tickets
-     */
     @GetMapping
     public ResponseEntity<List<Ticket>> getMyTickets(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(ticketRepository.findByUserIdOrderByCreatedAtDesc(user.getId()));
     }
 
-    /**
-     * GET /api/tickets/all — admin gets all tickets with user names
-     */
     @GetMapping("/all")
     public ResponseEntity<List<Map<String, Object>>> getAllTickets() {
         List<Ticket> tickets = ticketRepository.findAllByOrderByCreatedAtDesc();
         List<Map<String, Object>> enriched = tickets.stream().map(t -> {
             String userName = userRepository.findById(t.getUserId())
                     .map(User::getName).orElse("Unknown");
-            return Map.<String, Object>of(
-                    "id", t.getId(),
-                    "userId", t.getUserId(),
-                    "userName", userName,
-                    "title", t.getTitle(),
-                    "description", t.getDescription() != null ? t.getDescription() : "",
-                    "status", t.getStatus().name(),
-                    "comments", t.getComments(),
-                    "createdAt", t.getCreatedAt().toString()
-            );
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", t.getId());
+            map.put("userId", t.getUserId());
+            map.put("userName", userName);
+            map.put("title", t.getTitle() != null ? t.getTitle() : "");
+            map.put("description", t.getDescription() != null ? t.getDescription() : "");
+            map.put("category", t.getCategory() != null ? t.getCategory() : "");
+            map.put("location", t.getLocation() != null ? t.getLocation() : "");
+            map.put("priority", t.getPriority() != null ? t.getPriority() : "MEDIUM");
+            map.put("referenceId", t.getReferenceId() != null ? t.getReferenceId() : "");
+            map.put("status", t.getStatus().name());
+            map.put("comments", t.getComments());
+            map.put("createdAt", t.getCreatedAt().toString());
+            return map;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(enriched);
     }
 
-    /**
-     * PUT /api/tickets/{id}/status — admin changes ticket status → notification to user
-     */
     @PutMapping("/{id}/status")
     public ResponseEntity<Ticket> updateTicketStatus(@PathVariable String id,
                                                       @RequestBody Map<String, String> body) {
@@ -89,9 +89,9 @@ public class TicketController {
         ticket.setStatus(TicketStatus.valueOf(newStatus));
         ticketRepository.save(ticket);
 
-        // Notify user about status change
-        String message = "Your ticket \"" + ticket.getTitle() + "\" status changed to "
-                + newStatus.replace("_", " ") + ".";
+        String refPart = ticket.getReferenceId() != null ? " (" + ticket.getReferenceId() + ")" : "";
+        String message = "Your ticket \"" + ticket.getTitle() + "\"" + refPart
+                + " status changed to " + newStatus.replace("_", " ") + ".";
         notificationService.createNotification(
                 ticket.getUserId(), message, NotificationType.TICKET_STATUS_CHANGED, ticket.getId()
         );
@@ -99,9 +99,22 @@ public class TicketController {
         return ResponseEntity.ok(ticket);
     }
 
-    /**
-     * POST /api/tickets/{id}/comments — add a comment → notification to ticket owner
-     */
+    @PutMapping("/{id}/feedback")
+    public ResponseEntity<Ticket> addFeedback(@PathVariable String id,
+                                               @RequestBody Map<String, String> body) {
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+        try {
+            ticket.setRating(Integer.parseInt(body.get("rating")));
+        } catch (NumberFormatException ignored) {}
+        if (body.get("feedback") != null) {
+            ticket.setFeedback(body.get("feedback"));
+        }
+        ticket.setStatus(TicketStatus.CLOSED);
+        ticketRepository.save(ticket);
+        return ResponseEntity.ok(ticket);
+    }
+
     @PostMapping("/{id}/comments")
     public ResponseEntity<Ticket> addComment(@PathVariable String id,
                                               @AuthenticationPrincipal User user,
@@ -117,7 +130,6 @@ public class TicketController {
         ticket.getComments().add(comment);
         ticketRepository.save(ticket);
 
-        // Notify ticket owner if commenter is not the owner
         if (!ticket.getUserId().equals(user.getId())) {
             String message = user.getName() + " commented on your ticket \"" + ticket.getTitle() + "\".";
             notificationService.createNotification(
@@ -128,9 +140,6 @@ public class TicketController {
         return ResponseEntity.ok(ticket);
     }
 
-    /**
-     * DELETE /api/tickets/{id} — delete a ticket
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deleteTicket(@PathVariable String id) {
         ticketRepository.deleteById(id);

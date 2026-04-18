@@ -9,8 +9,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -29,55 +31,56 @@ public class BookingController {
         this.notificationService = notificationService;
     }
 
-    /**
-     * POST /api/bookings — user creates a new booking (goes to PENDING)
-     */
     @PostMapping
     public ResponseEntity<Booking> createBooking(@AuthenticationPrincipal User user,
                                                   @RequestBody Map<String, String> body) {
         Booking booking = new Booking();
         booking.setUserId(user.getId());
-        booking.setTitle(body.get("title"));
-        booking.setDescription(body.get("description"));
+        booking.setTitle(body.getOrDefault("title", ""));
+        booking.setDescription(body.getOrDefault("description", ""));
+        booking.setResourceType(body.getOrDefault("resourceType", ""));
+        booking.setBookingDate(body.getOrDefault("bookingDate", ""));
+        booking.setTimeSlot(body.getOrDefault("timeSlot", ""));
+        booking.setPurpose(body.getOrDefault("purpose", ""));
         booking.setStatus(BookingStatus.PENDING);
         booking.setCreatedAt(LocalDateTime.now());
+
         Booking saved = bookingRepository.save(booking);
+        saved.setReferenceId("BK-" + saved.getId().substring(saved.getId().length() - 6).toUpperCase());
+        bookingRepository.save(saved);
+
         return ResponseEntity.ok(saved);
     }
 
-    /**
-     * GET /api/bookings — get current user's bookings
-     */
     @GetMapping
     public ResponseEntity<List<Booking>> getMyBookings(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(bookingRepository.findByUserIdOrderByCreatedAtDesc(user.getId()));
     }
 
-    /**
-     * GET /api/bookings/all — admin gets all bookings with user names
-     */
     @GetMapping("/all")
     public ResponseEntity<List<Map<String, Object>>> getAllBookings() {
         List<Booking> bookings = bookingRepository.findAllByOrderByCreatedAtDesc();
         List<Map<String, Object>> enriched = bookings.stream().map(b -> {
             String userName = userRepository.findById(b.getUserId())
                     .map(User::getName).orElse("Unknown");
-            return Map.<String, Object>of(
-                    "id", b.getId(),
-                    "userId", b.getUserId(),
-                    "userName", userName,
-                    "title", b.getTitle(),
-                    "description", b.getDescription() != null ? b.getDescription() : "",
-                    "status", b.getStatus().name(),
-                    "createdAt", b.getCreatedAt().toString()
-            );
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", b.getId());
+            map.put("userId", b.getUserId());
+            map.put("userName", userName);
+            map.put("title", b.getTitle() != null ? b.getTitle() : "");
+            map.put("description", b.getDescription() != null ? b.getDescription() : "");
+            map.put("resourceType", b.getResourceType() != null ? b.getResourceType() : "");
+            map.put("bookingDate", b.getBookingDate() != null ? b.getBookingDate() : "");
+            map.put("timeSlot", b.getTimeSlot() != null ? b.getTimeSlot() : "");
+            map.put("purpose", b.getPurpose() != null ? b.getPurpose() : "");
+            map.put("referenceId", b.getReferenceId() != null ? b.getReferenceId() : "");
+            map.put("status", b.getStatus().name());
+            map.put("createdAt", b.getCreatedAt().toString());
+            return map;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(enriched);
     }
 
-    /**
-     * PUT /api/bookings/{id}/status — admin approves or rejects a booking → notification to user
-     */
     @PutMapping("/{id}/status")
     public ResponseEntity<Booking> updateBookingStatus(@PathVariable String id,
                                                         @RequestBody Map<String, String> body) {
@@ -88,22 +91,19 @@ public class BookingController {
         booking.setStatus(BookingStatus.valueOf(newStatus));
         bookingRepository.save(booking);
 
-        // Send notification to the user
         NotificationType type = newStatus.equals("APPROVED")
                 ? NotificationType.BOOKING_APPROVED
                 : NotificationType.BOOKING_REJECTED;
 
-        String message = "Your booking \"" + booking.getTitle() + "\" has been "
-                + newStatus.toLowerCase() + ".";
+        String refPart = booking.getReferenceId() != null ? " (" + booking.getReferenceId() + ")" : "";
+        String message = "Your booking \"" + booking.getTitle() + "\"" + refPart
+                + " has been " + newStatus.toLowerCase() + ".";
 
         notificationService.createNotification(booking.getUserId(), message, type, booking.getId());
 
         return ResponseEntity.ok(booking);
     }
 
-    /**
-     * DELETE /api/bookings/{id} — delete a booking
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deleteBooking(@PathVariable String id) {
         bookingRepository.deleteById(id);

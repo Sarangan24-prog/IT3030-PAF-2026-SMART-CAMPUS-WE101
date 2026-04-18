@@ -14,15 +14,16 @@ public class Ticket {
     private String id;
 
     private String userId;
-
     private String title;
-
     private String description;
-
+    private String category;
+    private String location;
+    private String priority = "MEDIUM";
+    private String referenceId;
+    private Integer rating;
+    private String feedback;
     private TicketStatus status = TicketStatus.OPEN;
-
     private List<Comment> comments = new ArrayList<>();
-
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public Ticket() {}
@@ -38,6 +39,24 @@ public class Ticket {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+
+    public String getPriority() { return priority; }
+    public void setPriority(String priority) { this.priority = priority; }
+
+    public String getReferenceId() { return referenceId; }
+    public void setReferenceId(String referenceId) { this.referenceId = referenceId; }
+
+    public Integer getRating() { return rating; }
+    public void setRating(Integer rating) { this.rating = rating; }
+
+    public String getFeedback() { return feedback; }
+    public void setFeedback(String feedback) { this.feedback = feedback; }
 
     public TicketStatus getStatus() { return status; }
     public void setStatus(TicketStatus status) { this.status = status; }

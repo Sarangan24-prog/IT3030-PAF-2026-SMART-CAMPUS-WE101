@@ -21,7 +21,7 @@ html {
 body {
   height: 100%;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f1f5f9;
+  background: #E2E6DA;
   color: #374151;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -84,7 +84,7 @@ img {
 }
 
 ::selection {
-  background: #4361ee;
+  background: #77A365;
   color: #fff;
 }
 
@@ -95,7 +95,7 @@ img {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #E2E6DA;
 }
 
 ::-webkit-scrollbar-thumb {
