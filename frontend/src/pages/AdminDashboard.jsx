@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   getAdminStats,
   getAllUsers,
@@ -12,39 +12,63 @@ import {
   updateTicketStatus,
   addTicketComment,
 } from '../services/api';
+import {
+  BarChartIcon,
+  CalendarIcon,
+  TagIcon,
+  UsersIcon,
+  BellIcon,
+  SendIcon,
+  CheckIcon,
+  XIcon,
+  RadioIcon,
+  MessageCircleIcon,
+  AlertIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  RefreshIcon,
+} from '../components/Icons';
 import './AdminDashboard.css';
+
+const TABS = [
+  { key: 'overview',       label: 'Overview',       Icon: BarChartIcon },
+  { key: 'bookings',       label: 'Bookings',       Icon: CalendarIcon },
+  { key: 'tickets',        label: 'Tickets',        Icon: TagIcon },
+  { key: 'users',          label: 'Users',          Icon: UsersIcon },
+  { key: 'notifications',  label: 'Notifications',  Icon: BellIcon },
+  { key: 'send',           label: 'Send',           Icon: SendIcon },
+];
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
 
   return (
     <div className="admin-dashboard">
-      <h2>⚙️ Admin Dashboard</h2>
+      <div className="admin-header">
+        <h2>Admin Dashboard</h2>
+        <p className="admin-subtitle">Manage users, bookings, tickets and notifications</p>
+      </div>
 
       <div className="admin-tabs">
-        {['overview', 'bookings', 'tickets', 'users', 'notifications', 'send'].map((tab) => (
+        {TABS.map(({ key, label, Icon }) => (
           <button
-            key={tab}
-            className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab)}
+            key={key}
+            className={`tab-btn ${activeTab === key ? 'active' : ''}`}
+            onClick={() => setActiveTab(key)}
           >
-            {tab === 'overview' && '📊 Overview'}
-            {tab === 'bookings' && '📅 Bookings'}
-            {tab === 'tickets' && '🎫 Tickets'}
-            {tab === 'users' && '👥 Users'}
-            {tab === 'notifications' && '🔔 Notifications'}
-            {tab === 'send' && '📨 Send'}
+            <Icon size={14} />
+            <span>{label}</span>
           </button>
         ))}
       </div>
 
       <div className="tab-content">
-        {activeTab === 'overview' && <OverviewTab />}
-        {activeTab === 'bookings' && <BookingsTab />}
-        {activeTab === 'tickets' && <TicketsTab />}
-        {activeTab === 'users' && <UsersTab />}
+        {activeTab === 'overview'      && <OverviewTab />}
+        {activeTab === 'bookings'      && <BookingsTab />}
+        {activeTab === 'tickets'       && <TicketsTab />}
+        {activeTab === 'users'         && <UsersTab />}
         {activeTab === 'notifications' && <NotificationsTab />}
-        {activeTab === 'send' && <SendTab />}
+        {activeTab === 'send'          && <SendTab />}
       </div>
     </div>
   );
@@ -63,32 +87,28 @@ const OverviewTab = () => {
   }, []);
 
   if (loading) return <p className="loading-text">Loading stats...</p>;
-  if (!stats) return <p>Failed to load stats</p>;
+  if (!stats) return <p className="loading-text">Failed to load stats</p>;
+
+  const statCards = [
+    { label: 'Total Users',           value: stats.totalUsers,           Icon: UsersIcon },
+    { label: 'Total Notifications',   value: stats.totalNotifications,   Icon: BellIcon },
+    { label: 'Unread Notifications',  value: stats.unreadNotifications,  Icon: MessageCircleIcon },
+  ];
 
   return (
     <div className="overview-tab">
       <div className="stats-grid">
-        <div className="stat-card">
-          <span className="stat-icon">👥</span>
-          <div>
-            <p className="stat-number">{stats.totalUsers}</p>
-            <p className="stat-label">Total Users</p>
+        {statCards.map(({ label, value, Icon }) => (
+          <div key={label} className="stat-card">
+            <div className="stat-icon-box">
+              <Icon size={20} color="#ffffff" />
+            </div>
+            <div>
+              <p className="stat-number">{value}</p>
+              <p className="stat-label">{label}</p>
+            </div>
           </div>
-        </div>
-        <div className="stat-card">
-          <span className="stat-icon">🔔</span>
-          <div>
-            <p className="stat-number">{stats.totalNotifications}</p>
-            <p className="stat-label">Total Notifications</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <span className="stat-icon">📩</span>
-          <div>
-            <p className="stat-number">{stats.unreadNotifications}</p>
-            <p className="stat-label">Unread Notifications</p>
-          </div>
-        </div>
+        ))}
       </div>
 
       <div className="role-breakdown">
@@ -112,7 +132,7 @@ const OverviewTab = () => {
   );
 };
 
-/* ─── Bookings Tab (Admin approve/reject) ─── */
+/* ─── Bookings Tab ─── */
 const BookingsTab = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -139,10 +159,10 @@ const BookingsTab = () => {
     }
   };
 
-  const statusColors = {
-    PENDING: '#ff9800',
-    APPROVED: '#4caf50',
-    REJECTED: '#f44336',
+  const statusMeta = {
+    PENDING:  { bg: '#fef3c7', color: '#d97706' },
+    APPROVED: { bg: '#dcfce7', color: '#16a34a' },
+    REJECTED: { bg: '#fee2e2', color: '#dc2626' },
   };
 
   if (loading) return <p className="loading-text">Loading bookings...</p>;
@@ -153,49 +173,48 @@ const BookingsTab = () => {
         <div className="empty-box"><p>No bookings submitted yet</p></div>
       ) : (
         <div className="admin-items-list">
-          {bookings.map((b) => (
-            <div key={b.id} className="admin-item-card">
-              <div className="admin-item-header">
-                <div>
-                  <span className="admin-item-title">{b.title}</span>
-                  <span className="admin-item-user">by {b.userName}</span>
-                </div>
-                <span
-                  className="status-badge"
-                  style={{ background: statusColors[b.status] + '20', color: statusColors[b.status] }}
-                >
-                  {b.status}
-                </span>
-              </div>
-              {b.description && <p className="admin-item-desc">{b.description}</p>}
-              <div className="admin-item-footer">
-                <span className="admin-item-date">{new Date(b.createdAt).toLocaleString()}</span>
-                {b.status === 'PENDING' && (
-                  <div className="action-btns">
-                    <button
-                      className="approve-btn"
-                      onClick={() => handleAction(b.id, 'APPROVED')}
-                    >
-                      ✅ Approve
-                    </button>
-                    <button
-                      className="reject-btn"
-                      onClick={() => handleAction(b.id, 'REJECTED')}
-                    >
-                      ❌ Reject
-                    </button>
+          {bookings.map((b) => {
+            const meta = statusMeta[b.status] || statusMeta.PENDING;
+            return (
+              <div key={b.id} className="admin-item-card">
+                <div className="admin-item-header">
+                  <div>
+                    <span className="admin-item-title">{b.title}</span>
+                    <span className="admin-item-user">by {b.userName}</span>
                   </div>
-                )}
+                  <span
+                    className="status-badge"
+                    style={{ background: meta.bg, color: meta.color }}
+                  >
+                    {b.status}
+                  </span>
+                </div>
+                {b.description && <p className="admin-item-desc">{b.description}</p>}
+                <div className="admin-item-footer">
+                  <span className="admin-item-date">{new Date(b.createdAt).toLocaleString()}</span>
+                  {b.status === 'PENDING' && (
+                    <div className="action-btns">
+                      <button className="approve-btn" onClick={() => handleAction(b.id, 'APPROVED')}>
+                        <CheckIcon size={13} />
+                        Approve
+                      </button>
+                      <button className="reject-btn" onClick={() => handleAction(b.id, 'REJECTED')}>
+                        <XIcon size={13} />
+                        Reject
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
   );
 };
 
-/* ─── Tickets Tab (Admin change status, add comments) ─── */
+/* ─── Tickets Tab ─── */
 const TicketsTab = () => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -236,10 +255,10 @@ const TicketsTab = () => {
   };
 
   const statusColors = {
-    OPEN: '#2196f3',
-    IN_PROGRESS: '#ff9800',
-    RESOLVED: '#4caf50',
-    CLOSED: '#9e9e9e',
+    OPEN:        '#2563eb',
+    IN_PROGRESS: '#d97706',
+    RESOLVED:    '#16a34a',
+    CLOSED:      '#6b7280',
   };
 
   if (loading) return <p className="loading-text">Loading tickets...</p>;
@@ -271,7 +290,6 @@ const TicketsTab = () => {
               </div>
               {t.description && <p className="admin-item-desc">{t.description}</p>}
 
-              {/* Comments */}
               {t.comments && t.comments.length > 0 && (
                 <div className="ticket-comments">
                   {t.comments.map((c, i) => (
@@ -285,20 +303,18 @@ const TicketsTab = () => {
                 </div>
               )}
 
-              {/* Add comment */}
               <div className="add-comment">
                 <input
                   type="text"
                   placeholder="Add a comment..."
                   value={commentText[t.id] || ''}
-                  onChange={(e) =>
-                    setCommentText({ ...commentText, [t.id]: e.target.value })
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleAddComment(t.id);
-                  }}
+                  onChange={(e) => setCommentText({ ...commentText, [t.id]: e.target.value })}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleAddComment(t.id); }}
                 />
-                <button onClick={() => handleAddComment(t.id)}>💬 Send</button>
+                <button onClick={() => handleAddComment(t.id)}>
+                  <SendIcon size={13} />
+                  Send
+                </button>
               </div>
 
               <span className="admin-item-date">{new Date(t.createdAt).toLocaleString()}</span>
@@ -380,7 +396,7 @@ const UsersTab = () => {
   );
 };
 
-/* ─── All Notifications Tab ─── */
+/* ─── Notifications Tab ─── */
 const NotificationsTab = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -392,11 +408,11 @@ const NotificationsTab = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const typeLabels = {
-    BOOKING_APPROVED: '✅ Approved',
-    BOOKING_REJECTED: '❌ Rejected',
-    TICKET_STATUS_CHANGED: '🔄 Ticket',
-    NEW_COMMENT: '💬 Comment',
+  const typeConfig = {
+    BOOKING_APPROVED:     { label: 'Approved',       Icon: CheckCircleIcon, color: '#16a34a' },
+    BOOKING_REJECTED:     { label: 'Rejected',       Icon: XCircleIcon,     color: '#dc2626' },
+    TICKET_STATUS_CHANGED:{ label: 'Ticket Update',  Icon: RefreshIcon,     color: '#d97706' },
+    NEW_COMMENT:          { label: 'Comment',        Icon: MessageCircleIcon, color: '#4361ee' },
   };
 
   if (loading) return <p className="loading-text">Loading notifications...</p>;
@@ -418,19 +434,27 @@ const NotificationsTab = () => {
               </tr>
             </thead>
             <tbody>
-              {notifications.map((n) => (
-                <tr key={n.id}>
-                  <td>{n.userName}</td>
-                  <td><span className="type-chip">{typeLabels[n.type] || n.type}</span></td>
-                  <td className="msg-cell">{n.message}</td>
-                  <td>
-                    <span className={`status-dot ${n.isRead ? 'read' : 'unread'}`}>
-                      {n.isRead ? 'Read' : 'Unread'}
-                    </span>
-                  </td>
-                  <td>{new Date(n.createdAt).toLocaleString()}</td>
-                </tr>
-              ))}
+              {notifications.map((n) => {
+                const cfg = typeConfig[n.type] || { label: n.type, Icon: BellIcon, color: '#64748b' };
+                return (
+                  <tr key={n.id}>
+                    <td>{n.userName}</td>
+                    <td>
+                      <span className="type-chip" style={{ color: cfg.color }}>
+                        <cfg.Icon size={12} color={cfg.color} />
+                        {cfg.label}
+                      </span>
+                    </td>
+                    <td className="msg-cell">{n.message}</td>
+                    <td>
+                      <span className={`status-dot ${n.isRead ? 'read' : 'unread'}`}>
+                        {n.isRead ? 'Read' : 'Unread'}
+                      </span>
+                    </td>
+                    <td>{new Date(n.createdAt).toLocaleString()}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -439,13 +463,13 @@ const NotificationsTab = () => {
   );
 };
 
-/* ─── Send Notification Tab ─── */
+/* ─── Send Tab ─── */
 const SendTab = () => {
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({ userId: '', message: '', type: 'NEW_COMMENT' });
   const [isBroadcast, setIsBroadcast] = useState(false);
   const [sending, setSending] = useState(false);
-  const [result, setResult] = useState('');
+  const [result, setResult] = useState({ text: '', ok: null });
 
   useEffect(() => {
     getAllUsers().then((res) => setUsers(res.data)).catch(console.error);
@@ -453,23 +477,23 @@ const SendTab = () => {
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!form.message.trim()) { setResult('⚠️ Message is required'); return; }
-    if (!isBroadcast && !form.userId) { setResult('⚠️ Select a user'); return; }
+    if (!form.message.trim()) { setResult({ text: 'Message is required', ok: false }); return; }
+    if (!isBroadcast && !form.userId) { setResult({ text: 'Select a user', ok: false }); return; }
 
     setSending(true);
-    setResult('');
+    setResult({ text: '', ok: null });
     try {
       if (isBroadcast) {
         const res = await broadcastNotification({ message: form.message, type: form.type });
-        setResult('✅ ' + res.data.message);
+        setResult({ text: res.data.message, ok: true });
       } else {
         await sendNotification({ userId: form.userId, message: form.message, type: form.type });
         const userName = users.find((u) => u.id === form.userId)?.name || 'user';
-        setResult(`✅ Notification sent to ${userName}`);
+        setResult({ text: `Notification sent to ${userName}`, ok: true });
       }
       setForm({ userId: '', message: '', type: 'NEW_COMMENT' });
     } catch (err) {
-      setResult('❌ Failed to send');
+      setResult({ text: 'Failed to send notification', ok: false });
     } finally {
       setSending(false);
     }
@@ -489,7 +513,11 @@ const SendTab = () => {
         </div>
         <div className="form-group">
           <label className="toggle-label">
-            <input type="checkbox" checked={isBroadcast} onChange={(e) => setIsBroadcast(e.target.checked)} />
+            <input
+              type="checkbox"
+              checked={isBroadcast}
+              onChange={(e) => setIsBroadcast(e.target.checked)}
+            />
             <span>Broadcast to all users</span>
           </label>
         </div>
@@ -513,9 +541,24 @@ const SendTab = () => {
             placeholder="Enter notification message..."
           />
         </div>
-        {result && <p className="send-result">{result}</p>}
+
+        {result.text && (
+          <p className={`send-result ${result.ok ? 'result-ok' : 'result-err'}`}>
+            {result.ok
+              ? <CheckCircleIcon size={14} color="#16a34a" />
+              : <AlertIcon size={14} color="#dc2626" />}
+            {result.text}
+          </p>
+        )}
+
         <button type="submit" className="send-btn" disabled={sending}>
-          {sending ? 'Sending...' : isBroadcast ? '📢 Broadcast' : '📨 Send Notification'}
+          {sending ? (
+            'Sending...'
+          ) : isBroadcast ? (
+            <><RadioIcon size={15} /> Broadcast to All</>
+          ) : (
+            <><SendIcon size={15} /> Send Notification</>
+          )}
         </button>
       </form>
     </div>

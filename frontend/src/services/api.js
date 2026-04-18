@@ -34,12 +34,13 @@ export const getAdminNotifications = () => API.get('/admin/notifications');
 export const sendNotification = (data) => API.post('/admin/notifications', data);
 export const broadcastNotification = (data) => API.post('/admin/notifications/broadcast', data);
 
-// Bookings (user)
-export const createBooking = (data) => API.post('/bookings', data);
-export const getMyBookings = () => API.get('/bookings/my');
+// Bookings (admin)
+export const getAllBookings = () => API.get('/bookings/all');
+export const updateBookingStatus = (id, status) => API.put(`/bookings/${id}/status`, { status });
 
-// Tickets (user)
-export const createTicket = (data) => API.post('/tickets', data);
-export const getMyTickets = () => API.get('/tickets/my');
+// Tickets (admin)
+export const getAllTickets = () => API.get('/tickets/all');
+export const updateTicketStatus = (id, status) => API.put(`/tickets/${id}/status`, { status });
+export const addTicketComment = (id, text) => API.post(`/tickets/${id}/comments`, { text });
 
 export default API;
