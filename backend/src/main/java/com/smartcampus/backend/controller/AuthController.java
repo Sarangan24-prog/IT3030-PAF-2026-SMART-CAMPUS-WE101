@@ -1,5 +1,6 @@
 package com.smartcampus.backend.controller;
 
+import com.smartcampus.backend.model.Role;
 import com.smartcampus.backend.model.User;
 import com.smartcampus.backend.security.JwtUtil;
 import com.smartcampus.backend.service.UserService;
@@ -35,6 +36,7 @@ public class AuthController {
     /**
      * POST /api/auth/demo-login — for development/testing without Google OAuth.
      * Creates or finds a demo user and returns a JWT token.
+     * Admin emails (containing "admin") get ADMIN role automatically.
      */
     @PostMapping("/demo-login")
     public ResponseEntity<?> demoLogin(@RequestBody Map<String, String> body) {
@@ -47,8 +49,20 @@ public class AuthController {
                     newUser.setEmail(email);
                     newUser.setName(name);
                     newUser.setGoogleId("demo-" + email);
+
+                    // Auto-assign ADMIN role if email contains "admin"
+                    if (email.toLowerCase().contains("admin")) {
+                        newUser.setRole(Role.ADMIN);
+                    }
+
                     return userService.saveUser(newUser);
                 });
+
+        // Fix existing users: upgrade to ADMIN if admin email but wrong role
+        if (email.toLowerCase().contains("admin") && user.getRole() != Role.ADMIN) {
+            user.setRole(Role.ADMIN);
+            user = userService.saveUser(user);
+        }
 
         String token = jwtUtil.generateToken(user.getId(), user.getEmail(), user.getRole().name());
 

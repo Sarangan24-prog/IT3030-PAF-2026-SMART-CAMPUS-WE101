@@ -11,6 +11,7 @@ const LoginPage = () => {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loginMode, setLoginMode] = useState('user'); // 'user' or 'admin'
 
   const handleGoogleLogin = () => {
     window.location.href = 'http://localhost:8080/oauth2/authorization/google';
@@ -27,12 +28,29 @@ const LoginPage = () => {
     try {
       const res = await demoLogin({ email, name });
       login(res.data.token, res.data.user);
-      navigate('/dashboard');
+      // Redirect based on role
+      if (res.data.user.role === 'ADMIN') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setError('Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const fillAdminDemo = () => {
+    setLoginMode('admin');
+    setName('Campus Admin');
+    setEmail('admin@smartcampus.com');
+  };
+
+  const fillUserDemo = () => {
+    setLoginMode('user');
+    setName('');
+    setEmail('');
   };
 
   return (
@@ -57,6 +75,24 @@ const LoginPage = () => {
           <span>or use demo login</span>
         </div>
 
+        {/* Role toggle buttons */}
+        <div className="role-toggle">
+          <button
+            className={`toggle-btn ${loginMode === 'user' ? 'active-user' : ''}`}
+            onClick={fillUserDemo}
+            type="button"
+          >
+            👤 User Login
+          </button>
+          <button
+            className={`toggle-btn ${loginMode === 'admin' ? 'active-admin' : ''}`}
+            onClick={fillAdminDemo}
+            type="button"
+          >
+            ⚙️ Admin Login
+          </button>
+        </div>
+
         <form onSubmit={handleDemoLogin} className="demo-form">
           <input
             type="text"
@@ -74,7 +110,7 @@ const LoginPage = () => {
           />
           {error && <p className="error-msg">{error}</p>}
           <button type="submit" className="demo-btn" disabled={loading} id="demo-login-btn">
-            {loading ? 'Logging in...' : 'Demo Login'}
+            {loading ? 'Logging in...' : loginMode === 'admin' ? '⚙️ Login as Admin' : '👤 Login as User'}
           </button>
         </form>
       </div>

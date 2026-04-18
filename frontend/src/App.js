@@ -5,7 +5,7 @@ import Navbar from './components/Navbar';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import NotificationPanel from './pages/NotificationPanel';
-import AdminUsersPage from './pages/AdminUsersPage';
+import AdminDashboard from './pages/AdminDashboard';
 import OAuth2Redirect from './pages/OAuth2Redirect';
 import './App.css';
 
@@ -29,13 +29,18 @@ const AppRoutes = () => {
 
   if (loading) return <div className="loading">Loading...</div>;
 
+  // Determine where to redirect after login based on role
+  const homeRoute = user?.role === 'ADMIN' ? '/admin' : '/dashboard';
+
   return (
     <Routes>
       <Route
         path="/login"
-        element={user ? <Navigate to="/dashboard" /> : <LoginPage />}
+        element={user ? <Navigate to={homeRoute} /> : <LoginPage />}
       />
       <Route path="/oauth2/redirect" element={<OAuth2Redirect />} />
+
+      {/* User pages */}
       <Route
         path="/dashboard"
         element={
@@ -52,15 +57,18 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+
+      {/* Admin pages */}
       <Route
-        path="/admin/users"
+        path="/admin"
         element={
           <ProtectedRoute adminOnly>
-            <AdminUsersPage />
+            <AdminDashboard />
           </ProtectedRoute>
         }
       />
-      <Route path="*" element={<Navigate to="/dashboard" />} />
+
+      <Route path="*" element={<Navigate to={homeRoute} />} />
     </Routes>
   );
 };
