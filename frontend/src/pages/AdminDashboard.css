@@ -1,0 +1,350 @@
+.admin-dashboard {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.admin-dashboard h2 {
+  color: #1a1a2e;
+  margin-bottom: 20px;
+}
+
+/* ─── Tabs ─── */
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.tab-btn.active {
+  background: #4361ee;
+  color: #fff;
+}
+
+.tab-content {
+  min-height: 300px;
+}
+
+.loading-text {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+}
+
+/* ─── Overview Tab ─── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+
+.stat-icon {
+  font-size: 28px;
+}
+
+.stat-number {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #888;
+  margin: 0;
+}
+
+.role-breakdown {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+
+.role-breakdown h3 {
+  margin: 0 0 16px;
+  font-size: 15px;
+  color: #1a1a2e;
+}
+
+.role-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.role-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.role-label {
+  width: 90px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.role-color-user { color: #1565c0; }
+.role-color-admin { color: #c62828; }
+.role-color-technician { color: #2e7d32; }
+
+.role-bar-bg {
+  flex: 1;
+  height: 20px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.role-bar {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+
+.role-bar-user { background: #42a5f5; }
+.role-bar-admin { background: #ef5350; }
+.role-bar-technician { background: #66bb6a; }
+
+.role-count {
+  width: 30px;
+  text-align: right;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* ─── Table Styles (shared) ─── */
+.table-wrapper {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 12px 16px;
+  background: #fafafa;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #888;
+  border-bottom: 1px solid #eee;
+}
+
+.data-table td {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tr:hover {
+  background: #fafbff;
+}
+
+/* User avatar */
+.user-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #4361ee;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.role-select {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  text-transform: uppercase;
+}
+
+.role-sel-user { color: #1565c0; background: #e3f2fd; border-color: #bbdefb; }
+.role-sel-admin { color: #c62828; background: #fce4ec; border-color: #f8bbd0; }
+.role-sel-technician { color: #2e7d32; background: #e8f5e9; border-color: #c8e6c9; }
+
+/* Notifications table */
+.type-chip {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.msg-cell {
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-dot {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.status-dot.read {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-dot.unread {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.empty-box {
+  text-align: center;
+  padding: 50px;
+  color: #999;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+
+/* ─── Send Tab ─── */
+.send-form {
+  background: #fff;
+  border-radius: 10px;
+  padding: 28px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  max-width: 500px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #4361ee;
+}
+
+.toggle-label {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.toggle-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.toggle-label span {
+  font-size: 14px;
+  color: #333;
+}
+
+.send-result {
+  font-size: 14px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #f5f5f5;
+}
+
+.send-btn {
+  width: 100%;
+  padding: 12px;
+  background: #4361ee;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.send-btn:hover {
+  background: #3a56d4;
+}
+
+.send-btn:disabled {
+  background: #a0a0a0;
+  cursor: not-allowed;
+}

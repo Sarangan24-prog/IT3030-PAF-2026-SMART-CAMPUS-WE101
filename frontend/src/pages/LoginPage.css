@@ -118,3 +118,38 @@
   background: #a0a0a0;
   cursor: not-allowed;
 }
+
+.role-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.toggle-btn:hover {
+  background: #f5f5f5;
+}
+
+.toggle-btn.active-user {
+  background: #e3f2fd;
+  border-color: #90caf9;
+  color: #1565c0;
+}
+
+.toggle-btn.active-admin {
+  background: #fce4ec;
+  border-color: #f8bbd0;
+  color: #c62828;
+}

@@ -10,6 +10,8 @@ const Navbar = () => {
   const location = useLocation();
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const isAdmin = user?.role === 'ADMIN';
+
   useEffect(() => {
     if (user) {
       const fetchCount = () => {
@@ -18,7 +20,7 @@ const Navbar = () => {
           .catch(() => {});
       };
       fetchCount();
-      const interval = setInterval(fetchCount, 15000); // poll every 15s
+      const interval = setInterval(fetchCount, 15000);
       return () => clearInterval(interval);
     }
   }, [user]);
@@ -33,17 +35,34 @@ const Navbar = () => {
   return (
     <nav className="navbar" id="main-navbar">
       <div className="navbar-inner">
-        <Link to="/dashboard" className="navbar-brand">
+        <Link to={isAdmin ? '/admin' : '/dashboard'} className="navbar-brand">
           🏫 Smart Campus
         </Link>
 
         <div className="navbar-links">
-          <Link
-            to="/dashboard"
-            className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
-          >
-            Dashboard
-          </Link>
+          {isAdmin ? (
+            <>
+              <Link
+                to="/admin"
+                className={`nav-link ${isActive('/admin') ? 'active' : ''}`}
+              >
+                ⚙️ Admin Panel
+              </Link>
+              <Link
+                to="/dashboard"
+                className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
+              >
+                Dashboard
+              </Link>
+            </>
+          ) : (
+            <Link
+              to="/dashboard"
+              className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
+            >
+              Dashboard
+            </Link>
+          )}
 
           <Link
             to="/notifications"
@@ -55,18 +74,10 @@ const Navbar = () => {
               <span className="badge" id="unread-badge">{unreadCount}</span>
             )}
           </Link>
-
-          {user?.role === 'ADMIN' && (
-            <Link
-              to="/admin/users"
-              className={`nav-link ${isActive('/admin/users') ? 'active' : ''}`}
-            >
-              Users
-            </Link>
-          )}
         </div>
 
         <div className="navbar-user">
+          {isAdmin && <span className="admin-tag">ADMIN</span>}
           <span className="user-name">{user?.name}</span>
           <button className="logout-btn" onClick={handleLogout} id="logout-btn">
             Logout

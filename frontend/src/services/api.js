@@ -17,7 +17,7 @@ API.interceptors.request.use((config) => {
 export const demoLogin = (data) => API.post('/auth/demo-login', data);
 export const getMe = () => API.get('/auth/me');
 
-// Notifications
+// Notifications (user)
 export const getNotifications = () => API.get('/notifications');
 export const getUnreadCount = () => API.get('/notifications/unread-count');
 export const markNotificationRead = (id) => API.put(`/notifications/${id}/read`);
@@ -27,5 +27,11 @@ export const deleteNotification = (id) => API.delete(`/notifications/${id}`);
 // Users (admin)
 export const getAllUsers = () => API.get('/users');
 export const updateUserRole = (id, role) => API.put(`/users/${id}/role`, { role });
+
+// Admin
+export const getAdminStats = () => API.get('/admin/stats');
+export const getAdminNotifications = () => API.get('/admin/notifications');
+export const sendNotification = (data) => API.post('/admin/notifications', data);
+export const broadcastNotification = (data) => API.post('/admin/notifications/broadcast', data);
 
 export default API;
