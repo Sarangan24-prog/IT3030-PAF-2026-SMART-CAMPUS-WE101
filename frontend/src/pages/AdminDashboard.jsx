@@ -6,11 +6,6 @@ import {
   getAdminNotifications,
   sendNotification,
   broadcastNotification,
-  getAllBookings,
-  updateBookingStatus,
-  getAllTickets,
-  updateTicketStatus,
-  addTicketComment,
 } from '../services/api';
 import {
   BarChartIcon,
@@ -32,8 +27,6 @@ import './AdminDashboard.css';
 
 const TABS = [
   { key: 'overview',       label: 'Overview',       Icon: BarChartIcon },
-  { key: 'bookings',       label: 'Bookings',       Icon: CalendarIcon },
-  { key: 'tickets',        label: 'Tickets',        Icon: TagIcon },
   { key: 'users',          label: 'Users',          Icon: UsersIcon },
   { key: 'notifications',  label: 'Notifications',  Icon: BellIcon },
   { key: 'send',           label: 'Send',           Icon: SendIcon },
@@ -64,8 +57,6 @@ const AdminDashboard = () => {
 
       <div className="tab-content">
         {activeTab === 'overview'      && <OverviewTab />}
-        {activeTab === 'bookings'      && <BookingsTab />}
-        {activeTab === 'tickets'       && <TicketsTab />}
         {activeTab === 'users'         && <UsersTab />}
         {activeTab === 'notifications' && <NotificationsTab />}
         {activeTab === 'send'          && <SendTab />}
@@ -128,200 +119,6 @@ const OverviewTab = () => {
           ))}
         </div>
       </div>
-    </div>
-  );
-};
-
-/* ─── Bookings Tab ─── */
-const BookingsTab = () => {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchBookings = useCallback(async () => {
-    try {
-      const res = await getAllBookings();
-      setBookings(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { fetchBookings(); }, [fetchBookings]);
-
-  const handleAction = async (id, status) => {
-    try {
-      await updateBookingStatus(id, status);
-      fetchBookings();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const statusMeta = {
-    PENDING:  { bg: '#fef3c7', color: '#d97706' },
-    APPROVED: { bg: '#dcfce7', color: '#16a34a' },
-    REJECTED: { bg: '#fee2e2', color: '#dc2626' },
-  };
-
-  if (loading) return <p className="loading-text">Loading bookings...</p>;
-
-  return (
-    <div className="bookings-tab">
-      {bookings.length === 0 ? (
-        <div className="empty-box"><p>No bookings submitted yet</p></div>
-      ) : (
-        <div className="admin-items-list">
-          {bookings.map((b) => {
-            const meta = statusMeta[b.status] || statusMeta.PENDING;
-            return (
-              <div key={b.id} className="admin-item-card">
-                <div className="admin-item-header">
-                  <div>
-                    <span className="admin-item-title">{b.title}</span>
-                    <span className="admin-item-user">by {b.userName}</span>
-                  </div>
-                  <span
-                    className="status-badge"
-                    style={{ background: meta.bg, color: meta.color }}
-                  >
-                    {b.status}
-                  </span>
-                </div>
-                {b.description && <p className="admin-item-desc">{b.description}</p>}
-                <div className="admin-item-footer">
-                  <span className="admin-item-date">{new Date(b.createdAt).toLocaleString()}</span>
-                  {b.status === 'PENDING' && (
-                    <div className="action-btns">
-                      <button className="approve-btn" onClick={() => handleAction(b.id, 'APPROVED')}>
-                        <CheckIcon size={13} />
-                        Approve
-                      </button>
-                      <button className="reject-btn" onClick={() => handleAction(b.id, 'REJECTED')}>
-                        <XIcon size={13} />
-                        Reject
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-};
-
-/* ─── Tickets Tab ─── */
-const TicketsTab = () => {
-  const [tickets, setTickets] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [commentText, setCommentText] = useState({});
-
-  const fetchTickets = useCallback(async () => {
-    try {
-      const res = await getAllTickets();
-      setTickets(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { fetchTickets(); }, [fetchTickets]);
-
-  const handleStatusChange = async (id, newStatus) => {
-    try {
-      await updateTicketStatus(id, newStatus);
-      fetchTickets();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleAddComment = async (ticketId) => {
-    const text = commentText[ticketId];
-    if (!text || !text.trim()) return;
-    try {
-      await addTicketComment(ticketId, text);
-      setCommentText({ ...commentText, [ticketId]: '' });
-      fetchTickets();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const statusColors = {
-    OPEN:        '#2563eb',
-    IN_PROGRESS: '#d97706',
-    RESOLVED:    '#16a34a',
-    CLOSED:      '#6b7280',
-  };
-
-  if (loading) return <p className="loading-text">Loading tickets...</p>;
-
-  return (
-    <div className="tickets-tab">
-      {tickets.length === 0 ? (
-        <div className="empty-box"><p>No tickets raised yet</p></div>
-      ) : (
-        <div className="admin-items-list">
-          {tickets.map((t) => (
-            <div key={t.id} className="admin-item-card">
-              <div className="admin-item-header">
-                <div>
-                  <span className="admin-item-title">{t.title}</span>
-                  <span className="admin-item-user">by {t.userName}</span>
-                </div>
-                <select
-                  value={t.status}
-                  onChange={(e) => handleStatusChange(t.id, e.target.value)}
-                  className="ticket-status-select"
-                  style={{ color: statusColors[t.status] }}
-                >
-                  <option value="OPEN">OPEN</option>
-                  <option value="IN_PROGRESS">IN PROGRESS</option>
-                  <option value="RESOLVED">RESOLVED</option>
-                  <option value="CLOSED">CLOSED</option>
-                </select>
-              </div>
-              {t.description && <p className="admin-item-desc">{t.description}</p>}
-
-              {t.comments && t.comments.length > 0 && (
-                <div className="ticket-comments">
-                  {t.comments.map((c, i) => (
-                    <div key={i} className="ticket-comment">
-                      <strong>{c.authorName}</strong>: {c.text}
-                      <span className="comment-time">
-                        {new Date(c.createdAt).toLocaleString()}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className="add-comment">
-                <input
-                  type="text"
-                  placeholder="Add a comment..."
-                  value={commentText[t.id] || ''}
-                  onChange={(e) => setCommentText({ ...commentText, [t.id]: e.target.value })}
-                  onKeyDown={(e) => { if (e.key === 'Enter') handleAddComment(t.id); }}
-                />
-                <button onClick={() => handleAddComment(t.id)}>
-                  <SendIcon size={13} />
-                  Send
-                </button>
-              </div>
-
-              <span className="admin-item-date">{new Date(t.createdAt).toLocaleString()}</span>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 };

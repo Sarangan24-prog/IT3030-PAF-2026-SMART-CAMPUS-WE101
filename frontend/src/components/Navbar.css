@@ -34,7 +34,7 @@
 .brand-icon {
   width: 36px;
   height: 36px;
-  background: #4361ee;
+  background: #77A365;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -80,8 +80,8 @@
 }
 
 .nav-link.active {
-  background: rgba(67, 97, 238, 0.18);
-  color: #818cf8;
+  background: rgba(119, 163, 101, 0.18);
+  color: #93b887;
   font-weight: 600;
 }
 

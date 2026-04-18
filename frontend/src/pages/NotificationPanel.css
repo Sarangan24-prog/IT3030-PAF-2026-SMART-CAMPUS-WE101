@@ -44,8 +44,8 @@
 }
 
 .unread-pill {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: #e8f5e2;
+  color: #4a7040;
   font-size: 11.5px;
   font-weight: 700;
   padding: 3px 10px;
@@ -54,7 +54,7 @@
 
 .mark-all-btn {
   padding: 8px 16px;
-  background: #4361ee;
+  background: #77A365;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -67,8 +67,8 @@
 }
 
 .mark-all-btn:hover {
-  background: #3a56d4;
-  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+  background: #6a9258;
+  box-shadow: 0 4px 12px rgba(119, 163, 101, 0.3);
 }
 
 /* ─── Empty State ─── */
@@ -128,8 +128,8 @@
 }
 
 .notification-item.unread {
-  border-left: 3px solid #4361ee;
-  background: #f8f9ff;
+  border-left: 3px solid #77A365;
+  background: #f3f7f0;
 }
 
 /* ─── Type Icon ─── */

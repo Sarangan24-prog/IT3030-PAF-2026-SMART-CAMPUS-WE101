@@ -118,7 +118,7 @@
   width: 46px;
   height: 46px;
   border-radius: 10px;
-  background: #0f172a;
+  background: rgba(119, 163, 101, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -500,8 +500,8 @@
 }
 
 .add-comment input:focus {
-  border-color: #4361ee;
-  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+  border-color: #77A365;
+  box-shadow: 0 0 0 3px rgba(119, 163, 101, 0.1);
 }
 
 .add-comment button {
@@ -563,8 +563,8 @@
 
 .form-group select:focus,
 .form-group textarea:focus {
-  border-color: #4361ee;
-  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+  border-color: #77A365;
+  box-shadow: 0 0 0 3px rgba(119, 163, 101, 0.1);
 }
 
 .toggle-label {
@@ -583,7 +583,7 @@
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #4361ee;
+  accent-color: #77A365;
 }
 
 .send-result {

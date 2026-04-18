@@ -12,13 +12,14 @@ public class Booking {
     private String id;
 
     private String userId;
-
     private String title;
-
     private String description;
-
+    private String resourceType;
+    private String bookingDate;
+    private String timeSlot;
+    private String purpose;
+    private String referenceId;
     private BookingStatus status = BookingStatus.PENDING;
-
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public Booking() {}
@@ -34,6 +35,21 @@ public class Booking {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public String getResourceType() { return resourceType; }
+    public void setResourceType(String resourceType) { this.resourceType = resourceType; }
+
+    public String getBookingDate() { return bookingDate; }
+    public void setBookingDate(String bookingDate) { this.bookingDate = bookingDate; }
+
+    public String getTimeSlot() { return timeSlot; }
+    public void setTimeSlot(String timeSlot) { this.timeSlot = timeSlot; }
+
+    public String getPurpose() { return purpose; }
+    public void setPurpose(String purpose) { this.purpose = purpose; }
+
+    public String getReferenceId() { return referenceId; }
+    public void setReferenceId(String referenceId) { this.referenceId = referenceId; }
 
     public BookingStatus getStatus() { return status; }
     public void setStatus(BookingStatus status) { this.status = status; }

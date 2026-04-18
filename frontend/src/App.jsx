@@ -6,6 +6,8 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import NotificationPanel from './pages/NotificationPanel';
 import AdminDashboard from './pages/AdminDashboard';
+import BookingPage from './pages/BookingPage';
+import TicketPage from './pages/TicketPage';
 import OAuth2Redirect from './pages/OAuth2Redirect';
 import './App.css';
 
@@ -62,6 +64,22 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <NotificationPanel />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/bookings"
+        element={
+          <ProtectedRoute>
+            <BookingPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/tickets"
+        element={
+          <ProtectedRoute>
+            <TicketPage />
           </ProtectedRoute>
         }
       />
