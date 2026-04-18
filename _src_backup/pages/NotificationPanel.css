@@ -1,58 +1,42 @@
-/* ═══════════════════════════════════════════════
-   Notification Panel — Professional Clean Design
-   ═══════════════════════════════════════════════ */
-
 .notification-page {
   max-width: 700px;
   margin: 0 auto;
-  animation: fadeInUp 0.4s ease;
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .notification-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .notification-header h2 {
   color: #1a1a2e;
   margin: 0;
-  font-size: 22px;
-  font-weight: 700;
 }
 
 .mark-all-btn {
-  padding: 8px 18px;
+  padding: 8px 16px;
   background: #4361ee;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 13px;
-  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s;
 }
 
 .mark-all-btn:hover {
   background: #3a56d4;
-  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
 }
 
 .empty-state {
   text-align: center;
   padding: 60px 20px;
   background: #fff;
-  border-radius: 12px;
+  border-radius: 10px;
   color: #999;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  border: 1px solid #f0f0f0;
-  font-size: 15px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.06);
 }
 
 .notification-list {
@@ -66,15 +50,10 @@
   justify-content: space-between;
   align-items: flex-start;
   background: #fff;
-  border-radius: 10px;
-  padding: 16px 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  border: 1px solid #f0f0f0;
-  transition: all 0.2s ease;
-}
-
-.notification-item:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  transition: background 0.2s;
 }
 
 .notification-item.unread {
@@ -94,9 +73,8 @@
 
 .notification-msg {
   margin: 4px 0;
-  color: #374151;
+  color: #333;
   font-size: 14px;
-  line-height: 1.45;
 }
 
 .notification-time {
@@ -107,21 +85,21 @@
 .notification-actions {
   display: flex;
   gap: 6px;
-  margin-left: 14px;
+  margin-left: 12px;
   flex-shrink: 0;
 }
 
 .action-btn {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: background 0.2s;
 }
 
 .read-btn {
@@ -131,7 +109,6 @@
 
 .read-btn:hover {
   background: #c8e6c9;
-  box-shadow: 0 2px 6px rgba(46, 125, 50, 0.15);
 }
 
 .delete-btn {
@@ -141,5 +118,4 @@
 
 .delete-btn:hover {
   background: #f8bbd0;
-  box-shadow: 0 2px 6px rgba(198, 40, 40, 0.15);
 }
