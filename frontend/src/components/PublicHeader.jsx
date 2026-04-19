@@ -10,7 +10,7 @@ const PublicHeader = () => {
           <div className="logo-icon">
             <GraduationCapIcon size={24} color="#ffffff" />
           </div>
-          <span className="logo-text">Smart Campus</span>
+          <span className="logo-text">Smart<span className="logo-accent">Campus</span></span>
         </Link>
         <nav className="header-nav">
           <Link to="/" className="nav-link">Home</Link>
