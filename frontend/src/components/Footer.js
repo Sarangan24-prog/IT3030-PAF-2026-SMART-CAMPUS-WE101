@@ -24,8 +24,10 @@ const Footer = () => {
           <div className="footer-links-group">
             <h4>Quick Links</h4>
             <ul>
+              <li><Link to="/">Home</Link></li>
+              <li><Link to="/about">About Us</Link></li>
+              <li><Link to="/contact">Contact Us</Link></li>
               <li><Link to="/dashboard">Dashboard</Link></li>
-              <li><Link to="/notifications">Notifications</Link></li>
             </ul>
           </div>
 
