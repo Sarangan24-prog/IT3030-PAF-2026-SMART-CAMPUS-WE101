@@ -1,0 +1,252 @@
+/* ═══════════════════════════════════════════════
+   Login Page — Professional Clean Design
+   ═══════════════════════════════════════════════ */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f172a;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(119, 163, 101, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(58, 12, 163, 0.08) 0%, transparent 50%);
+  padding: 20px;
+}
+
+.login-card {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 44px 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+  animation: fadeInScale 0.4s ease;
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.97) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ─── Header ─── */
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-logo {
+  width: 56px;
+  height: 56px;
+  background: #77A365;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  box-shadow: 0 8px 24px rgba(119, 163, 101, 0.35);
+}
+
+.login-header h1 {
+  font-size: 24px;
+  color: #f1f5f9;
+  margin: 0 0 8px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+.login-header p {
+  color: #475569;
+  font-size: 13.5px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Google Button ─── */
+.google-btn {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #cbd5e1;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.google-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #f1f5f9;
+}
+
+/* ─── Divider ─── */
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  gap: 12px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.divider span {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ─── Role Toggle ─── */
+.role-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.toggle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #94a3b8;
+}
+
+.toggle-btn.active-user {
+  background: rgba(119, 163, 101, 0.15);
+  border-color: rgba(119, 163, 101, 0.35);
+  color: #93b887;
+}
+
+.toggle-btn.active-admin {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+/* ─── Form Fields ─── */
+.demo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-wrap label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.demo-form input {
+  padding: 11px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.04);
+  color: #e2e8f0;
+}
+
+.demo-form input::placeholder {
+  color: #334155;
+}
+
+.demo-form input:focus {
+  border-color: #77A365;
+  box-shadow: 0 0 0 3px rgba(119, 163, 101, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ─── Error Message ─── */
+.error-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #f87171;
+  font-size: 13px;
+  margin: 0;
+  padding: 10px 14px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 8px;
+}
+
+/* ─── Submit Button ─── */
+.demo-btn {
+  padding: 13px;
+  background: #77A365;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  letter-spacing: 0.1px;
+}
+
+.demo-btn:hover {
+  background: #6a9258;
+  box-shadow: 0 6px 20px rgba(119, 163, 101, 0.35);
+  transform: translateY(-1px);
+}
+
+.demo-btn:active {
+  transform: translateY(0);
+}
+
+.demo-btn:disabled {
+  background: #4a7040;
+  color: #a7c49e;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 24px;
+  }
+}
