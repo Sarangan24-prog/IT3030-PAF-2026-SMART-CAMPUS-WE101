@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class BookingService {
@@ -54,7 +55,7 @@ public class BookingService {
     // ── Approve or Reject booking ─────────────────────────
     public Booking updateStatus(String id, String status, String reason, String adminName) {
 
-        Booking booking = bookingRepository.findById(id)
+        Booking booking = bookingRepository.findById(Objects.requireNonNull(id, "id must not be null"))
             .orElseThrow(() -> new RuntimeException("Booking not found"));
 
         // Cannot update a cancelled booking
@@ -91,7 +92,7 @@ public class BookingService {
     // ── Cancel booking ────────────────────────────────────
     public void cancelBooking(String id, String userId) {
 
-        Booking booking = bookingRepository.findById(id)
+        Booking booking = bookingRepository.findById(Objects.requireNonNull(id, "id must not be null"))
             .orElseThrow(() -> new RuntimeException("Booking not found"));
 
         // Only owner can cancel
@@ -104,7 +105,7 @@ public class BookingService {
             throw new RuntimeException("Cannot cancel a rejected booking");
         }
 
-        bookingRepository.deleteById(id);
+        bookingRepository.deleteById(Objects.requireNonNull(id, "id must not be null"));
     }
 
     // ── Filter by status (admin) ──────────────────────────

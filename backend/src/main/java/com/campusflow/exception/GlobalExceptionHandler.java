@@ -6,6 +6,8 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import com.mongodb.MongoTimeoutException;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -49,6 +51,25 @@ public class GlobalExceptionHandler {
         body.put("message", "Resource code already exists");
         body.put("status", HttpStatus.CONFLICT.value());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    @ExceptionHandler(MongoTimeoutException.class)
+    public ResponseEntity<Map<String, Object>> handleMongoTimeout(MongoTimeoutException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Database Unavailable");
+        body.put("message", "The application could not connect to the database (MongoDB Atlas). This is usually caused by your IP address not being whitelisted.");
+        body.put("help", "Please check your Atlas Network Access settings.");
+        body.put("status", HttpStatus.SERVICE_UNAVAILABLE.value());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
+    }
+
+    @ExceptionHandler(DataAccessResourceFailureException.class)
+    public ResponseEntity<Map<String, Object>> handleDbFailure(DataAccessResourceFailureException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Database Communication Error");
+        body.put("message", ex.getMessage());
+        body.put("status", HttpStatus.SERVICE_UNAVAILABLE.value());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

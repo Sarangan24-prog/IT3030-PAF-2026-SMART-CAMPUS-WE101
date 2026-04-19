@@ -20,7 +20,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
-    @Value("${app.cors.allowed-origins}")
+    @Value("${app.frontend-url}")
     private String frontendUrl;
 
     public OAuth2LoginSuccessHandler(UserRepository userRepository, JwtUtil jwtUtil) {
@@ -55,7 +55,10 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String token = jwtUtil.generateToken(user.getId(), user.getEmail(), user.getRole().name());
 
         // Redirect to frontend with token
-        String redirectUrl = frontendUrl + "/oauth2/redirect?token=" + token;
+        String normalizedFrontendUrl = frontendUrl.endsWith("/")
+            ? frontendUrl.substring(0, frontendUrl.length() - 1)
+            : frontendUrl;
+        String redirectUrl = normalizedFrontendUrl + "/oauth2/redirect?token=" + token;
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 }
