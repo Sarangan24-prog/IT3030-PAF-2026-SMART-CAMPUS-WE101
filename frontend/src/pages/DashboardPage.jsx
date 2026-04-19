@@ -21,6 +21,7 @@ import {
   XIcon,
   TagIcon,
   ChevronRightIcon,
+  PinIcon,
 } from '../components/Icons';
 import './DashboardPage.css';
 
@@ -139,6 +140,19 @@ const DashboardPage = () => {
                 <p>Lecture halls, Labs, Sports facilities, Auditorium</p>
                 <span className="service-cta">
                   Browse &amp; Book
+                  <ChevronRightIcon size={13} color="#77A365" />
+                </span>
+              </div>
+            </div>
+            <div className="service-card" onClick={() => navigate('/resources')} role="button" tabIndex={0}>
+              <div className="service-icon-wrap">
+                <PinIcon size={24} color="#77A365" />
+              </div>
+              <div className="service-body">
+                <h4>Facilities Catalogue</h4>
+                <p>Browse campus laboratories, lecture halls, and manage specific assets.</p>
+                <span className="service-cta">
+                  Explore Catalogue
                   <ChevronRightIcon size={13} color="#77A365" />
                 </span>
               </div>
@@ -282,6 +296,10 @@ const DashboardPage = () => {
                   <button className="quick-link-btn" onClick={() => navigate('/bookings')}>
                     <CalendarIcon size={14} color="#77A365" />
                     <span>Common Booking</span>
+                  </button>
+                  <button className="quick-link-btn" onClick={() => navigate('/resources')}>
+                    <PinIcon size={14} color="#77A365" />
+                    <span>Facilities Catalogue</span>
                   </button>
                   <button className="quick-link-btn" onClick={() => navigate('/tickets')}>
                     <TagIcon size={14} color="#77A365" />

@@ -12,6 +12,7 @@ import {
   CloseIcon,
   CalendarIcon,
   TagIcon,
+  PinIcon,
 } from './Icons';
 import './Navbar.css';
 
@@ -91,6 +92,13 @@ const Navbar = () => {
               >
                 <CalendarIcon size={15} />
                 <span>Bookings</span>
+              </Link>
+              <Link
+                to="/resources"
+                className={`nav-link ${isActive('/resources') ? 'active' : ''}`}
+              >
+                <PinIcon size={15} />
+                <span>Facilities</span>
               </Link>
               <Link
                 to="/tickets"
