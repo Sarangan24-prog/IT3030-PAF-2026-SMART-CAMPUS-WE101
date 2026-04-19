@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════
-   Register Page — matches Smart Campus dark theme
+   Register Page — Premium University Design
    ═══════════════════════════════════════════════ */
 
 .register-page {
@@ -7,78 +7,117 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0f172a;
-  background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(119, 163, 101, 0.12) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(58, 12, 163, 0.08) 0%, transparent 50%);
+  
+  /* Stunning University Background */
+  background-color: #0f172a;
+  background-image: url('../assets/university_bg.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  
+  /* Adds a subtle dark overlay over the image to ensure text legibility */
+  box-shadow: inset 0 0 0 2000px rgba(10, 15, 25, 0.65);
+  
   padding: 20px;
 }
 
 .register-card {
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 44px 40px;
+  /* Premium Glassmorphism */
+  background: rgba(22, 30, 48, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  
+  border-radius: 20px;
+  padding: 48px 44px;
   width: 100%;
   max-width: 440px;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
-  animation: fadeInScale 0.4s ease;
+  box-shadow: 0 32px 72px rgba(0, 0, 0, 0.6);
+  animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Elegant glow effect behind the card content */
+.register-card::after {
+  content: '';
+  position: absolute;
+  top: -150px;
+  left: -150px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(234, 179, 8, 0.15) 0%, transparent 70%);
+  z-index: 0;
+  pointer-events: none;
 }
 
 @keyframes fadeInScale {
-  from { opacity: 0; transform: scale(0.97) translateY(10px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
+  from { opacity: 0; transform: scale(0.95) translateY(20px); filter: blur(5px); }
+  to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
 }
 
 /* ─── Header ─── */
 .register-header {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 1;
 }
 
 .register-logo {
-  width: 56px;
-  height: 56px;
-  background: #77A365;
+  width: 60px;
+  height: 60px;
+  /* Classic University Gold */
+  background: linear-gradient(135deg, #eab308 0%, #a16207 100%);
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 16px;
-  box-shadow: 0 8px 24px rgba(119, 163, 101, 0.35);
+  margin: 0 auto 18px;
+  box-shadow: 0 10px 24px rgba(161, 98, 7, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.3);
 }
 
 .register-header h1 {
-  font-size: 24px;
-  color: #f1f5f9;
+  font-size: 26px;
+  color: #ffffff;
   margin: 0 0 8px;
-  font-weight: 700;
-  letter-spacing: -0.4px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  font-family: 'Playfair Display', 'Merriweather', 'Georgia', serif;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .register-header p {
-  color: #475569;
-  font-size: 13.5px;
+  color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 400;
   margin: 0;
   line-height: 1.5;
 }
 
 /* ─── Success Banner ─── */
 .register-success-msg {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: #4ade80;
-  font-size: 13px;
-  padding: 10px 14px;
-  background: rgba(74, 222, 128, 0.08);
-  border: 1px solid rgba(74, 222, 128, 0.2);
-  border-radius: 8px;
-  margin-bottom: 16px;
+  font-size: 13.5px;
+  padding: 12px 16px;
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(4px);
 }
 
 /* ─── Form ─── */
 .register-form {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -87,54 +126,56 @@
 .reg-field-wrap {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .reg-field-wrap label {
   font-size: 12px;
   font-weight: 600;
-  color: #64748b;
+  color: #cbd5e1;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
 }
 
 .register-form input {
-  padding: 11px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 9px;
+  padding: 12px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.18s, box-shadow 0.18s;
+  transition: all 0.25s ease;
   font-family: inherit;
-  background: rgba(255, 255, 255, 0.04);
-  color: #e2e8f0;
+  background: rgba(15, 23, 42, 0.4);
+  color: #ffffff;
+  backdrop-filter: blur(4px);
 }
 
 .register-form input::placeholder {
-  color: #334155;
+  color: #64748b;
 }
 
 .register-form input:focus {
-  border-color: #77A365;
-  box-shadow: 0 0 0 3px rgba(119, 163, 101, 0.15);
-  background: rgba(255, 255, 255, 0.06);
+  border-color: #eab308;
+  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.2);
+  background: rgba(15, 23, 42, 0.5);
 }
 
 .register-form input.input-error {
   border-color: rgba(239, 68, 68, 0.5);
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.05);
 }
 
 .field-error {
-  font-size: 12px;
-  color: #f87171;
+  font-size: 11.5px;
+  color: #fca5a5;
   margin-top: 2px;
+  font-weight: 500;
 }
 
 /* ─── Role Toggle ─── */
 .reg-role-toggle {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   margin-top: 2px;
 }
 
@@ -143,35 +184,37 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.03);
+  gap: 8px;
+  padding: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
   cursor: pointer;
   font-size: 13px;
-  font-weight: 500;
-  color: #64748b;
-  transition: all 0.18s ease;
+  font-weight: 600;
+  color: #94a3b8;
+  transition: all 0.2s ease;
   font-family: inherit;
 }
 
 .reg-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.14);
-  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #e2e8f0;
 }
 
 .reg-toggle-btn.active-client {
-  background: rgba(119, 163, 101, 0.15);
-  border-color: rgba(119, 163, 101, 0.35);
-  color: #93b887;
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #93c5fd;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1);
 }
 
 .reg-toggle-btn.active-admin {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: #f87171;
+  background: rgba(234, 179, 8, 0.12);
+  border-color: rgba(234, 179, 8, 0.4);
+  color: #fde047;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1);
 }
 
 /* ─── Global Error ─── */
@@ -179,35 +222,38 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #f87171;
+  color: #fca5a5;
   font-size: 13px;
   margin: 0;
-  padding: 10px 14px;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 8px;
+  padding: 12px 14px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  backdrop-filter: blur(4px);
 }
 
 /* ─── Submit Button ─── */
 .register-btn {
-  padding: 13px;
-  background: #77A365;
-  color: #fff;
+  padding: 14px;
+  background: linear-gradient(135deg, #eab308 0%, #d97706 100%);
+  color: #ffffff;
   border: none;
-  border-radius: 10px;
+  border-radius: 11px;
   font-size: 14.5px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   font-family: inherit;
-  letter-spacing: 0.1px;
-  margin-top: 4px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: 6px;
+  box-shadow: 0 8px 20px rgba(217, 119, 6, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
 
 .register-btn:hover {
-  background: #6a9258;
-  box-shadow: 0 6px 20px rgba(119, 163, 101, 0.35);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #facc15 0%, #ea580c 100%);
+  box-shadow: 0 12px 28px rgba(234, 88, 12, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 .register-btn:active {
@@ -215,19 +261,22 @@
 }
 
 .register-btn:disabled {
-  background: #4a7040;
-  color: #a7c49e;
+  background: rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* ─── Auth Switch Link ─── */
 .auth-switch-link {
   text-align: center;
-  margin: 20px 0 0;
+  margin: 24px 0 0;
   font-size: 13.5px;
   color: #475569;
+  position: relative;
+  z-index: 1;
 }
 
 .auth-switch-link a {
@@ -244,6 +293,7 @@
 /* ─── Responsive ─── */
 @media (max-width: 480px) {
   .register-card {
-    padding: 32px 24px;
+    padding: 36px 28px;
+    border-radius: 16px;
   }
 }

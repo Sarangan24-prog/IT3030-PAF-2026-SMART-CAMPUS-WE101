@@ -400,6 +400,11 @@
   white-space: nowrap;
 }
 
+.status-badge.active { background: #dcfce7; color: #16a34a; }
+.status-badge.out-of-service { background: #fee2e2; color: #dc2626; }
+
+
+
 .action-btns {
   display: flex;
   gap: 8px;
