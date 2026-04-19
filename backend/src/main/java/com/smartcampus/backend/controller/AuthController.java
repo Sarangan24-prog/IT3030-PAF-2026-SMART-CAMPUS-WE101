@@ -101,6 +101,12 @@ public class AuthController {
                     .body(Map.of("error", "Invalid email or password"));
         }
 
+        // Null-safe role fallback — older MongoDB documents may have role=null
+        if (user.getRole() == null) {
+            user.setRole(com.smartcampus.backend.model.Role.USER);
+            userService.saveUser(user);
+        }
+
         String token = jwtUtil.generateToken(user.getId(), user.getEmail(), user.getRole().name());
         return ResponseEntity.ok(Map.of("token", token, "user", user));
     }
