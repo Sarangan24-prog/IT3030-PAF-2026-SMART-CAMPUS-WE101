@@ -302,6 +302,25 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* ─── Auth Switch Link ─── */
+.login-switch-link {
+  text-align: center;
+  margin: 20px 0 0;
+  font-size: 13.5px;
+  color: #475569;
+}
+
+.login-switch-link a {
+  color: #77A365;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-switch-link a:hover {
+  color: #93b887;
+  text-decoration: underline;
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 480px) {
   .login-card {

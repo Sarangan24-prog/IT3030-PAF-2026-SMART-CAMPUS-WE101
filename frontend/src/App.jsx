@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import NotificationPanel from './pages/NotificationPanel';
 import AdminDashboard from './pages/AdminDashboard';
@@ -10,6 +11,10 @@ import BookingPage from './pages/BookingPage';
 import TicketPage from './pages/TicketPage';
 import ResourcePage from './pages/ResourcePage';
 import OAuth2Redirect from './pages/OAuth2Redirect';
+import HomePage from './pages/HomePage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import PublicHeader from './components/PublicHeader';
 import './App.css';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -28,6 +33,16 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   );
 };
 
+const PublicShell = ({ children }) => {
+  return (
+    <div className="app-shell public-shell">
+      <PublicHeader />
+      <main className="main-content">{children}</main>
+      <Footer />
+    </div>
+  );
+};
+
 const AppRoutes = () => {
   const { user, loading } = useAuth();
 
@@ -38,6 +53,30 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route
+        path="/"
+        element={
+          <PublicShell>
+            <HomePage />
+          </PublicShell>
+        }
+      />
+      <Route
+        path="/about"
+        element={
+          <PublicShell>
+            <AboutPage />
+          </PublicShell>
+        }
+      />
+      <Route
+        path="/contact"
+        element={
+          <PublicShell>
+            <ContactPage />
+          </PublicShell>
+        }
+      />
+      <Route
         path="/login"
         element={
           user ? (
@@ -45,6 +84,19 @@ const AppRoutes = () => {
           ) : (
             <div className="app-shell login-shell">
               <LoginPage />
+              <Footer />
+            </div>
+          )
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          user ? (
+            <Navigate to={homeRoute} />
+          ) : (
+            <div className="app-shell login-shell">
+              <RegisterPage />
               <Footer />
             </div>
           )
@@ -101,7 +153,7 @@ const AppRoutes = () => {
         }
       />
 
-      <Route path="*" element={<Navigate to={homeRoute} />} />
+      <Route path="*" element={<Navigate to={user ? homeRoute : '/'} replace />} />
     </Routes>
   );
 };

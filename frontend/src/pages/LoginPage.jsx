@@ -1,33 +1,36 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { demoLogin } from '../services/api';
-import { GraduationCapIcon, UserIcon, SettingsIcon, AlertIcon } from '../components/Icons';
+import { login as loginApi } from '../services/api';
+import { GraduationCapIcon, AlertIcon } from '../components/Icons';
 import './LoginPage.css';
 
 const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [loginMode, setLoginMode] = useState('user');
 
   const handleGoogleLogin = () => {
     window.location.href = 'http://localhost:8080/oauth2/authorization/google';
   };
 
-  const handleDemoLogin = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (!email || !name) {
-      setError('Please enter both name and email');
+    if (!email.trim()) {
+      setError('Email is required');
+      return;
+    }
+    if (!password) {
+      setError('Password is required');
       return;
     }
     setLoading(true);
     setError('');
     try {
-      const res = await demoLogin({ email, name });
+      const res = await loginApi({ email: email.trim(), password });
       login(res.data.token, res.data.user);
       if (res.data.user.role === 'ADMIN') {
         navigate('/admin');
@@ -35,22 +38,11 @@ const LoginPage = () => {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError('Login failed. Please try again.');
+      const message = err.response?.data?.error || 'Login failed. Please check your credentials.';
+      setError(message);
     } finally {
       setLoading(false);
     }
-  };
-
-  const fillAdminDemo = () => {
-    setLoginMode('admin');
-    setName('Campus Admin');
-    setEmail('admin@smartcampus.com');
-  };
-
-  const fillUserDemo = () => {
-    setLoginMode('user');
-    setName('');
-    setEmail('');
   };
 
   return (
@@ -75,47 +67,30 @@ const LoginPage = () => {
         </button>
 
         <div className="divider">
-          <span>or use demo credentials</span>
+          <span>or sign in with email</span>
         </div>
 
-        <div className="role-toggle">
-          <button
-            className={`toggle-btn ${loginMode === 'user' ? 'active-user' : ''}`}
-            onClick={fillUserDemo}
-            type="button"
-          >
-            <UserIcon size={14} />
-            User Login
-          </button>
-          <button
-            className={`toggle-btn ${loginMode === 'admin' ? 'active-admin' : ''}`}
-            onClick={fillAdminDemo}
-            type="button"
-          >
-            <SettingsIcon size={14} />
-            Admin Login
-          </button>
-        </div>
-
-        <form onSubmit={handleDemoLogin} className="demo-form">
+        <form onSubmit={handleLogin} className="demo-form">
           <div className="field-wrap">
-            <label htmlFor="demo-name-input">Full Name</label>
+            <label htmlFor="login-email">Email Address</label>
             <input
-              id="demo-name-input"
-              type="text"
-              placeholder="Enter your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-          <div className="field-wrap">
-            <label htmlFor="demo-email-input">Email Address</label>
-            <input
-              id="demo-email-input"
+              id="login-email"
               type="email"
               placeholder="Enter your email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); setError(''); }}
+              autoComplete="email"
+            />
+          </div>
+          <div className="field-wrap">
+            <label htmlFor="login-password">Password</label>
+            <input
+              id="login-password"
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setError(''); }}
+              autoComplete="current-password"
             />
           </div>
           {error && (
@@ -124,14 +99,15 @@ const LoginPage = () => {
               {error}
             </p>
           )}
-          <button type="submit" className="demo-btn" disabled={loading} id="demo-login-btn">
-            {loading
-              ? 'Signing in...'
-              : loginMode === 'admin'
-              ? 'Sign in as Admin'
-              : 'Sign in as User'}
+          <button type="submit" className="demo-btn" disabled={loading} id="login-submit-btn">
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
+
+        <p className="login-switch-link">
+          Don't have an account?{' '}
+          <Link to="/register">Create one</Link>
+        </p>
       </div>
     </div>
   );

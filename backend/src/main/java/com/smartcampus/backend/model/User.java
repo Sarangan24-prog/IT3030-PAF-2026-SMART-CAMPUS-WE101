@@ -17,8 +17,10 @@ public class User {
     @Indexed(unique = true)
     private String email;
 
-    @Indexed(unique = true)
+    @Indexed(unique = true, sparse = true)
     private String googleId;
+
+    private String password;
 
     private Role role = Role.USER;
 
@@ -49,6 +51,9 @@ public class User {
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
