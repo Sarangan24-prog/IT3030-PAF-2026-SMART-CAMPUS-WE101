@@ -228,6 +228,26 @@ export const PinIcon = ({ size = 16, color = 'currentColor', strokeWidth = 2 }) 
   </svg>
 );
 
+export const SearchIcon = ({ size = 16, color = 'currentColor', strokeWidth = 2 }) => (
+  <svg {...base(size, color, strokeWidth)}>
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+);
+
+export const FilterIcon = ({ size = 16, color = 'currentColor', strokeWidth = 2 }) => (
+  <svg {...base(size, color, strokeWidth)}>
+    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+  </svg>
+);
+
+export const MonitorIcon = ({ size = 16, color = 'currentColor', strokeWidth = 2 }) => (
+  <svg {...base(size, color, strokeWidth)}>
+    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+    <line x1="8" y1="21" x2="16" y2="21" />
+    <line x1="12" y1="17" x2="12" y2="21" />
+  </svg>
+);
 export const PhoneIcon = ({ size = 16, color = 'currentColor', strokeWidth = 2 }) => (
   <svg {...base(size, color, strokeWidth)}>
     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l2.28-2.28a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
