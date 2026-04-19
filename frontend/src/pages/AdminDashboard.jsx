@@ -6,6 +6,8 @@ import {
   getAdminNotifications,
   sendNotification,
   broadcastNotification,
+  getAllBookings,
+  updateBookingStatus,
 } from '../services/api';
 import {
   BarChartIcon,
@@ -24,9 +26,10 @@ import {
   RefreshIcon,
 } from '../components/Icons';
 import './AdminDashboard.css';
-
+//booking added 
 const TABS = [
   { key: 'overview',       label: 'Overview',       Icon: BarChartIcon },
+  { key: 'bookings',       label: 'Bookings',       Icon: CalendarIcon },
   { key: 'users',          label: 'Users',          Icon: UsersIcon },
   { key: 'notifications',  label: 'Notifications',  Icon: BellIcon },
   { key: 'send',           label: 'Send',           Icon: SendIcon },
@@ -54,9 +57,10 @@ const AdminDashboard = () => {
           </button>
         ))}
       </div>
-
+       
       <div className="tab-content">
         {activeTab === 'overview'      && <OverviewTab />}
+        {activeTab === 'bookings'      && <BookingsTab />}
         {activeTab === 'users'         && <UsersTab />}
         {activeTab === 'notifications' && <NotificationsTab />}
         {activeTab === 'send'          && <SendTab />}
@@ -361,5 +365,183 @@ const SendTab = () => {
     </div>
   );
 };
+/* ─── Bookings Tab ─── */
+const BookingsTab = () => {
+  const [bookings, setBookings]     = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [filter, setFilter]         = useState('ALL');
+  const [rejectingId, setRejectingId] = useState(null);
+  const [reason, setReason]         = useState('');
+  const [processing, setProcessing] = useState(null);
 
+  const fetchBookings = useCallback(async () => {
+    try {
+      const res = await getAllBookings();
+      setBookings(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchBookings(); }, [fetchBookings]);
+
+  const handleStatus = async (id, status, rejReason = '') => {
+    setProcessing(id);
+    try {
+      await updateBookingStatus(id, status, rejReason);
+      fetchBookings();
+      setRejectingId(null);
+      setReason('');
+    } catch (err) {
+      alert('Failed to update booking status');
+    } finally {
+      setProcessing(null);
+    }
+  };
+
+  const STATUS_STYLES = {
+    PENDING:   { bg: '#fef3c7', color: '#d97706' },
+    APPROVED:  { bg: '#dcfce7', color: '#16a34a' },
+    REJECTED:  { bg: '#fee2e2', color: '#dc2626' },
+    CANCELLED: { bg: '#f1f5f9', color: '#64748b' },
+  };
+
+  const filtered = filter === 'ALL'
+    ? bookings
+    : bookings.filter(b => b.status === filter);
+
+  if (loading) return <p className="loading-text">Loading bookings...</p>;
+
+  return (
+    <div className="bookings-tab">
+
+      {/* Filter buttons */}
+      <div className="booking-filters">
+        {['ALL', 'PENDING', 'APPROVED', 'REJECTED', 'CANCELLED'].map(f => (
+          <button
+            key={f}
+            className={`filter-btn ${filter === f ? 'active' : ''}`}
+            onClick={() => setFilter(f)}
+          >
+            {f}
+            {f === 'PENDING' && bookings.filter(b => b.status === 'PENDING').length > 0 && (
+              <span className="filter-badge">
+                {bookings.filter(b => b.status === 'PENDING').length}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="empty-box">
+          <CalendarIcon size={30} color="#94a3b8" />
+          <p>No bookings found</p>
+        </div>
+      ) : (
+        <div className="table-wrapper">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>User</th>
+                <th>Resource</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Purpose</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(b => {
+                const s = STATUS_STYLES[b.status] || STATUS_STYLES.PENDING;
+                return (
+                  <>
+                    <tr key={b.id}>
+                      <td>
+                        <span className="ref-chip">
+                          {b.referenceId || 'N/A'}
+                        </span>
+                      </td>
+                      <td>{b.userName || b.userId}</td>
+                      <td>{b.resourceType}</td>
+                      <td>{b.bookingDate}</td>
+                      <td>{b.timeSlot}</td>
+                      <td>{b.purpose}</td>
+                      <td>
+                        <span
+                          className="status-chip"
+                          style={{ background: s.bg, color: s.color }}
+                        >
+                          {b.status}
+                        </span>
+                      </td>
+                      <td>
+                        {b.status === 'PENDING' && (
+                          <div className="action-btns">
+                            {/* Approve button */}
+                            <button
+                              className="approve-btn"
+                              disabled={processing === b.id}
+                              onClick={() => handleStatus(b.id, 'APPROVED')}
+                            >
+                              <CheckIcon size={12} /> Approve
+                            </button>
+                            {/* Reject button */}
+                            <button
+                              className="reject-btn"
+                              disabled={processing === b.id}
+                              onClick={() => setRejectingId(b.id)}
+                            >
+                              <XIcon size={12} /> Reject
+                            </button>
+                          </div>
+                        )}
+                        {b.status !== 'PENDING' && (
+                          <span className="no-action">—</span>
+                        )}
+                      </td>
+                    </tr>
+
+                    {/* Reject reason row */}
+                    {rejectingId === b.id && (
+                      <tr key={`${b.id}-reject`} className="reject-reason-row">
+                        <td colSpan={8}>
+                          <div className="reject-reason-box">
+                            <input
+                              type="text"
+                              placeholder="Enter rejection reason..."
+                              value={reason}
+                              onChange={e => setReason(e.target.value)}
+                            />
+                            <button
+                              className="confirm-reject-btn"
+                              disabled={!reason.trim() || processing === b.id}
+                              onClick={() => handleStatus(b.id, 'REJECTED', reason)}
+                            >
+                              Confirm Reject
+                            </button>
+                            <button
+                              className="cancel-reject-btn"
+                              onClick={() => { setRejectingId(null); setReason(''); }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
 export default AdminDashboard;

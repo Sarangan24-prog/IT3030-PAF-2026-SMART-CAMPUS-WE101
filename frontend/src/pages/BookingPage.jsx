@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { createBooking, getMyBookings } from '../services/api';
+import { createBooking, getMyBookings, cancelBooking } from '../services/api';
 import {
   CalendarIcon, CheckCircleIcon, XCircleIcon, RefreshIcon,
-  BuildingIcon, UsersIcon, MapPinIcon, SettingsIcon, MessageCircleIcon,
-  TagIcon, ChevronRightIcon, CheckIcon,
+  BuildingIcon, UsersIcon, MapPinIcon, SettingsIcon,
+  MessageCircleIcon, TagIcon, ChevronRightIcon, CheckIcon,
 } from '../components/Icons';
 import './BookingPage.css';
 
@@ -17,14 +17,19 @@ const RESOURCES = [
 ];
 
 const TIME_SLOTS = [
-  '08:00 – 10:00', '10:00 – 12:00', '12:00 – 14:00',
-  '14:00 – 16:00', '16:00 – 18:00', '18:00 – 20:00',
+  { label: '08:00 – 10:00', start: '08:00', end: '10:00' },
+  { label: '10:00 – 12:00', start: '10:00', end: '12:00' },
+  { label: '12:00 – 14:00', start: '12:00', end: '14:00' },
+  { label: '14:00 – 16:00', start: '14:00', end: '16:00' },
+  { label: '16:00 – 18:00', start: '16:00', end: '18:00' },
+  { label: '18:00 – 20:00', start: '18:00', end: '20:00' },
 ];
 
 const STATUS_STYLES = {
-  PENDING:  { bg: '#fef3c7', color: '#d97706' },
-  APPROVED: { bg: '#dcfce7', color: '#16a34a' },
-  REJECTED: { bg: '#fee2e2', color: '#dc2626' },
+  PENDING:   { bg: '#fef3c7', color: '#d97706' },
+  APPROVED:  { bg: '#dcfce7', color: '#16a34a' },
+  REJECTED:  { bg: '#fee2e2', color: '#dc2626' },
+  CANCELLED: { bg: '#f1f5f9', color: '#64748b' },
 };
 
 const ResourceIcon = ({ icon, color, size = 22 }) => {
@@ -37,21 +42,26 @@ const ResourceIcon = ({ icon, color, size = 22 }) => {
 };
 
 const StatusIcon = ({ status }) => {
-  if (status === 'APPROVED') return <CheckCircleIcon size={13} color="#16a34a" />;
-  if (status === 'REJECTED') return <XCircleIcon     size={13} color="#dc2626" />;
+  if (status === 'APPROVED')  return <CheckCircleIcon size={13} color="#16a34a" />;
+  if (status === 'REJECTED')  return <XCircleIcon     size={13} color="#dc2626" />;
+  if (status === 'CANCELLED') return <XCircleIcon     size={13} color="#64748b" />;
   return <RefreshIcon size={13} color="#d97706" />;
 };
 
 const BookingPage = () => {
-  const [bookings, setBookings]   = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [step, setStep]           = useState(1);
-  const [form, setForm]           = useState({
-    resourceType: '', bookingDate: '', timeSlot: '',
+  const [bookings, setBookings]         = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [step, setStep]                 = useState(1);
+  const [form, setForm]                 = useState({
+    resourceType: '', bookingDate: '',
+    timeSlot: '', startTime: '', endTime: '',
     title: '', purpose: '', description: '',
+    expectedAttendees: '',
   });
-  const [submitting, setSubmitting] = useState(false);
-  const [confirmed, setConfirmed]   = useState(null);
+  const [submitting, setSubmitting]     = useState(false);
+  const [confirmed, setConfirmed]       = useState(null);
+  const [cancellingId, setCancellingId] = useState(null);
+  const [error, setError]               = useState('');
 
   const fetchBookings = useCallback(async () => {
     try {
@@ -67,29 +77,66 @@ const BookingPage = () => {
   const canSubmit   = form.title.trim() && form.purpose.trim();
   const today       = new Date().toISOString().split('T')[0];
 
+  const handleSlotSelect = (slot) => {
+    setForm(f => ({
+      ...f,
+      timeSlot:  slot.label,
+      startTime: slot.start,
+      endTime:   slot.end,
+    }));
+  };
+
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setSubmitting(true);
+    setError('');
     try {
       const res = await createBooking({
-        title:        form.title,
-        description:  form.description,
-        resourceType: form.resourceType,
-        bookingDate:  form.bookingDate,
-        timeSlot:     form.timeSlot,
-        purpose:      form.purpose,
+        title:             form.title,
+        description:       form.description,
+        resourceType:      form.resourceType,
+        bookingDate:       form.bookingDate,
+        timeSlot:          form.timeSlot,
+        startTime:         form.startTime,
+        endTime:           form.endTime,
+        purpose:           form.purpose,
+        expectedAttendees: form.expectedAttendees || '0',
       });
       setConfirmed(res.data);
       setStep(3);
       fetchBookings();
-    } catch {}
-    finally { setSubmitting(false); }
+    } catch (err) {
+      const msg = err.response?.data?.error
+        || 'Failed to submit booking. Try again.';
+      setError(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleCancel = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to cancel this booking?')) return;
+    setCancellingId(bookingId);
+    try {
+      await cancelBooking(bookingId);
+      fetchBookings();
+    } catch {
+      alert('Failed to cancel booking.');
+    } finally {
+      setCancellingId(null);
+    }
   };
 
   const startNew = () => {
     setStep(1);
     setConfirmed(null);
-    setForm({ resourceType: '', bookingDate: '', timeSlot: '', title: '', purpose: '', description: '' });
+    setError('');
+    setForm({
+      resourceType: '', bookingDate: '',
+      timeSlot: '', startTime: '', endTime: '',
+      title: '', purpose: '', description: '',
+      expectedAttendees: '',
+    });
   };
 
   return (
@@ -105,7 +152,7 @@ const BookingPage = () => {
       </div>
 
       <div className="bp-grid">
-        {/* ── Form / Steps ── */}
+        {/* ── Form ── */}
         <div className="bp-form-card">
           {step < 3 && (
             <div className="bp-steps">
@@ -120,7 +167,7 @@ const BookingPage = () => {
             </div>
           )}
 
-          {/* ─── Step 1 ─── */}
+          {/* Step 1 */}
           {step === 1 && (
             <>
               <h3>Choose a Resource</h3>
@@ -156,12 +203,12 @@ const BookingPage = () => {
                 <div className="bp-slot-grid">
                   {TIME_SLOTS.map(slot => (
                     <button
-                      key={slot}
+                      key={slot.label}
                       type="button"
-                      className={`bp-slot ${form.timeSlot === slot ? 'selected' : ''}`}
-                      onClick={() => setForm(f => ({ ...f, timeSlot: slot }))}
+                      className={`bp-slot ${form.timeSlot === slot.label ? 'selected' : ''}`}
+                      onClick={() => handleSlotSelect(slot)}
                     >
-                      {slot}
+                      {slot.label}
                     </button>
                   ))}
                 </div>
@@ -177,7 +224,7 @@ const BookingPage = () => {
             </>
           )}
 
-          {/* ─── Step 2 ─── */}
+          {/* Step 2 */}
           {step === 2 && (
             <>
               <div className="bp-back-row">
@@ -195,6 +242,13 @@ const BookingPage = () => {
 
               <h3>Booking Details</h3>
 
+              {/* Error banner */}
+              {error && (
+                <div className="bp-error-banner">
+                  ⚠️ {error}
+                </div>
+              )}
+
               <div className="bp-form-fields">
                 <div className="bp-field">
                   <label>Title *</label>
@@ -209,16 +263,28 @@ const BookingPage = () => {
                   <label>Purpose *</label>
                   <input
                     type="text"
-                    placeholder="e.g. Group study, Practical exam, Club meeting"
+                    placeholder="e.g. Group study, Practical exam"
                     value={form.purpose}
                     onChange={e => setForm(f => ({ ...f, purpose: e.target.value }))}
+                  />
+                </div>
+                <div className="bp-field">
+                  <label>Expected Attendees</label>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="e.g. 25"
+                    value={form.expectedAttendees}
+                    onChange={e => setForm(f => ({
+                      ...f, expectedAttendees: e.target.value
+                    }))}
                   />
                 </div>
                 <div className="bp-field">
                   <label>Additional Notes</label>
                   <textarea
                     rows={3}
-                    placeholder="Expected attendees, special requirements..."
+                    placeholder="Special requirements..."
                     value={form.description}
                     onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   />
@@ -235,21 +301,32 @@ const BookingPage = () => {
             </>
           )}
 
-          {/* ─── Step 3 — Success ─── */}
+          {/* Step 3 - Success */}
           {step === 3 && confirmed && (
             <div className="bp-success">
               <div className="bp-success-icon">
                 <CheckCircleIcon size={40} color="#77A365" />
               </div>
               <h3>Booking Submitted!</h3>
-              <div className="bp-ref-badge">{confirmed.referenceId || 'BK-XXXXXX'}</div>
+              <div className="bp-ref-badge">
+                {confirmed.referenceId || 'BK-XXXXXX'}
+              </div>
               <p className="bp-success-msg">
-                Your booking is pending approval. You'll be notified once it's reviewed.
+                Your booking is pending approval. You'll be notified once reviewed.
               </p>
               <div className="bp-success-details">
-                <div className="bp-sd-row"><span>Resource</span><strong>{confirmed.resourceType}</strong></div>
-                <div className="bp-sd-row"><span>Date</span><strong>{confirmed.bookingDate}</strong></div>
-                <div className="bp-sd-row"><span>Time</span><strong>{confirmed.timeSlot}</strong></div>
+                <div className="bp-sd-row">
+                  <span>Resource</span>
+                  <strong>{confirmed.resourceType}</strong>
+                </div>
+                <div className="bp-sd-row">
+                  <span>Date</span>
+                  <strong>{confirmed.bookingDate}</strong>
+                </div>
+                <div className="bp-sd-row">
+                  <span>Time</span>
+                  <strong>{confirmed.timeSlot}</strong>
+                </div>
                 <div className="bp-sd-row">
                   <span>Status</span>
                   <strong className="bp-sd-pending">PENDING</strong>
@@ -262,7 +339,7 @@ const BookingPage = () => {
           )}
         </div>
 
-        {/* ── History ── */}
+        {/* ── My Bookings History ── */}
         <div className="bp-history">
           <h3>My Bookings</h3>
           {loading ? (
@@ -291,22 +368,52 @@ const BookingPage = () => {
                           {b.resourceType}
                         </span>
                       )}
-                      <span className="bp-status-badge" style={{ background: s.bg, color: s.color }}>
+                      <span
+                        className="bp-status-badge"
+                        style={{ background: s.bg, color: s.color }}
+                      >
                         <StatusIcon status={b.status} />
                         {b.status}
                       </span>
                     </div>
-                    <div className="bp-item-title">{b.title || b.resourceType}</div>
-                    <div className="bp-item-meta">
-                      {b.bookingDate && <span>Date: {b.bookingDate}</span>}
-                      {b.timeSlot    && <span>{b.timeSlot}</span>}
-                      {b.referenceId && <span className="bp-item-ref">{b.referenceId}</span>}
+
+                    <div className="bp-item-title">
+                      {b.title || b.resourceType}
                     </div>
-                    <span className="bp-item-date">
-                      Submitted {new Date(b.createdAt).toLocaleDateString('en-US', {
-                        month: 'short', day: 'numeric', year: 'numeric',
-                      })}
-                    </span>
+
+                    <div className="bp-item-meta">
+                      {b.bookingDate && <span>📅 {b.bookingDate}</span>}
+                      {b.timeSlot    && <span>🕐 {b.timeSlot}</span>}
+                      {b.referenceId && (
+                        <span className="bp-item-ref">{b.referenceId}</span>
+                      )}
+                    </div>
+
+                    {/* Show rejection reason */}
+                    {b.status === 'REJECTED' && b.adminReason && (
+                      <div className="bp-rejection-reason">
+                        ❌ Reason: {b.adminReason}
+                      </div>
+                    )}
+
+                    <div className="bp-item-footer">
+                      <span className="bp-item-date">
+                        Submitted {new Date(b.createdAt).toLocaleDateString('en-US', {
+                          month: 'short', day: 'numeric', year: 'numeric',
+                        })}
+                      </span>
+
+                      {/* Cancel button */}
+                      {(b.status === 'PENDING' || b.status === 'APPROVED') && (
+                        <button
+                          className="bp-cancel-btn"
+                          disabled={cancellingId === b.id}
+                          onClick={() => handleCancel(b.id)}
+                        >
+                          {cancellingId === b.id ? 'Cancelling...' : 'Cancel'}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 );
               })}
