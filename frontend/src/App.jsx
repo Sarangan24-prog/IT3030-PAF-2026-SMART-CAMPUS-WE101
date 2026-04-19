@@ -8,6 +8,7 @@ import NotificationPanel from './pages/NotificationPanel';
 import AdminDashboard from './pages/AdminDashboard';
 import BookingPage from './pages/BookingPage';
 import TicketPage from './pages/TicketPage';
+import ResourcePage from './pages/ResourcePage';
 import OAuth2Redirect from './pages/OAuth2Redirect';
 import './App.css';
 
@@ -72,6 +73,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <BookingPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/resources"
+        element={
+          <ProtectedRoute>
+            <ResourcePage />
           </ProtectedRoute>
         }
       />

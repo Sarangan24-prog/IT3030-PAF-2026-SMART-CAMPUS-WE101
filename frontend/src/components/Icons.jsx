@@ -217,3 +217,24 @@ export const PinIcon = ({ size = 16, color = 'currentColor', strokeWidth = 2 }) 
     <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17z" />
   </svg>
 );
+
+export const SearchIcon = ({ size = 16, color = 'currentColor', strokeWidth = 2 }) => (
+  <svg {...base(size, color, strokeWidth)}>
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+);
+
+export const FilterIcon = ({ size = 16, color = 'currentColor', strokeWidth = 2 }) => (
+  <svg {...base(size, color, strokeWidth)}>
+    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+  </svg>
+);
+
+export const MonitorIcon = ({ size = 16, color = 'currentColor', strokeWidth = 2 }) => (
+  <svg {...base(size, color, strokeWidth)}>
+    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+    <line x1="8" y1="21" x2="16" y2="21" />
+    <line x1="12" y1="17" x2="12" y2="21" />
+  </svg>
+);

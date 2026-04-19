@@ -52,8 +52,9 @@ const TicketPage = () => {
     setResult(null);
     try {
       await createTicket({
-        title: `[${form.category}] ${form.title}`,
+        title: form.title,
         description: form.description,
+        category: form.category,
       });
       setResult({ ok: true, msg: 'Ticket raised successfully.' });
       setForm({ category: 'Network', title: '', description: '' });

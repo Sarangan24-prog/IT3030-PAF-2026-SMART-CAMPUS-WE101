@@ -8,6 +8,10 @@ import {
   broadcastNotification,
   getAllBookings,
   updateBookingStatus,
+  getAllResources,
+  createResource,
+  updateResource,
+  deleteResource
 } from '../services/api';
 import {
   BarChartIcon,
@@ -24,12 +28,14 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   RefreshIcon,
+  PinIcon,
 } from '../components/Icons';
 import './AdminDashboard.css';
 //booking added 
 const TABS = [
   { key: 'overview',       label: 'Overview',       Icon: BarChartIcon },
   { key: 'bookings',       label: 'Bookings',       Icon: CalendarIcon },
+  { key: 'resources',      label: 'Facilities',     Icon: PinIcon },
   { key: 'users',          label: 'Users',          Icon: UsersIcon },
   { key: 'notifications',  label: 'Notifications',  Icon: BellIcon },
   { key: 'send',           label: 'Send',           Icon: SendIcon },
@@ -61,6 +67,7 @@ const AdminDashboard = () => {
       <div className="tab-content">
         {activeTab === 'overview'      && <OverviewTab />}
         {activeTab === 'bookings'      && <BookingsTab />}
+        {activeTab === 'resources'     && <ResourcesTab />}
         {activeTab === 'users'         && <UsersTab />}
         {activeTab === 'notifications' && <NotificationsTab />}
         {activeTab === 'send'          && <SendTab />}
@@ -544,4 +551,200 @@ const BookingsTab = () => {
     </div>
   );
 };
+/* ─── Resources Tab (Facilities Catalogue Management) ─── */
+const ResourcesTab = () => {
+  const [resources, setResources] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({
+    code: '', name: '', type: 'LECTURE_HALL', capacity: 0,
+    location: '', building: '', floor: '', status: 'ACTIVE',
+    description: '', bookable: true, amenities: '', imageUrl: ''
+  });
+
+  const fetchResources = useCallback(async () => {
+    try {
+      const res = await getAllResources();
+      setResources(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchResources(); }, [fetchResources]);
+
+  const handleOpenAdd = () => {
+    setEditingId(null);
+    setFormData({ code: '', name: '', type: 'LECTURE_HALL', capacity: 0, location: '', building: '', floor: '', status: 'ACTIVE', description: '', bookable: true, amenities: '', imageUrl: '' });
+    setShowModal(true);
+  };
+
+  const handleOpenEdit = (res) => {
+    setEditingId(res.id);
+    setFormData({
+      ...res,
+      amenities: res.amenities ? res.amenities.join(', ') : '',
+    });
+    setShowModal(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this resource?")) {
+      try {
+        await deleteResource(id);
+        fetchResources();
+      } catch (err) { alert('Failed to delete resource'); }
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const payload = {
+      ...formData,
+      capacity: parseInt(formData.capacity, 10) || 0,
+      amenities: formData.amenities ? formData.amenities.split(',').map(a => a.trim()).filter(a => a) : [],
+    };
+    
+    try {
+      if (editingId) {
+        await updateResource(editingId, payload);
+      } else {
+        await createResource(payload);
+      }
+      setShowModal(false);
+      fetchResources();
+    } catch (err) {
+      alert('Failed to save resource. Please check the data.');
+    }
+  };
+
+  return (
+    <div className="resources-admin-tab">
+      <div className="tab-header-actions">
+        <h3>Managed Facilities</h3>
+        <button className="add-btn" onClick={handleOpenAdd}>+ Add New Resource</button>
+      </div>
+
+      {loading ? <p className="loading-text">Loading resources...</p> : (
+        <div className="table-wrapper">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Building - Floor</th>
+                <th>Capacity</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {resources.length === 0 ? (
+                <tr><td colSpan="7" style={{textAlign: 'center', padding: '20px'}}>No resources found</td></tr>
+              ) : resources.map(res => (
+                <tr key={res.id}>
+                  <td><strong>{res.code}</strong></td>
+                  <td>{res.name}</td>
+                  <td>{res.type.replace('_', ' ')}</td>
+                  <td>{res.building} - {res.floor}</td>
+                  <td>{res.capacity > 0 ? res.capacity : 'N/A'}</td>
+                  <td>
+                    <span className={`status-badge ${res.status.toLowerCase()}`}>{res.status}</span>
+                  </td>
+                  <td>
+                    <div className="action-btns">
+                      <button className="edit-btn" onClick={() => handleOpenEdit(res)}>Edit</button>
+                      <button className="reject-btn" onClick={() => handleDelete(res.id)}>Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {showModal && (
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
+            <h3>{editingId ? 'Edit Resource' : 'Add New Resource'}</h3>
+            <form onSubmit={handleSubmit}>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Code (e.g. LH-001) *</label>
+                  <input required placeholder="Code" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label>Name *</label>
+                  <input required placeholder="Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label>Type *</label>
+                  <select value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})}>
+                    <option value="LECTURE_HALL">Lecture Hall</option>
+                    <option value="LAB">Lab</option>
+                    <option value="MEETING_ROOM">Meeting Room</option>
+                    <option value="PROJECTOR">Projector</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Capacity</label>
+                  <input type="number" min="0" value={formData.capacity} onChange={e => setFormData({...formData, capacity: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label>Building *</label>
+                  <input required value={formData.building} onChange={e => setFormData({...formData, building: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label>Floor *</label>
+                  <input required value={formData.floor} onChange={e => setFormData({...formData, floor: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label>Room/Specific Location *</label>
+                  <input required value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label>Status *</label>
+                  <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
+                    <option value="ACTIVE">ACTIVE</option>
+                    <option value="INACTIVE">INACTIVE</option>
+                    <option value="MAINTENANCE">MAINTENANCE</option>
+                  </select>
+                </div>
+                <div className="form-group full-width">
+                  <label>Description</label>
+                  <textarea rows={2} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+                </div>
+                <div className="form-group full-width">
+                  <label>Amenities (Comma separated)</label>
+                  <input placeholder="Projector, Whiteboard, A/C" value={formData.amenities} onChange={e => setFormData({...formData, amenities: e.target.value})} />
+                </div>
+                <div className="form-group full-width">
+                  <label>Image URL (Optional)</label>
+                  <input placeholder="https://..." value={formData.imageUrl} onChange={e => setFormData({...formData, imageUrl: e.target.value})} />
+                </div>
+                <div className="form-group full-width">
+                  <label className="toggle-label">
+                    <input type="checkbox" checked={formData.bookable} onChange={e => setFormData({...formData, bookable: e.target.checked})} />
+                    <span>Is this resource bookable by students?</span>
+                  </label>
+                </div>
+              </div>
+              <div className="modal-actions">
+                <button type="button" className="cancel-btn" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="submit" className="save-btn">Save Resource</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default AdminDashboard;
