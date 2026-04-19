@@ -1,0 +1,255 @@
+/* ═══════════════════════════════════════════════
+   Navbar — Dark Professional Design
+   ═══════════════════════════════════════════════ */
+
+.navbar {
+  background: #0f172a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+}
+
+.navbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* ─── Brand ─── */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  background: #77A365;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.brand-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+
+/* ─── Nav Links ─── */
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #94a3b8;
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 7px 14px;
+  border-radius: 8px;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  position: relative;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #f1f5f9;
+}
+
+.nav-link.active {
+  background: rgba(119, 163, 101, 0.18);
+  color: #93b887;
+  font-weight: 600;
+}
+
+.badge {
+  background: #ef4444;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1.4;
+  animation: badgePulse 2s infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+/* ─── User Section ─── */
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.user-name {
+  font-size: 13.5px;
+  color: #cbd5e1;
+  font-weight: 500;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  font-size: 13px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-weight: 500;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
+
+.admin-tag {
+  padding: 3px 9px;
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 5px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  white-space: nowrap;
+}
+
+/* ─── Hamburger (mobile only) ─── */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.hamburger:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Mobile User Section (inside dropdown) ─── */
+.mobile-user-section {
+  display: none;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .navbar-inner {
+    padding: 0 16px;
+    height: 58px;
+  }
+
+  .hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .navbar-user {
+    display: none;
+  }
+
+  .navbar-links {
+    display: none;
+    position: absolute;
+    top: 58px;
+    left: 0;
+    right: 0;
+    background: #0f172a;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 8px 16px 16px;
+    z-index: 999;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  .navbar-links.open {
+    display: flex;
+  }
+
+  .nav-link {
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  .mobile-user-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .mobile-user-name {
+    font-size: 13px;
+    color: #64748b;
+    padding: 0 14px;
+  }
+
+  .mobile-user-section .admin-tag {
+    margin: 0 14px;
+    display: inline-block;
+    width: fit-content;
+  }
+
+  .mobile-user-section .logout-btn {
+    margin: 0;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-text {
+    font-size: 14px;
+  }
+}

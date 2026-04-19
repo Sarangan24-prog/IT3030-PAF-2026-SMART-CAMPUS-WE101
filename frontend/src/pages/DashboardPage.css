@@ -1,0 +1,590 @@
+/* ═══════════════════════════════════════════════
+   Dashboard Page
+   ═══════════════════════════════════════════════ */
+
+.dashboard-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  animation: fadeInUp 0.35s ease;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Hero ─── */
+.dash-hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e1b4b 100%);
+  border-radius: 14px;
+  padding: 28px 32px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  gap: 20px;
+}
+
+.dash-hero::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  right: -10%;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  pointer-events: none;
+}
+
+.dash-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(119, 163, 101, 0.25);
+  border: 2px solid rgba(119, 163, 101, 0.5);
+  color: #93b887;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dash-hero-text h1 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  line-height: 1.3;
+  color: #f1f5f9;
+}
+
+.dash-hero-text p {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.hero-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  font-size: 11.5px;
+  color: #cbd5e1;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.hero-pill-accent {
+  background: rgba(119, 163, 101, 0.2);
+  border-color: rgba(119, 163, 101, 0.35);
+  color: #93b887;
+}
+
+.dash-hero-date {
+  flex-shrink: 0;
+}
+
+.date-display {
+  font-size: 12.5px;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 14px;
+  border-radius: 8px;
+  white-space: nowrap;
+  display: block;
+}
+
+/* ─── Campus Services ─── */
+.campus-services {
+  margin-bottom: 20px;
+}
+
+.services-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 0 0 12px;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.service-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  border: 1px solid #d4dbc9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.service-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(119, 163, 101, 0.18);
+  border-color: #77A365;
+}
+
+.service-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: rgba(119, 163, 101, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.service-body h4 {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+
+.service-body p {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+
+.service-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #77A365;
+}
+
+/* ─── Main Grid ─── */
+.dash-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 290px;
+  gap: 20px;
+  align-items: start;
+}
+
+.dash-primary {
+  min-width: 0;
+}
+
+.dash-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ─── Section Header ─── */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title {
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.mark-all-btn {
+  padding: 7px 14px;
+  background: #77A365;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.mark-all-btn:hover {
+  background: #6a9258;
+  box-shadow: 0 4px 12px rgba(119, 163, 101, 0.3);
+}
+
+/* ─── Notifications Feed ─── */
+.notif-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #ffffff;
+  border-radius: 11px;
+  padding: 14px 16px;
+  border: 1px solid #d4dbc9;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.18s ease;
+  position: relative;
+}
+
+.notif-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+}
+
+.notif-item.unread {
+  border-left: 3px solid #77A365;
+  background: #f3f7f0;
+}
+
+.notif-icon-wrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.notif-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-type {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.notif-msg {
+  font-size: 13.5px;
+  color: #374151;
+  margin: 0 0 4px;
+  line-height: 1.45;
+}
+
+.notif-time {
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
+.notif-actions {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.notif-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.notif-btn.read-btn {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.notif-btn.read-btn:hover {
+  background: #bbf7d0;
+}
+
+.notif-btn.del-btn {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.notif-btn.del-btn:hover {
+  background: #fecaca;
+}
+
+.unread-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #77A365;
+  flex-shrink: 0;
+  margin-top: 7px;
+}
+
+/* ─── Empty Feed ─── */
+.empty-feed {
+  background: #ffffff;
+  border: 1px solid #d4dbc9;
+  border-radius: 12px;
+  padding: 52px 24px;
+  text-align: center;
+  color: #64748b;
+}
+
+.empty-feed-icon {
+  width: 56px;
+  height: 56px;
+  background: #f1f5f9;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.empty-feed p {
+  font-size: 15px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 6px;
+}
+
+.empty-feed span {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.loading-text {
+  text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+/* ─── Sidebar Cards ─── */
+.dash-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #d4dbc9;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid #edf0e8;
+}
+
+.card-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+
+/* ─── Profile Card ─── */
+.profile-body {
+  padding: 22px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.profile-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #0f172a;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+}
+
+.profile-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 8px;
+}
+
+.role-chip {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 18px;
+}
+
+.role-chip.role-user        { background: #dbeafe; color: #1d4ed8; }
+.role-chip.role-admin       { background: #fee2e2; color: #dc2626; }
+.role-chip.role-technician  { background: #dcfce7; color: #16a34a; }
+
+.profile-details {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px;
+  background: #f3f7f0;
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: #475569;
+  text-align: left;
+}
+
+.detail-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.detail-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+/* ─── Quick Access Card ─── */
+.quick-body {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quick-link-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #d4dbc9;
+  border-radius: 8px;
+  background: #f3f7f0;
+  cursor: pointer;
+  font-size: 13px;
+  color: #374151;
+  font-weight: 500;
+  transition: all 0.18s ease;
+  font-family: inherit;
+  text-align: left;
+}
+
+.quick-link-btn:hover {
+  background: rgba(119, 163, 101, 0.1);
+  border-color: rgba(119, 163, 101, 0.4);
+  color: #4a7040;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+  .dash-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 22px;
+  }
+
+  .dash-hero-left {
+    width: 100%;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dash-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-sidebar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .dash-hero {
+    padding: 18px;
+  }
+
+  .dash-hero-text h1 {
+    font-size: 17px;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+}
