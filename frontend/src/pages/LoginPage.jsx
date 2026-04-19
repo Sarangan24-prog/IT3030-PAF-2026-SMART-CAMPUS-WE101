@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { login as loginApi } from '../services/api';
 import { GraduationCapIcon, AlertIcon } from '../components/Icons';
@@ -8,10 +8,18 @@ import './LoginPage.css';
 const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const oauth2Error = searchParams.get('oauth2Error');
+    if (oauth2Error) {
+      setError(`Google sign-in failed: ${decodeURIComponent(oauth2Error).trim()}`);
+    }
+  }, [searchParams]);
 
   const handleGoogleLogin = () => {
     window.location.href = 'http://localhost:8080/oauth2/authorization/google';

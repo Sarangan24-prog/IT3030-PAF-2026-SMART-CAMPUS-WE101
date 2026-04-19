@@ -67,9 +67,13 @@ public class AdminController {
 
         // Enrich with user name
         List<Map<String, Object>> enriched = notifications.stream().map(n -> {
-            String userName = userRepository.findById(n.getUserId())
-                    .map(User::getName)
-                    .orElse("Unknown");
+            String userName = "Unknown";
+            String notificationUserId = n.getUserId();
+            if (notificationUserId != null) {
+                userName = userRepository.findById(notificationUserId)
+                        .map(User::getName)
+                        .orElse("Unknown");
+            }
             return Map.<String, Object>of(
                     "id", n.getId(),
                     "userId", n.getUserId(),

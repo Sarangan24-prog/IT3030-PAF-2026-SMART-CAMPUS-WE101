@@ -6,6 +6,7 @@ import com.smartcampus.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -22,7 +23,7 @@ public class UserService {
     }
 
     public Optional<User> getUserById(String id) {
-        return userRepository.findById(id);
+        return userRepository.findById(Objects.requireNonNull(id, "id must not be null"));
     }
 
     public Optional<User> getUserByGoogleId(String googleId) {
@@ -34,12 +35,13 @@ public class UserService {
     }
 
     public User updateUserRole(String userId, Role role) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findById(Objects.requireNonNull(userId, "userId must not be null"))
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setRole(role);
         return userRepository.save(user);
     }
 
+    @SuppressWarnings("null")
     public User saveUser(User user) {
         return userRepository.save(user);
     }

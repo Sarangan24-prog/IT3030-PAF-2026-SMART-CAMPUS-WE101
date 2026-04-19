@@ -12,19 +12,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 public class ResourceServiceImpl implements ResourceService {
 
     private final ResourceRepository resourceRepository;
 
-    @Autowired
     public ResourceServiceImpl(ResourceRepository resourceRepository) {
         this.resourceRepository = resourceRepository;
     }
 
     @Override
+    @SuppressWarnings("null")
     public ResourceResponse createResource(ResourceRequest request) {
         if (resourceRepository.existsByCode(request.getCode())) {
             throw new IllegalArgumentException("Resource code already exists");
@@ -45,14 +44,14 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public ResourceResponse getResourceById(String id) {
-        Resource resource = resourceRepository.findById(id)
+        Resource resource = resourceRepository.findById(Objects.requireNonNull(id, "id must not be null"))
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
         return ResourceMapper.toResponse(resource);
     }
 
     @Override
     public ResourceResponse updateResource(String id, ResourceRequest request) {
-        Resource existing = resourceRepository.findById(id)
+        Resource existing = resourceRepository.findById(Objects.requireNonNull(id, "id must not be null"))
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
 
         if (!existing.getCode().equals(request.getCode()) && resourceRepository.existsByCode(request.getCode())) {
@@ -81,10 +80,11 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public void deleteResource(String id) {
-        if (!resourceRepository.existsById(id)) {
+        String resourceId = Objects.requireNonNull(id, "id must not be null");
+        if (!resourceRepository.existsById(resourceId)) {
             throw new ResourceNotFoundException("Resource not found with id: " + id);
         }
-        resourceRepository.deleteById(id);
+        resourceRepository.deleteById(resourceId);
     }
 
     @Override

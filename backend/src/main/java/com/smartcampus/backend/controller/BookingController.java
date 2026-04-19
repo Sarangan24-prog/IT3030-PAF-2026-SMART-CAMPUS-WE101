@@ -113,7 +113,6 @@ public class BookingController {
 */package com.smartcampus.backend.controller;
 
 import com.smartcampus.backend.model.*;
-import com.smartcampus.backend.repository.UserRepository;
 import com.smartcampus.backend.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -130,9 +129,6 @@ public class BookingController {
 
     @Autowired
     private BookingService bookingService;
-
-    @Autowired
-    private UserRepository userRepository;
 
     /**
      * POST /api/bookings

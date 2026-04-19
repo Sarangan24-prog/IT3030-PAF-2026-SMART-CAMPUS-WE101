@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { GraduationCapIcon, CheckCircleIcon, UsersIcon, BellIcon, TicketIcon } from '../components/Icons';
+import { GraduationCapIcon, BellIcon, TicketIcon, CalendarIcon, UsersIcon } from '../components/Icons';
 import './HomePage.css';
 
 const HomePage = () => {
@@ -19,8 +19,27 @@ const HomePage = () => {
           </div>
         </div>
         <div className="hero-visual">
-          <div className="visual-card">
-            <GraduationCapIcon size={120} color="#77A365" />
+          <div className="visual-composition">
+            {/* Main Center Card */}
+            <div className="floating-card card-main">
+              <GraduationCapIcon size={100} color="#77A365" />
+            </div>
+            
+            {/* Secondary Accessory Cards */}
+            <div className="floating-card card-top-right">
+              <div className="card-badge">Alerts</div>
+              <BellIcon size={32} color="#eab308" />
+            </div>
+
+            <div className="floating-card card-bottom-left">
+              <div className="card-badge">Bookings</div>
+              <CalendarIcon size={32} color="#3b82f6" />
+            </div>
+
+            <div className="floating-card card-status">
+              <div className="status-dot"></div>
+              <span>System Active</span>
+            </div>
           </div>
         </div>
       </section>

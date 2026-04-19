@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -59,8 +60,13 @@ public class TicketController {
     public ResponseEntity<List<Map<String, Object>>> getAllTickets() {
         List<Ticket> tickets = ticketRepository.findAllByOrderByCreatedAtDesc();
         List<Map<String, Object>> enriched = tickets.stream().map(t -> {
-            String userName = userRepository.findById(t.getUserId())
-                    .map(User::getName).orElse("Unknown");
+            String userName = "Unknown";
+            String ticketUserId = t.getUserId();
+            if (ticketUserId != null) {
+                userName = userRepository.findById(ticketUserId)
+                .map(User::getName)
+                .orElse("Unknown");
+            }
             Map<String, Object> map = new HashMap<>();
             map.put("id", t.getId());
             map.put("userId", t.getUserId());
@@ -82,7 +88,7 @@ public class TicketController {
     @PutMapping("/{id}/status")
     public ResponseEntity<Ticket> updateTicketStatus(@PathVariable String id,
                                                       @RequestBody Map<String, String> body) {
-        Ticket ticket = ticketRepository.findById(id)
+        Ticket ticket = ticketRepository.findById(Objects.requireNonNull(id, "id must not be null"))
                 .orElseThrow(() -> new RuntimeException("Ticket not found"));
 
         String newStatus = body.get("status");
@@ -102,7 +108,7 @@ public class TicketController {
     @PutMapping("/{id}/feedback")
     public ResponseEntity<Ticket> addFeedback(@PathVariable String id,
                                                @RequestBody Map<String, String> body) {
-        Ticket ticket = ticketRepository.findById(id)
+        Ticket ticket = ticketRepository.findById(Objects.requireNonNull(id, "id must not be null"))
                 .orElseThrow(() -> new RuntimeException("Ticket not found"));
         try {
             ticket.setRating(Integer.parseInt(body.get("rating")));
@@ -119,7 +125,7 @@ public class TicketController {
     public ResponseEntity<Ticket> addComment(@PathVariable String id,
                                               @AuthenticationPrincipal User user,
                                               @RequestBody Map<String, String> body) {
-        Ticket ticket = ticketRepository.findById(id)
+        Ticket ticket = ticketRepository.findById(Objects.requireNonNull(id, "id must not be null"))
                 .orElseThrow(() -> new RuntimeException("Ticket not found"));
 
         Comment comment = new Comment();
@@ -142,7 +148,7 @@ public class TicketController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deleteTicket(@PathVariable String id) {
-        ticketRepository.deleteById(id);
+        ticketRepository.deleteById(Objects.requireNonNull(id, "id must not be null"));
         return ResponseEntity.ok(Map.of("message", "Ticket deleted"));
     }
 }
