@@ -1,31 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import {
   getNotifications,
-  markNotificationRead,
-  markAllNotificationsRead,
-  deleteNotification,
   getAllResources,
 } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import {
   BellIcon,
-  InboxIcon,
   ShieldIcon,
   CheckCircleIcon,
-  XCircleIcon,
-  RefreshIcon,
-  MessageCircleIcon,
-  MailIcon,
-  CalendarIcon,
-  CheckIcon,
-  XIcon,
   TagIcon,
-  ChevronRightIcon,
-  PinIcon,
   SearchIcon,
-  UserIcon,
 } from '../components/Icons';
 import CalendarWidget from '../components/CalendarWidget';
 import ThemeToggle from '../components/ThemeToggle';
@@ -36,16 +21,13 @@ import './DashboardPage.css';
 
 const DashboardPage = () => {
   const { user } = useAuth();
-  const { theme } = useTheme();
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [resources, setResources] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   const fetchDashboardData = useCallback(async () => {
     try {
-      setLoading(true);
       const [notifRes, bookingRes, resourceRes] = await Promise.all([
         getNotifications(),
         user?.role === 'ADMIN' ? { data: [] } : import('../services/api').then(api => api.getMyBookings()),
@@ -56,8 +38,6 @@ const DashboardPage = () => {
       if (resourceRes?.data) setResources(resourceRes.data.slice(0, 3));
     } catch (err) {
       console.error('Failed to fetch dashboard data:', err);
-    } finally {
-      setLoading(false);
     }
   }, [user?.role]);
 
@@ -154,7 +134,6 @@ const DashboardPage = () => {
            <div className="aside-card calendar-aside">
               <div className="card-top">
                  <h4>Schedule</h4>
-                 <ThemeToggle />
               </div>
               <CalendarWidget 
                 highlights={bookings.reduce((acc, b) => {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUnreadCount } from '../services/api';
@@ -11,9 +11,10 @@ import {
   CalendarIcon,
   TagIcon,
   PinIcon,
-  UserIcon,
   MenuIcon,
-  CloseIcon
+  CloseIcon,
+  UsersIcon,
+  SendIcon
 } from './Icons';
 import './Navbar.css';
 
@@ -21,15 +22,25 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [unreadCount, setUnreadCount] = useState(0);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isAdminExpanded, setIsAdminExpanded] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   
   const isAdmin = user?.role === 'ADMIN';
+  const adminPanelTabs = [
+    { key: 'overview', label: 'Overview', icon: GridIcon },
+    { key: 'bookings', label: 'Bookings', icon: CalendarIcon },
+    { key: 'resources', label: 'Facilities', icon: PinIcon },
+    { key: 'users', label: 'Users', icon: UsersIcon },
+    { key: 'notifications', label: 'Notifications', icon: null },
+    { key: 'send', label: 'Send', icon: SendIcon },
+  ];
+  const currentAdminTab = new URLSearchParams(location.search).get('tab') || 'overview';
 
   // Navigation Items Mapping
   const navItems = isAdmin ? [
     { path: '/admin', label: 'Admin Panel', icon: SettingsIcon, color: 'orange' },
-    { path: '/dashboard', label: 'Dashboard', icon: GridIcon, color: 'blue' },
+    { path: '/dashboard', label: 'Overview', icon: GridIcon, color: 'blue' },
     { path: '/notifications', label: 'Inbox', icon: BellIcon, color: 'red', isInbox: true },
   ] : [
     { path: '/dashboard', label: 'Overview', icon: GridIcon, color: 'orange' },
@@ -54,6 +65,12 @@ const Navbar = () => {
       return () => clearInterval(interval);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (isAdmin && location.pathname.startsWith('/admin')) {
+      setIsAdminExpanded(true);
+    }
+  }, [location.pathname, isAdmin]);
 
   const handleLogout = () => {
     logout();
@@ -82,26 +99,33 @@ const Navbar = () => {
           </div>
           <div className="brand-info">
             <span className="brand-name">CAMPUS</span>
-            <span className="brand-sub">FLOW HUB</span>
+            <span className="brand-sub">{isAdmin ? 'ADMIN PANEL' : 'FLOW HUB'}</span>
           </div>
         </div>
 
         <nav className="sidebar-nav">
           <ul className="nav-list">
-            {/* Sliding Indicator Blob */}
-            {activeIndex !== -1 && (
-              <div 
-                className={`sliding-indicator ${navItems[activeIndex].color}`}
-                style={{ transform: `translateY(${activeIndex * 56}px)` }}
-              />
-            )}
 
             {navItems.map((item, index) => {
               const Icon = item.icon;
               const isActive = index === activeIndex;
+              const isAdminPanelItem = isAdmin && item.path === '/admin';
+              const showAdminSubnav = isAdminPanelItem && isAdminExpanded;
+
               return (
-                <li key={item.path} className={isActive ? 'active' : ''}>
-                  <Link to={item.path}>
+                <li 
+                  key={item.path} 
+                  className={`${isActive ? 'active' : ''} ${showAdminSubnav ? 'has-subnav' : ''} ${item.color}`}
+                >
+                  <Link 
+                    to={item.path} 
+                    onClick={(e) => {
+                      if (isAdminPanelItem) {
+                        e.preventDefault();
+                        setIsAdminExpanded(!isAdminExpanded);
+                      }
+                    }}
+                  >
                     <div className="nav-icon-wrap">
                       <Icon size={20} />
                       {item.isInbox && unreadCount > 0 && <span className="notif-dot" />}
@@ -111,6 +135,25 @@ const Navbar = () => {
                       <span className="count-badge">{unreadCount}</span>
                     )}
                   </Link>
+
+                  {showAdminSubnav && (
+                    <ul className="admin-subnav">
+                      {adminPanelTabs.map((tab) => {
+                        const TabIcon = tab.icon;
+                        return (
+                          <li key={tab.key}>
+                            <Link
+                              to={`/admin?tab=${tab.key}`}
+                              className={`admin-subnav-link ${currentAdminTab === tab.key ? 'active' : ''}`}
+                            >
+                              {TabIcon && <TabIcon size={18} />}
+                              <span>{tab.label}</span>
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
                 </li>
               );
             })}

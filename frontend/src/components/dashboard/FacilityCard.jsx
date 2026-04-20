@@ -1,5 +1,3 @@
-import { PinIcon, StarIcon } from '../Icons';
-
 const FacilityCard = ({ facility }) => {
   return (
     <div className="facility-card">

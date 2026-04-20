@@ -32,9 +32,10 @@
   left: 0;
   z-index: 1000;
   padding: 0;
-  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.05); /* Softened shadow for light mode */
   overflow: hidden;
-  border-right: 1px solid rgba(255, 255, 255, 0.03);
+  border-right: 1px solid var(--border-color);
+  transition: background 0.3s ease;
 }
 
 /* ─── Header ─── */
@@ -63,7 +64,7 @@
 }
 
 .brand-name {
-  color: #ffffff; /* Keeping logo text white for contrast on dark sidebar */
+  color: var(--text-main);
   font-weight: 800;
   font-size: 1.1rem;
   letter-spacing: 2px;
@@ -86,65 +87,68 @@
 
 .nav-list {
   list-style: none;
-  padding: 0;
+  padding: 10px 0;
   margin: 0;
-  position: relative; /* Container for the sliding blob */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-/* The Sliding Blob */
-.sliding-indicator {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 100%;
-  height: 56px;
-  background: var(--sidebar-active-bg);
-  border-radius: 40px 0 0 40px;
-  transition: transform 0.4s var(--ease), background 0.3s ease;
-  z-index: 0;
+.nav-list li {
+  margin: 4px 14px;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: visible; /* To allow indicator to float at edge if needed */
 }
 
-/* Concave Curves on the Blob */
-.sliding-indicator::before,
-.sliding-indicator::after {
+.nav-list li.active > a {
+  background: var(--bg-card);
+  backdrop-filter: blur(8px);
+  border: var(--glass-border);
+  box-shadow: var(--shadow);
+  color: var(--text-main) !important;
+}
+
+/* Left Side Indicator (Classic) */
+.nav-list li.active > a::after {
   content: '';
   position: absolute;
-  right: 0;
-  width: 30px;
-  height: 30px;
-  background: transparent;
-  pointer-events: none;
-  z-index: 0;
+  left: -14px; /* Align with li margin */
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  background: var(--accent-green);
+  border-radius: 0 4px 4px 0;
+  box-shadow: 2px 0 10px var(--accent-green-light);
 }
 
-.sliding-indicator::before {
-  top: -30px;
-  border-radius: 0 0 30px 0;
-  box-shadow: 15px 15px 0 5px var(--sidebar-active-bg);
-}
+/* Color specific indicators */
+.nav-list li.active.orange > a::after { background: var(--clr-orange); box-shadow: 2px 0 10px rgba(243, 156, 18, 0.3); }
+.nav-list li.active.blue > a::after   { background: var(--clr-blue); box-shadow: 2px 0 10px rgba(52, 152, 219, 0.3); }
+.nav-list li.active.purple > a::after { background: var(--clr-purple); box-shadow: 2px 0 10px rgba(155, 89, 182, 0.3); }
+.nav-list li.active.green > a::after  { background: var(--clr-green); box-shadow: 2px 0 10px rgba(119, 163, 101, 0.3); }
+.nav-list li.active.red > a::after    { background: var(--clr-red); box-shadow: 2px 0 10px rgba(231, 76, 60, 0.3); }
 
-.sliding-indicator::after {
-  bottom: -30px;
-  border-radius: 0 30px 0 0;
-  box-shadow: 15px -15px 0 5px var(--sidebar-active-bg);
-}
-
-/* Link Items */
-.nav-list li {
-  position: relative;
-  z-index: 1;
-  height: 56px;
+/* Remove background overrides if they conflict with glass look */
+.nav-list li.active.orange > a,
+.nav-list li.active.blue > a,
+.nav-list li.active.purple > a,
+.nav-list li.active.green > a,
+.nav-list li.active.red > a {
+  background: var(--bg-card);
 }
 
 .nav-list li a {
   display: flex;
   align-items: center;
-  padding: 0 24px;
-  height: 100%;
+  padding: 8px 24px;
+  min-height: 56px;
   color: var(--text-dim);
   font-weight: 600;
   font-size: 0.92rem;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .nav-list li.active a {
@@ -152,28 +156,31 @@
 }
 
 .nav-icon-wrap {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 14px;
-  border-radius: 50%;
+  margin-right: 12px;
+  border-radius: 10px;
+  background: var(--bg-page);
+  border: var(--glass-border);
   position: relative;
   transition: var(--trans);
 }
 
 /* Icon Highlight Colors when active */
 .nav-list li.active .nav-icon-wrap {
-  color: #fff;
-  transform: scale(1.1);
+  background: var(--accent-green-light);
+  border-color: var(--accent-green);
+  transform: scale(1.05);
 }
 
-.sliding-indicator.orange ~ li.active .nav-icon-wrap { background: var(--clr-orange); }
-.sliding-indicator.blue   ~ li.active .nav-icon-wrap { background: var(--clr-blue); }
-.sliding-indicator.purple ~ li.active .nav-icon-wrap { background: var(--clr-purple); }
-.sliding-indicator.green  ~ li.active .nav-icon-wrap { background: var(--clr-green); }
-.sliding-indicator.red    ~ li.active .nav-icon-wrap { background: var(--clr-red); }
+.nav-list li.active.orange .nav-icon-wrap { color: var(--clr-orange); }
+.nav-list li.active.blue   .nav-icon-wrap { color: var(--clr-blue); }
+.nav-list li.active.purple .nav-icon-wrap { color: var(--clr-purple); }
+.nav-list li.active.green  .nav-icon-wrap { color: var(--clr-green); }
+.nav-list li.active.red    .nav-icon-wrap { color: var(--clr-red); }
 
 /* Hover Effect */
 .nav-list li:not(.active) a:hover {
@@ -181,7 +188,7 @@
 }
 
 .nav-list li:not(.active) a:hover .nav-icon-wrap {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--accent-green-light);
 }
 
 /* Badges */
@@ -206,11 +213,68 @@
   font-weight: 700;
 }
 
+.admin-subnav {
+  list-style: none;
+  margin: 0 0 0 34px; /* Shifting left to avoid overlapping icons */
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  position: relative;
+  border-left: 2px solid var(--border-color);
+}
+
+.has-subnav .admin-subnav {
+  max-height: 500px;
+  opacity: 1;
+  padding: 10px 0 15px;
+}
+
+.admin-subnav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  width: calc(100% - 10px);
+  padding: 8px 16px;
+  margin-left: -2px; /* Anchor to the border line */
+  border-radius: 0 8px 8px 0;
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.admin-subnav-link:hover {
+  background: var(--accent-green-light);
+  color: var(--accent-green);
+}
+
+.admin-subnav-link.active {
+  background: var(--accent-green-light);
+  color: var(--accent-green);
+  font-weight: 700;
+}
+
+.admin-subnav-link.active::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--accent-green);
+}
+
 /* ─── Footer Section ─── */
 .sidebar-footer {
   padding: 24px;
-  background: rgba(0, 0, 0, 0.15);
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.03);
+  border-top: 1px solid var(--border-color);
 }
 
 .user-mini-card {
@@ -230,7 +294,7 @@
   justify-content: center;
   color: #fff;
   font-weight: 800;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .user-text-mini {

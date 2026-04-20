@@ -1,5 +1,4 @@
 import { useTheme } from '../context/ThemeContext';
-import { RefreshIcon } from './Icons'; // Using Refresh as a fallback or if I have a Sun/Moon icon
 
 const SunIcon = ({ size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
