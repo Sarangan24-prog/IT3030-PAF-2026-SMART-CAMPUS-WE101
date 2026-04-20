@@ -34,7 +34,11 @@ cd backend
 
 # Configure application.properties (see below for Google OAuth)
 # Then run:
+# macOS/Linux
 ./mvnw spring-boot:run
+
+# Windows (PowerShell/CMD)
+.\mvnw.cmd spring-boot:run
 ```
 
 The backend starts on **http://localhost:8080**
@@ -48,6 +52,33 @@ npm start
 ```
 
 The frontend starts on **http://localhost:3000**
+
+### Common Startup Fixes (Windows)
+
+If backend fails with `Port 8080 was already in use`:
+
+```powershell
+netstat -ano | findstr :8080
+tasklist /FI "PID eq <PID>"
+taskkill /PID <PID> /F
+```
+
+If frontend fails with `Something is already running on port 3000`:
+
+```powershell
+netstat -ano | findstr :3000
+taskkill /PID <PID> /F
+```
+
+If backend fails with MongoDB connection refused (`localhost:27017`), start MongoDB first.
+
+Example with Docker:
+
+```powershell
+docker run -d --name smart-campus-mongo -p 27017:27017 mongo:7
+```
+
+Then run backend and frontend again.
 
 ---
 

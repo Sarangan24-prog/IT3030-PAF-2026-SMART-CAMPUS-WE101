@@ -69,7 +69,7 @@ const ResourcePage = () => {
       <div className="resources-layout">
         {/* Sidebar Filters */}
         <aside className="resources-sidebar">
-          <div className="filter-card glass-panel">
+          <div className="filter-card">
             <div className="filter-header">
               <FilterIcon size={18} />
               <h2>Smart Filter</h2>
@@ -137,7 +137,7 @@ const ResourcePage = () => {
             <div className="resources-grid">
               {resources.map((res) => (
                 <div 
-                  className="resource-card glass-panel" 
+                  className="resource-card" 
                   key={res.id}
                   onClick={() => setSelectedResource(res)}
                 >
@@ -153,7 +153,7 @@ const ResourcePage = () => {
                     <h3>{res.name}</h3>
                     <div className="card-meta">
                       <span className="meta-tag">
-                        {getTypeIcon(res.type)} {res.type.replace('_', ' ')}
+                        {getTypeIcon(res.type)} {res.type.replaceAll('_', ' ')}
                       </span>
                       {res.capacity > 0 && (
                         <span className="meta-tag capacity">
@@ -169,7 +169,7 @@ const ResourcePage = () => {
                       {res.bookable ? (
                          <span className="status-indicator active"><CheckCircleIcon size={14} /> Bookable</span>
                       ) : (
-                         <span className="status-indicator inactive"><XCircleIcon size={14} /> Read-only</span>
+                         <span className="status-indicator inactive"><XCircleIcon size={14} /> Not Bookable</span>
                       )}
                     </div>
                   </div>
@@ -177,7 +177,7 @@ const ResourcePage = () => {
               ))}
             </div>
           ) : (
-            <div className="empty-state glass-panel">
+            <div className="empty-state">
               <SearchIcon size={48} color="#64748b" />
               <h3>No resources found</h3>
               <p>Try adjusting your smart filters to discover more facilities.</p>
@@ -195,7 +195,7 @@ const ResourcePage = () => {
       {/* Resource Details Modal */}
       {selectedResource && (
         <div className="modal-overlay" onClick={() => setSelectedResource(null)}>
-          <div className="resource-modal glass-panel" onClick={e => e.stopPropagation()}>
+          <div className="resource-modal" onClick={e => e.stopPropagation()}>
             <button className="close-modal-btn" onClick={() => setSelectedResource(null)}>&times;</button>
             
             <div className="modal-header-image" style={{ backgroundImage: `url(${selectedResource.imageUrl || getFallbackImage(selectedResource.type)})` }}>
@@ -215,9 +215,9 @@ const ResourcePage = () => {
                 </div>
                 <div className="info-block">
                   <h4>Specifications</h4>
-                  <p><strong>Type:</strong> {selectedResource.type.replace('_', ' ')}</p>
+                  <p><strong>Type:</strong> {selectedResource.type.replaceAll('_', ' ')}</p>
                   <p><strong>Capacity:</strong> {selectedResource.capacity || 'N/A'}</p>
-                  <p><strong>Status:</strong> <span className={`status-badge ${selectedResource.status.toLowerCase()}`}>{selectedResource.status}</span></p>
+                  <p><strong>Status:</strong> <span className={`status-badge ${selectedResource.status.toLowerCase().replace('_', '-')}`}>{selectedResource.status.replaceAll('_', ' ')}</span></p>
                 </div>
               </div>
 

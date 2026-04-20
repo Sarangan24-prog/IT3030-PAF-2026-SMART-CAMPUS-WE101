@@ -6,8 +6,11 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import com.mongodb.MongoTimeoutException;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -16,6 +19,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("message", ex.getMessage());
+        body.put("status", HttpStatus.NOT_FOUND.value());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    // Handles Spring's own "no handler found" for paths like /favicon.ico
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNoResource(NoResourceFoundException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "Resource not found");
         body.put("status", HttpStatus.NOT_FOUND.value());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
@@ -41,6 +53,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
+    @ExceptionHandler(MongoTimeoutException.class)
+    public ResponseEntity<Map<String, Object>> handleMongoTimeout(MongoTimeoutException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Database Unavailable");
+        body.put("message", "The application could not connect to the database (MongoDB Atlas). This is usually caused by your IP address not being whitelisted.");
+        body.put("help", "Please check your Atlas Network Access settings.");
+        body.put("status", HttpStatus.SERVICE_UNAVAILABLE.value());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
+    }
+
+    @ExceptionHandler(DataAccessResourceFailureException.class)
+    public ResponseEntity<Map<String, Object>> handleDbFailure(DataAccessResourceFailureException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Database Communication Error");
+        body.put("message", ex.getMessage());
+        body.put("status", HttpStatus.SERVICE_UNAVAILABLE.value());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
         Map<String, Object> body = new HashMap<>();
@@ -51,9 +82,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneral(Exception ex) {
+        // Don't swallow framework-level exceptions — log them and return 500
         Map<String, Object> body = new HashMap<>();
-        body.put("message", ex.getMessage());
+        body.put("message", "An internal server error occurred");
         body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 }
+

@@ -16,7 +16,6 @@ import {
 import {
   BarChartIcon,
   CalendarIcon,
-  TagIcon,
   UsersIcon,
   BellIcon,
   SendIcon,
@@ -649,11 +648,11 @@ const ResourcesTab = () => {
                 <tr key={res.id}>
                   <td><strong>{res.code}</strong></td>
                   <td>{res.name}</td>
-                  <td>{res.type.replace('_', ' ')}</td>
+                  <td>{res.type.replaceAll('_', ' ')}</td>
                   <td>{res.building} - {res.floor}</td>
                   <td>{res.capacity > 0 ? res.capacity : 'N/A'}</td>
                   <td>
-                    <span className={`status-badge ${res.status.toLowerCase()}`}>{res.status}</span>
+                    <span className={`status-badge ${res.status.toLowerCase().replace('_', '-')}`}>{res.status.replaceAll('_', ' ')}</span>
                   </td>
                   <td>
                     <div className="action-btns">
@@ -689,6 +688,8 @@ const ResourcesTab = () => {
                     <option value="LAB">Lab</option>
                     <option value="MEETING_ROOM">Meeting Room</option>
                     <option value="PROJECTOR">Projector</option>
+                    <option value="CAMERA">Camera</option>
+                    <option value="MICROPHONE">Microphone</option>
                     <option value="OTHER">Other</option>
                   </select>
                 </div>
@@ -712,8 +713,7 @@ const ResourcesTab = () => {
                   <label>Status *</label>
                   <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
                     <option value="ACTIVE">ACTIVE</option>
-                    <option value="INACTIVE">INACTIVE</option>
-                    <option value="MAINTENANCE">MAINTENANCE</option>
+                    <option value="OUT_OF_SERVICE">OUT OF SERVICE</option>
                   </select>
                 </div>
                 <div className="form-group full-width">

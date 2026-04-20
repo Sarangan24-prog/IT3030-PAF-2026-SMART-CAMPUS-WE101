@@ -7,7 +7,6 @@ import com.campusflow.service.ResourceService;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -18,7 +17,6 @@ public class ResourceController {
 
     private final ResourceService resourceService;
 
-    @Autowired
     public ResourceController(ResourceService resourceService) {
         this.resourceService = resourceService;
     }

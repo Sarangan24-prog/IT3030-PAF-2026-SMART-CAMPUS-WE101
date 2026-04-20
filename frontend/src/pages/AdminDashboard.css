@@ -5,6 +5,7 @@
 .admin-dashboard {
   max-width: 1000px;
   margin: 0 auto;
+  padding: 28px 20px;
   animation: fadeInUp 0.35s ease;
 }
 
@@ -399,6 +400,11 @@
   letter-spacing: 0.4px;
   white-space: nowrap;
 }
+
+.status-badge.active { background: #dcfce7; color: #16a34a; }
+.status-badge.out-of-service { background: #fee2e2; color: #dc2626; }
+
+
 
 .action-btns {
   display: flex;

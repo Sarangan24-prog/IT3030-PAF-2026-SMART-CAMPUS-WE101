@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class NotificationService {
@@ -41,7 +42,7 @@ public class NotificationService {
     }
 
     public Notification markAsRead(String notificationId) {
-        Notification notification = notificationRepository.findById(notificationId)
+        Notification notification = notificationRepository.findById(Objects.requireNonNull(notificationId, "notificationId must not be null"))
                 .orElseThrow(() -> new RuntimeException("Notification not found"));
         notification.setRead(true);
         return notificationRepository.save(notification);
@@ -55,6 +56,6 @@ public class NotificationService {
     }
 
     public void deleteNotification(String notificationId) {
-        notificationRepository.deleteById(notificationId);
+        notificationRepository.deleteById(Objects.requireNonNull(notificationId, "notificationId must not be null"));
     }
 }
