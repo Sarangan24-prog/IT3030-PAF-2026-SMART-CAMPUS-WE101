@@ -1,3 +1,31 @@
+:root {
+  /* Day Mode (Light) */
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --accent-green: #77A365;
+  --accent-green-light: rgba(119, 163, 101, 0.12);
+  --sidebar-bg: #0f172a; /* Keeping sidebar navy as per previous refinement */
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='dark'] {
+  /* Night Mode (Dark) */
+  --bg-page: #0f172a;
+  --bg-card: #1e293b;
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --border-color: #334155;
+  --accent-green: #77A365;
+  --accent-green-light: rgba(119, 163, 101, 0.2);
+  --sidebar-bg: #020617;
+  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
 /* ═══════════════════════════════════════════════
    Smart Campus — Global Styles
    ═══════════════════════════════════════════════ */
@@ -21,8 +49,9 @@ html {
 body {
   height: 100%;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #0f172a; /* Deep Navy to match premium theme */
-  color: #f1f5f9;
+  background: var(--bg-page);
+  color: var(--text-main);
+  transition: background 0.3s ease, color 0.3s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
