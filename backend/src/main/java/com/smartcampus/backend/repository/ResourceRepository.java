@@ -1,8 +1,8 @@
-package com.campusflow.repository;
+package com.smartcampus.backend.repository;
 
-import com.campusflow.entity.Resource;
-import com.campusflow.enums.ResourceStatus;
-import com.campusflow.enums.ResourceType;
+import com.smartcampus.backend.model.Resource;
+import com.smartcampus.backend.model.ResourceStatus;
+import com.smartcampus.backend.model.ResourceType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.mongodb.repository.MongoRepository;

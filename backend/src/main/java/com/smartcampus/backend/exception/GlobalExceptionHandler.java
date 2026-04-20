@@ -1,4 +1,4 @@
-package com.campusflow.exception;
+package com.smartcampus.backend.exception;
 
 import java.util.HashMap;
 import java.util.Map;

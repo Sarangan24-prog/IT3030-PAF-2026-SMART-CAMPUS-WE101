@@ -42,6 +42,19 @@ body {
   min-height: 100vh;
 }
 
+.dashboard-shell {
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+}
+
 .login-shell {
   background: #0f172a;
 }

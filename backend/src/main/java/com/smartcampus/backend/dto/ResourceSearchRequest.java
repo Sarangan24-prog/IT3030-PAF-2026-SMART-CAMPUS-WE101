@@ -1,7 +1,7 @@
-package com.campusflow.dto;
+package com.smartcampus.backend.dto;
 
-import com.campusflow.enums.ResourceStatus;
-import com.campusflow.enums.ResourceType;
+import com.smartcampus.backend.model.ResourceStatus;
+import com.smartcampus.backend.model.ResourceType;
 
 public class ResourceSearchRequest {
     private String keyword;

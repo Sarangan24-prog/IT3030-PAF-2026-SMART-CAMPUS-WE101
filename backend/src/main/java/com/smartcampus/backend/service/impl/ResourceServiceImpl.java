@@ -1,13 +1,13 @@
-package com.campusflow.service.impl;
+package com.smartcampus.backend.service.impl;
 
-import com.campusflow.dto.ResourceRequest;
-import com.campusflow.dto.ResourceResponse;
-import com.campusflow.dto.ResourceSearchRequest;
-import com.campusflow.entity.Resource;
-import com.campusflow.exception.ResourceNotFoundException;
-import com.campusflow.repository.ResourceRepository;
-import com.campusflow.service.ResourceService;
-import com.campusflow.util.ResourceMapper;
+import com.smartcampus.backend.dto.ResourceRequest;
+import com.smartcampus.backend.dto.ResourceResponse;
+import com.smartcampus.backend.dto.ResourceSearchRequest;
+import com.smartcampus.backend.model.Resource;
+import com.smartcampus.backend.exception.ResourceNotFoundException;
+import com.smartcampus.backend.repository.ResourceRepository;
+import com.smartcampus.backend.service.ResourceService;
+import com.smartcampus.backend.util.ResourceMapper;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;

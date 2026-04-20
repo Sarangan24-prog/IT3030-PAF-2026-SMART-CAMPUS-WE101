@@ -1,8 +1,8 @@
-package com.campusflow.service;
+package com.smartcampus.backend.service;
 
-import com.campusflow.dto.ResourceRequest;
-import com.campusflow.dto.ResourceResponse;
-import com.campusflow.dto.ResourceSearchRequest;
+import com.smartcampus.backend.dto.ResourceRequest;
+import com.smartcampus.backend.dto.ResourceResponse;
+import com.smartcampus.backend.dto.ResourceSearchRequest;
 import java.util.List;
 
 public interface ResourceService {

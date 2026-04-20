@@ -25,10 +25,12 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   if (adminOnly && user.role !== 'ADMIN') return <Navigate to="/dashboard" />;
 
   return (
-    <div className="app-shell">
+    <div className="app-shell dashboard-shell">
       <Navbar />
-      <main className="main-content">{children}</main>
-      <Footer />
+      <div className="main-container">
+        <main className="main-content">{children}</main>
+        <Footer />
+      </div>
     </div>
   );
 };
