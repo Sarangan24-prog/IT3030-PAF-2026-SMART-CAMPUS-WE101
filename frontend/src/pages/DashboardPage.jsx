@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import {
   getNotifications,
   markNotificationRead,
   markAllNotificationsRead,
   deleteNotification,
+  getAllResources,
 } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -22,298 +24,168 @@ import {
   TagIcon,
   ChevronRightIcon,
   PinIcon,
+  SearchIcon,
+  UserIcon,
 } from '../components/Icons';
+import CalendarWidget from '../components/CalendarWidget';
+import ThemeToggle from '../components/ThemeToggle';
+import StatCard from '../components/dashboard/StatCard';
+import ProgressSection from '../components/dashboard/ProgressSection';
+import FacilityCard from '../components/dashboard/FacilityCard';
 import './DashboardPage.css';
-
-const typeIcons = {
-  BOOKING_APPROVED: CheckCircleIcon,
-  BOOKING_REJECTED: XCircleIcon,
-  TICKET_STATUS_CHANGED: RefreshIcon,
-  NEW_COMMENT: MessageCircleIcon,
-};
-
-const typeColors = {
-  BOOKING_APPROVED: '#10b981',
-  BOOKING_REJECTED: '#ef4444',
-  TICKET_STATUS_CHANGED: '#f59e0b',
-  NEW_COMMENT: '#77A365',
-};
-
-const typeLabels = {
-  BOOKING_APPROVED: 'Booking Approved',
-  BOOKING_REJECTED: 'Booking Rejected',
-  TICKET_STATUS_CHANGED: 'Ticket Updated',
-  NEW_COMMENT: 'New Comment',
-};
 
 const DashboardPage = () => {
   const { user } = useAuth();
+  const { theme } = useTheme();
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
+  const [bookings, setBookings] = useState([]);
+  const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchNotifications = useCallback(async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
-      const res = await getNotifications();
-      setNotifications(res.data);
+      setLoading(true);
+      const [notifRes, bookingRes, resourceRes] = await Promise.all([
+        getNotifications(),
+        user?.role === 'ADMIN' ? { data: [] } : import('../services/api').then(api => api.getMyBookings()),
+        getAllResources()
+      ]);
+      setNotifications(notifRes.data);
+      if (bookingRes?.data) setBookings(bookingRes.data);
+      if (resourceRes?.data) setResources(resourceRes.data.slice(0, 3));
     } catch (err) {
-      console.error(err);
+      console.error('Failed to fetch dashboard data:', err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user?.role]);
 
-  useEffect(() => { fetchNotifications(); }, [fetchNotifications]);
-
-  const handleMarkRead = async (id) => {
-    await markNotificationRead(id);
-    fetchNotifications();
-  };
-
-  const handleMarkAllRead = async () => {
-    await markAllNotificationsRead();
-    fetchNotifications();
-  };
-
-  const handleDelete = async (id) => {
-    await deleteNotification(id);
-    fetchNotifications();
-  };
+  useEffect(() => { fetchDashboardData(); }, [fetchDashboardData]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
-  };
-
   return (
-    <div className="dashboard-page" id="dashboard-page">
-
-      {/* Hero */}
-      <div className="dash-hero">
-        <div className="dash-hero-left">
-          <div className="hero-avatar">
-            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-          </div>
-          <div className="dash-hero-text">
-            <h1>{getGreeting()}, {user?.name || 'User'}</h1>
-            <p>Welcome to your Smart Campus Operations Hub</p>
-            <div className="hero-pills">
-              <span className="hero-pill">
-                <BellIcon size={11} color="#77A365" />
-                {notifications.length} Notifications
-              </span>
-              <span className="hero-pill hero-pill-accent">
-                <InboxIcon size={11} color="#fff" />
-                {unreadCount} Unread
-              </span>
-              <span className="hero-pill">
-                <ShieldIcon size={11} color="#77A365" />
-                {user?.role || 'N/A'}
-              </span>
-            </div>
+    <div className="dashboard-page modern-theme">
+      
+      {/* Top Header Row */}
+      <header className="dashboard-header">
+        <div className="header-search">
+          <div className="search-box">
+             <SearchIcon size={18} color="var(--text-muted)" />
+             <input type="text" placeholder="Search facilities, events..." />
           </div>
         </div>
-        <div className="dash-hero-date">
-          <span className="date-display">
-            {new Date().toLocaleDateString('en-US', {
-              weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-            })}
-          </span>
+        <div className="header-actions">
+           <ThemeToggle />
+           <div className="header-notif">
+              <BellIcon size={22} color="var(--text-muted)" />
+              {unreadCount > 0 && <span className="notif-badge">{unreadCount}</span>}
+           </div>
+           <div className="header-profile">
+              <img src={`https://ui-avatars.com/api/?name=${user?.name}&background=77A365&color=fff`} alt="avatar" />
+              <div className="profile-info">
+                 <span className="profile-name">{user?.name}</span>
+                 <span className="profile-role">{user?.role}</span>
+              </div>
+           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Campus Services - Hidden for Admins */}
-      {user?.role !== 'ADMIN' && (
-        <div className="campus-services">
-          <h3 className="services-label">Campus Services</h3>
-          <div className="services-grid">
-            <div className="service-card" onClick={() => navigate('/bookings')} role="button" tabIndex={0}>
-              <div className="service-icon-wrap">
-                <CalendarIcon size={24} color="#77A365" />
-              </div>
-              <div className="service-body">
-                <h4>Common Booking</h4>
-                <p>Lecture halls, Labs, Sports facilities, Auditorium</p>
-                <span className="service-cta">
-                  Browse &amp; Book
-                  <ChevronRightIcon size={13} color="#77A365" />
-                </span>
-              </div>
-            </div>
-            <div className="service-card" onClick={() => navigate('/resources')} role="button" tabIndex={0}>
-              <div className="service-icon-wrap">
-                <PinIcon size={24} color="#77A365" />
-              </div>
-              <div className="service-body">
-                <h4>Facilities Catalogue</h4>
-                <p>Browse campus laboratories, lecture halls, and manage specific assets.</p>
-                <span className="service-cta">
-                  Explore Catalogue
-                  <ChevronRightIcon size={13} color="#77A365" />
-                </span>
-              </div>
-            </div>
-            <div className="service-card" onClick={() => navigate('/tickets')} role="button" tabIndex={0}>
-              <div className="service-icon-wrap">
-                <TagIcon size={24} color="#77A365" />
-              </div>
-              <div className="service-body">
-                <h4>Ticket Raising</h4>
-                <p>Network, Equipment, Facility, Academic Support</p>
-                <span className="service-cta">
-                  Raise a Ticket
-                  <ChevronRightIcon size={13} color="#77A365" />
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Main Grid */}
-      <div className="dash-main-grid">
-
-        {/* Notifications Feed */}
-        <div className="dash-primary">
-          <div className="section-header">
-            <div className="section-title-row">
-              <BellIcon size={16} color="#77A365" />
-              <h3 className="section-title">Notifications</h3>
-            </div>
-            {unreadCount > 0 && (
-              <button className="mark-all-btn" onClick={handleMarkAllRead}>
-                Mark all as read ({unreadCount})
-              </button>
-            )}
+      <div className="dashboard-content-grid">
+        
+        {/* Left/Main Column */}
+        <div className="dashboard-main">
+          
+          <div className="greeting-row">
+             <h2>Welcome back, {user?.name?.split(' ')[0]}!</h2>
+             <p>You have {unreadCount} new notifications and 2 upcoming bookings today.</p>
           </div>
 
-          {loading ? (
-            <p className="loading-text">Loading notifications...</p>
-          ) : notifications.length === 0 ? (
-            <div className="empty-feed">
-              <div className="empty-feed-icon">
-                <BellIcon size={28} color="#94a3b8" />
-              </div>
-              <p>No notifications yet</p>
-              <span>You will see updates here when activity occurs</span>
-            </div>
-          ) : (
-            <div className="notif-list">
-              {notifications.map((n) => {
-                const IconComp = typeIcons[n.type] || BellIcon;
-                const iconColor = typeColors[n.type] || '#64748b';
-                return (
-                  <div key={n.id} className={`notif-item ${!n.read ? 'unread' : ''}`}>
-                    <div className="notif-icon-wrap" style={{ background: iconColor + '18' }}>
-                      <IconComp size={15} color={iconColor} />
-                    </div>
-                    <div className="notif-body">
-                      <span className="notif-type" style={{ color: iconColor }}>
-                        {typeLabels[n.type] || n.type}
-                      </span>
-                      <p className="notif-msg">{n.message}</p>
-                      <span className="notif-time">
-                        {new Date(n.createdAt).toLocaleString('en-US', {
-                          month: 'short', day: 'numeric',
-                          hour: '2-digit', minute: '2-digit',
-                        })}
-                      </span>
-                    </div>
-                    <div className="notif-actions">
-                      {!n.read && (
-                        <button
-                          className="notif-btn read-btn"
-                          onClick={() => handleMarkRead(n.id)}
-                          title="Mark as read"
-                        >
-                          <CheckIcon size={13} />
-                        </button>
-                      )}
-                      <button
-                        className="notif-btn del-btn"
-                        onClick={() => handleDelete(n.id)}
-                        title="Delete"
-                      >
-                        <XIcon size={13} />
-                      </button>
-                    </div>
-                    {!n.read && <span className="unread-dot" />}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+          {/* Stat Row */}
+          <div className="stat-grid">
+            <StatCard icon={CheckCircleIcon} label="Total Bookings" value={bookings.length} color="#3b82f6" />
+            <StatCard icon={TagIcon} label="Active Tickets" value={Math.floor(Math.random() * 5)} color="#f97316" />
+            <StatCard icon={BellIcon} label="Unread Notifs" value={unreadCount} color="#77A365" />
+          </div>
 
-        {/* Profile Sidebar */}
-        <div className="dash-sidebar">
-          <div className="dash-card profile-card" id="profile-card">
-            <div className="card-header">
-              <h3>Profile</h3>
+          {/* Middle Row */}
+          <div className="middle-grid">
+            <div className="progress-container">
+               <ProgressSection 
+                 userProgress={73} 
+                 teamProgress={[
+                   { name: 'Library Usage', percentage: 85, color: '#3b82f6' },
+                   { name: 'Lab Bookings', percentage: 62, color: '#f97316' },
+                   { name: 'Sports Hub', percentage: 45, color: '#77A365' }
+                 ]} 
+               />
             </div>
-            <div className="profile-body">
-              <div className="profile-avatar">
-                {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-              </div>
-              <h4 className="profile-name">{user?.name || 'User'}</h4>
-              <span className={`role-chip role-${user?.role?.toLowerCase()}`}>
-                {user?.role}
-              </span>
-              <div className="profile-details">
-                <div className="detail-row">
-                  <span className="detail-icon">
-                    <MailIcon size={13} color="#64748b" />
-                  </span>
-                  <span className="detail-text">{user?.email}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-icon">
-                    <CalendarIcon size={13} color="#64748b" />
-                  </span>
-                  <span className="detail-text">
-                    Joined {user?.createdAt
-                      ? new Date(user.createdAt).toLocaleDateString('en-US', {
-                        month: 'short', day: 'numeric', year: 'numeric',
-                      })
-                      : 'N/A'}
-                  </span>
-                </div>
-              </div>
+            
+            <div className="promo-banner">
+               <div className="promo-content">
+                  <span className="deadline-tag">4 Days 9 Hours</span>
+                  <p>to your facility booking deadline</p>
+               </div>
+               <div className="promo-image">
+                  {/* Decorative elements */}
+                  <ShieldIcon size={100} color="rgba(255,255,255,0.1)" />
+               </div>
             </div>
           </div>
 
-          <div className="dash-card quick-card">
-            <div className="card-header">
-              <h3>Quick Access</h3>
-            </div>
-            <div className="quick-body">
-              {user?.role !== 'ADMIN' && (
-                <>
-                  <button className="quick-link-btn" onClick={() => navigate('/bookings')}>
-                    <CalendarIcon size={14} color="#77A365" />
-                    <span>Common Booking</span>
-                  </button>
-                  <button className="quick-link-btn" onClick={() => navigate('/resources')}>
-                    <PinIcon size={14} color="#77A365" />
-                    <span>Facilities Catalogue</span>
-                  </button>
-                  <button className="quick-link-btn" onClick={() => navigate('/tickets')}>
-                    <TagIcon size={14} color="#77A365" />
-                    <span>Raise a Ticket</span>
-                  </button>
-                </>
-              )}
-              <button className="quick-link-btn" onClick={() => navigate('/notifications')}>
-                <BellIcon size={14} color="#77A365" />
-                <span>All Notifications</span>
-              </button>
-            </div>
+          {/* Bottom Section - Facilities Spotlight */}
+          <div className="spotlight-section">
+             <div className="section-title-row">
+                <h3>Facilities Spotlight</h3>
+                <button className="view-all-btn" onClick={() => navigate('/resources')}>View All</button>
+             </div>
+             <div className="facility-grid">
+                {resources.map(res => (
+                  <FacilityCard key={res.id} facility={res} />
+                ))}
+                {resources.length === 0 && <p className="empty-text">No resources found.</p>}
+             </div>
           </div>
         </div>
+
+        {/* Right Column */}
+        <aside className="dashboard-aside">
+           <div className="aside-card calendar-aside">
+              <div className="card-top">
+                 <h4>Schedule</h4>
+                 <ThemeToggle />
+              </div>
+              <CalendarWidget 
+                highlights={bookings.reduce((acc, b) => {
+                  if (b.startTime) {
+                    const dateStr = b.startTime.split('T')[0];
+                    acc[dateStr] = b.status === 'APPROVED' ? 'green' : 'orange';
+                  }
+                  return acc;
+                }, {})}
+              />
+           </div>
+
+           <div className="aside-card activity-card">
+              <div className="card-top">
+                 <h4>Recent Activity</h4>
+              </div>
+              <div className="activity-list">
+                 {notifications.slice(0, 5).map(n => (
+                   <div key={n.id} className="activity-item">
+                      <div className="activity-dot"></div>
+                      <div className="activity-text">
+                         <span className="activity-msg">{n.message}</span>
+                         <span className="activity-time">{new Date(n.createdAt).toLocaleDateString()}</span>
+                      </div>
+                   </div>
+                 ))}
+                 {notifications.length === 0 && <p className="empty-text">No recent activity.</p>}
+              </div>
+           </div>
+        </aside>
+
       </div>
     </div>
   );

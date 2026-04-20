@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUnreadCount } from '../services/api';
@@ -23,8 +23,24 @@ const Navbar = () => {
   const location = useLocation();
   const [unreadCount, setUnreadCount] = useState(0);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-
+  
   const isAdmin = user?.role === 'ADMIN';
+
+  // Navigation Items Mapping
+  const navItems = isAdmin ? [
+    { path: '/admin', label: 'Admin Panel', icon: SettingsIcon, color: 'orange' },
+    { path: '/dashboard', label: 'Dashboard', icon: GridIcon, color: 'blue' },
+    { path: '/notifications', label: 'Inbox', icon: BellIcon, color: 'red', isInbox: true },
+  ] : [
+    { path: '/dashboard', label: 'Overview', icon: GridIcon, color: 'orange' },
+    { path: '/bookings', label: 'Bookings', icon: CalendarIcon, color: 'purple' },
+    { path: '/resources', label: 'Facilities', icon: PinIcon, color: 'green' },
+    { path: '/tickets', label: 'Support', icon: TagIcon, color: 'blue' },
+    { path: '/notifications', label: 'Inbox', icon: BellIcon, color: 'red', isInbox: true },
+  ];
+
+  // Find active index for sliding indicator
+  const activeIndex = navItems.findIndex(item => item.path === location.pathname);
 
   useEffect(() => {
     if (user) {
@@ -39,42 +55,10 @@ const Navbar = () => {
     }
   }, [user]);
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 992) {
-        setIsMobileOpen(false);
-      }
-    };
-
-    const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
-        setIsMobileOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-
-  useEffect(() => {
-    document.body.classList.toggle('sidebar-open', isMobileOpen);
-
-    return () => {
-      document.body.classList.remove('sidebar-open');
-    };
-  }, [isMobileOpen]);
-
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
-
-  const isActive = (path) => location.pathname === path;
 
   // Toggle for mobile
   useEffect(() => {
@@ -83,13 +67,6 @@ const Navbar = () => {
 
   return (
     <>
-      <div
-        className={`sidebar-backdrop ${isMobileOpen ? 'visible' : ''}`}
-        onClick={() => setIsMobileOpen(false)}
-        aria-hidden="true"
-      />
-
-      {/* Mobile Toggle Button */}
       <button 
         className="mobile-toggle" 
         onClick={() => setIsMobileOpen(!isMobileOpen)}
@@ -100,85 +77,62 @@ const Navbar = () => {
 
       <div className={`sidebar ${isMobileOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-header">
-          <div className="logo-container">
-            <GraduationCapIcon size={32} color="#0f172a" />
+          <div className="logo-box">
+            <GraduationCapIcon size={28} color="#77A365" />
           </div>
-          <span className="logo-text">CAMPUS.FLOW</span>
+          <div className="brand-info">
+            <span className="brand-name">CAMPUS</span>
+            <span className="brand-sub">FLOW HUB</span>
+          </div>
         </div>
 
         <nav className="sidebar-nav">
-          <ul>
-            {isAdmin ? (
-              <>
-                 <li className={isActive('/admin') ? 'active orange' : ''}>
-                  <Link to="/admin">
-                    <span className="icon-box"><SettingsIcon size={20} /></span>
-                    <span className="link-text">Admin Panel</span>
-                  </Link>
-                </li>
-                <li className={isActive('/dashboard') ? 'active blue' : ''}>
-                  <Link to="/dashboard">
-                    <span className="icon-box"><GridIcon size={20} /></span>
-                    <span className="link-text">Dashboard</span>
-                  </Link>
-                </li>
-              </>
-            ) : (
-              <>
-                <li className={isActive('/dashboard') ? 'active orange' : ''}>
-                  <Link to="/dashboard">
-                    <span className="icon-box"><GridIcon size={20} /></span>
-                    <span className="link-text">Overview</span>
-                  </Link>
-                </li>
-                <li className={isActive('/bookings') ? 'active purple' : ''}>
-                  <Link to="/bookings">
-                    <span className="icon-box"><CalendarIcon size={20} /></span>
-                    <span className="link-text">Bookings</span>
-                  </Link>
-                </li>
-                <li className={isActive('/resources') ? 'active green' : ''}>
-                  <Link to="/resources">
-                    <span className="icon-box"><PinIcon size={20} /></span>
-                    <span className="link-text">Facilities</span>
-                  </Link>
-                </li>
-                <li className={isActive('/tickets') ? 'active blue' : ''}>
-                  <Link to="/tickets">
-                    <span className="icon-box"><TagIcon size={20} /></span>
-                    <span className="link-text">Support</span>
-                  </Link>
-                </li>
-              </>
+          <ul className="nav-list">
+            {/* Sliding Indicator Blob */}
+            {activeIndex !== -1 && (
+              <div 
+                className={`sliding-indicator ${navItems[activeIndex].color}`}
+                style={{ transform: `translateY(${activeIndex * 56}px)` }}
+              />
             )}
-            
-            <li className={isActive('/notifications') ? 'active red' : ''}>
-              <Link to="/notifications" id="nav-notifications">
-                <span className="icon-box">
-                  <BellIcon size={20} />
-                  {unreadCount > 0 && <span className="notification-dot"></span>}
-                </span>
-                <span className="link-text">Inbox</span>
-                {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
-              </Link>
-            </li>
+
+            {navItems.map((item, index) => {
+              const Icon = item.icon;
+              const isActive = index === activeIndex;
+              return (
+                <li key={item.path} className={isActive ? 'active' : ''}>
+                  <Link to={item.path}>
+                    <div className="nav-icon-wrap">
+                      <Icon size={20} />
+                      {item.isInbox && unreadCount > 0 && <span className="notif-dot" />}
+                    </div>
+                    <span className="nav-label">{item.label}</span>
+                    {item.isInbox && unreadCount > 0 && (
+                      <span className="count-badge">{unreadCount}</span>
+                    )}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
         <div className="sidebar-footer">
-          <div className="user-profile">
-            <div className="avatar">
-               <UserIcon size={24} color="#475569" />
+          <div className="user-mini-card">
+            <div className="user-avatar-mini">
+               {user?.name?.charAt(0)?.toUpperCase()}
             </div>
-            <div className="user-info">
-              <span className="user-name">{user?.name || 'User'}</span>
-              <span className="user-role">{user?.role || 'Member'}</span>
+            <div className="user-text-mini">
+              <span className="mini-name">{user?.name}</span>
+              <span className="mini-role">{user?.role}</span>
             </div>
           </div>
           
-          <button className="logout-btn" onClick={handleLogout}>
-            <span className="icon-box"><LogOutIcon size={18} /></span>
-            <span className="link-text">LOGOUT</span>
+          <button className="logout-action" onClick={handleLogout}>
+            <div className="logout-icon-box">
+              <LogOutIcon size={18} />
+            </div>
+            <span>LOGOUT</span>
           </button>
         </div>
       </div>
