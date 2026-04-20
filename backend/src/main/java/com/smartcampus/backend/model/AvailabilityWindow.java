@@ -1,4 +1,4 @@
-package com.campusflow.entity;
+package com.smartcampus.backend.model;
 
 import jakarta.validation.constraints.NotBlank;
 

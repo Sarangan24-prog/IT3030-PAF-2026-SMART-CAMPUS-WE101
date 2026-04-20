@@ -1,8 +1,8 @@
-package com.campusflow.util;
+package com.smartcampus.backend.util;
 
-import com.campusflow.dto.ResourceRequest;
-import com.campusflow.dto.ResourceResponse;
-import com.campusflow.entity.Resource;
+import com.smartcampus.backend.dto.ResourceRequest;
+import com.smartcampus.backend.dto.ResourceResponse;
+import com.smartcampus.backend.model.Resource;
 
 public class ResourceMapper {
 

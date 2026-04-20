@@ -1,8 +1,8 @@
-package com.campusflow.dto;
+package com.smartcampus.backend.dto;
 
-import com.campusflow.entity.AvailabilityWindow;
-import com.campusflow.enums.ResourceStatus;
-import com.campusflow.enums.ResourceType;
+import com.smartcampus.backend.model.AvailabilityWindow;
+import com.smartcampus.backend.model.ResourceStatus;
+import com.smartcampus.backend.model.ResourceType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

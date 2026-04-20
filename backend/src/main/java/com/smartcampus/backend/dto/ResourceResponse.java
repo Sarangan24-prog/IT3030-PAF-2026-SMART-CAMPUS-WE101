@@ -1,21 +1,13 @@
-package com.campusflow.entity;
+package com.smartcampus.backend.dto;
 
-import com.campusflow.enums.ResourceStatus;
-import com.campusflow.enums.ResourceType;
+import com.smartcampus.backend.model.AvailabilityWindow;
+import com.smartcampus.backend.model.ResourceStatus;
+import com.smartcampus.backend.model.ResourceType;
 import java.util.List;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "resources")
-public class Resource {
-
-    @Id
+public class ResourceResponse {
     private String id;
-
-    @Indexed(unique = true)
     private String code;
-
     private String name;
     private ResourceType type;
     private Integer capacity;
@@ -29,7 +21,7 @@ public class Resource {
     private List<AvailabilityWindow> availabilityWindows;
     private String imageUrl;
 
-    public Resource() {}
+    public ResourceResponse() {}
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }

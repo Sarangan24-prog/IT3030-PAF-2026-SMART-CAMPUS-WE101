@@ -1,9 +1,9 @@
-package com.campusflow.controller;
+package com.smartcampus.backend.controller;
 
-import com.campusflow.dto.ResourceRequest;
-import com.campusflow.dto.ResourceResponse;
-import com.campusflow.dto.ResourceSearchRequest;
-import com.campusflow.service.ResourceService;
+import com.smartcampus.backend.dto.ResourceRequest;
+import com.smartcampus.backend.dto.ResourceResponse;
+import com.smartcampus.backend.dto.ResourceSearchRequest;
+import com.smartcampus.backend.service.ResourceService;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/resources")
-@CrossOrigin(origins = "http://localhost:3000") // changed to 3000 to match the project React port instead of 5173
 public class ResourceController {
 
     private final ResourceService resourceService;

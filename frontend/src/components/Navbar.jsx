@@ -8,11 +8,12 @@ import {
   SettingsIcon,
   BellIcon,
   LogOutIcon,
-  MenuIcon,
-  CloseIcon,
   CalendarIcon,
   TagIcon,
   PinIcon,
+  UserIcon,
+  MenuIcon,
+  CloseIcon
 } from './Icons';
 import './Navbar.css';
 
@@ -21,7 +22,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [unreadCount, setUnreadCount] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const isAdmin = user?.role === 'ADMIN';
 
@@ -39,8 +40,34 @@ const Navbar = () => {
   }, [user]);
 
   useEffect(() => {
-    setMenuOpen(false);
-  }, [location.pathname]);
+    const handleResize = () => {
+      if (window.innerWidth > 992) {
+        setIsMobileOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setIsMobileOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle('sidebar-open', isMobileOpen);
+
+    return () => {
+      document.body.classList.remove('sidebar-open');
+    };
+  }, [isMobileOpen]);
 
   const handleLogout = () => {
     logout();
@@ -49,107 +76,113 @@ const Navbar = () => {
 
   const isActive = (path) => location.pathname === path;
 
+  // Toggle for mobile
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [location.pathname]);
+
   return (
-    <nav className="navbar" id="main-navbar">
-      <div className="navbar-inner">
-        <Link to={isAdmin ? '/admin' : '/dashboard'} className="navbar-brand">
-          <span className="brand-icon">
-            <GraduationCapIcon size={20} color="#ffffff" />
-          </span>
-          <span className="brand-text">Smart Campus</span>
-        </Link>
+    <>
+      <div
+        className={`sidebar-backdrop ${isMobileOpen ? 'visible' : ''}`}
+        onClick={() => setIsMobileOpen(false)}
+        aria-hidden="true"
+      />
 
-        <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
-          {isAdmin ? (
-            <>
-              <Link
-                to="/admin"
-                className={`nav-link ${isActive('/admin') ? 'active' : ''}`}
-              >
-                <SettingsIcon size={15} />
-                <span>Admin Panel</span>
-              </Link>
-              <Link
-                to="/dashboard"
-                className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
-              >
-                <GridIcon size={15} />
-                <span>Dashboard</span>
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/dashboard"
-                className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
-              >
-                <GridIcon size={15} />
-                <span>Dashboard</span>
-              </Link>
-              <Link
-                to="/bookings"
-                className={`nav-link ${isActive('/bookings') ? 'active' : ''}`}
-              >
-                <CalendarIcon size={15} />
-                <span>Bookings</span>
-              </Link>
-              <Link
-                to="/resources"
-                className={`nav-link ${isActive('/resources') ? 'active' : ''}`}
-              >
-                <PinIcon size={15} />
-                <span>Facilities</span>
-              </Link>
-              <Link
-                to="/tickets"
-                className={`nav-link ${isActive('/tickets') ? 'active' : ''}`}
-              >
-                <TagIcon size={15} />
-                <span>Tickets</span>
-              </Link>
-            </>
-          )}
+      {/* Mobile Toggle Button */}
+      <button 
+        className="mobile-toggle" 
+        onClick={() => setIsMobileOpen(!isMobileOpen)}
+        aria-label="Toggle Menu"
+      >
+        {isMobileOpen ? <CloseIcon size={24} color="#ffffff" /> : <MenuIcon size={24} color="#ffffff" />}
+      </button>
 
-          <Link
-            to="/notifications"
-            className={`nav-link ${isActive('/notifications') ? 'active' : ''}`}
-            id="nav-notifications"
-          >
-            <BellIcon size={15} />
-            <span>Notifications</span>
-            {unreadCount > 0 && (
-              <span className="badge" id="unread-badge">{unreadCount}</span>
-            )}
-          </Link>
-
-          <div className="mobile-user-section">
-            <span className="mobile-user-name">{user?.name}</span>
-            {isAdmin && <span className="admin-tag">ADMIN</span>}
-            <button className="logout-btn" onClick={handleLogout}>
-              <LogOutIcon size={14} />
-              <span>Sign Out</span>
-            </button>
+      <div className={`sidebar ${isMobileOpen ? 'mobile-open' : ''}`}>
+        <div className="sidebar-header">
+          <div className="logo-container">
+            <GraduationCapIcon size={32} color="#0f172a" />
           </div>
+          <span className="logo-text">CAMPUS.FLOW</span>
         </div>
 
-        <div className="navbar-user">
-          {isAdmin && <span className="admin-tag">ADMIN</span>}
-          <span className="user-name">{user?.name}</span>
-          <button className="logout-btn" onClick={handleLogout} id="logout-btn">
-            <LogOutIcon size={14} />
-            <span>Sign Out</span>
+        <nav className="sidebar-nav">
+          <ul>
+            {isAdmin ? (
+              <>
+                 <li className={isActive('/admin') ? 'active orange' : ''}>
+                  <Link to="/admin">
+                    <span className="icon-box"><SettingsIcon size={20} /></span>
+                    <span className="link-text">Admin Panel</span>
+                  </Link>
+                </li>
+                <li className={isActive('/dashboard') ? 'active blue' : ''}>
+                  <Link to="/dashboard">
+                    <span className="icon-box"><GridIcon size={20} /></span>
+                    <span className="link-text">Dashboard</span>
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className={isActive('/dashboard') ? 'active orange' : ''}>
+                  <Link to="/dashboard">
+                    <span className="icon-box"><GridIcon size={20} /></span>
+                    <span className="link-text">Overview</span>
+                  </Link>
+                </li>
+                <li className={isActive('/bookings') ? 'active purple' : ''}>
+                  <Link to="/bookings">
+                    <span className="icon-box"><CalendarIcon size={20} /></span>
+                    <span className="link-text">Bookings</span>
+                  </Link>
+                </li>
+                <li className={isActive('/resources') ? 'active green' : ''}>
+                  <Link to="/resources">
+                    <span className="icon-box"><PinIcon size={20} /></span>
+                    <span className="link-text">Facilities</span>
+                  </Link>
+                </li>
+                <li className={isActive('/tickets') ? 'active blue' : ''}>
+                  <Link to="/tickets">
+                    <span className="icon-box"><TagIcon size={20} /></span>
+                    <span className="link-text">Support</span>
+                  </Link>
+                </li>
+              </>
+            )}
+            
+            <li className={isActive('/notifications') ? 'active red' : ''}>
+              <Link to="/notifications" id="nav-notifications">
+                <span className="icon-box">
+                  <BellIcon size={20} />
+                  {unreadCount > 0 && <span className="notification-dot"></span>}
+                </span>
+                <span className="link-text">Inbox</span>
+                {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
+              </Link>
+            </li>
+          </ul>
+        </nav>
+
+        <div className="sidebar-footer">
+          <div className="user-profile">
+            <div className="avatar">
+               <UserIcon size={24} color="#475569" />
+            </div>
+            <div className="user-info">
+              <span className="user-name">{user?.name || 'User'}</span>
+              <span className="user-role">{user?.role || 'Member'}</span>
+            </div>
+          </div>
+          
+          <button className="logout-btn" onClick={handleLogout}>
+            <span className="icon-box"><LogOutIcon size={18} /></span>
+            <span className="link-text">LOGOUT</span>
           </button>
         </div>
-
-        <button
-          className="hamburger"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? <CloseIcon size={22} color="#e2e8f0" /> : <MenuIcon size={22} color="#e2e8f0" />}
-        </button>
       </div>
-    </nav>
+    </>
   );
 };
 

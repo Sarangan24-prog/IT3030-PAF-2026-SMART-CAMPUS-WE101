@@ -1,4 +1,4 @@
-package com.campusflow.enums;
+package com.smartcampus.backend.model;
 
 public enum ResourceStatus {
     ACTIVE,
