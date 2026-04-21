@@ -1,0 +1,20 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/resources'
+order: 1000
+headers:
+  - key: 'Authorization'
+    value: 'Bearer {{jwtToken}}'
+  - key: 'Content-Type'
+    value: 'application/json'
+body:
+  type: json
+  content: |-
+    {
+      "name": "Computer Lab A",
+      "type": "LAB",
+      "location": "Engineering Building - Floor 2",
+      "capacity": 40,
+      "description": "High-performance computer lab for scheduled practical sessions",
+      "available": true
+    }

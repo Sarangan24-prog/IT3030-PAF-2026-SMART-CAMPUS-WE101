@@ -235,11 +235,11 @@
 }
 
 .admin-subnav-link {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 12px;
   width: calc(100% - 10px);
-  padding: 8px 16px;
+  padding: 10px 16px;
   margin-left: -2px; /* Anchor to the border line */
   border-radius: 0 8px 8px 0;
   color: var(--text-dim);
@@ -247,6 +247,12 @@
   font-weight: 500;
   transition: all 0.2s ease;
   position: relative;
+}
+
+.admin-subnav-link svg {
+  flex-shrink: 0;
+  opacity: 0.8;
+  color: inherit;
 }
 
 .admin-subnav-link:hover {

@@ -1,0 +1,18 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/resources/search'
+order: 6000
+headers:
+  - key: 'Authorization'
+    value: 'Bearer {{jwtToken}}'
+  - key: 'Content-Type'
+    value: 'application/json'
+body:
+  type: json
+  content: |-
+    {
+      "query": "lab",
+      "location": "Engineering Building",
+      "capacity": 30,
+      "available": true
+    }

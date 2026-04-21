@@ -1,0 +1,8 @@
+$kind: collection
+name: 'Smart Campus API'
+description: 'Collection generated from backend Spring controllers in the Smart Campus project.'
+values:
+  - key: 'baseUrl'
+    value: 'http://localhost:8080'
+  - key: 'jwtToken'
+    value: ''
