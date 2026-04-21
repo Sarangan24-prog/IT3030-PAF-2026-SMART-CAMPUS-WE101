@@ -11,6 +11,9 @@
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
   --radius-lg: 16px;
+  --text-dim: #64748b;
+  --text-bright: #0f172a;
+  --trans: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-theme='dark'] {
@@ -26,6 +29,9 @@
   --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
   --card-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.4);
   --radius-lg: 16px;
+  --text-dim: #94a3b8;
+  --text-bright: #ffffff;
+  --trans: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ═══════════════════════════════════════════════

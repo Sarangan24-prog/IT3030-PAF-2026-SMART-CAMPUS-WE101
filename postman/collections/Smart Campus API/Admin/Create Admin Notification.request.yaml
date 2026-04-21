@@ -1,0 +1,17 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/admin/notifications'
+order: 3000
+headers:
+  - key: 'Authorization'
+    value: 'Bearer {{jwtToken}}'
+  - key: 'Content-Type'
+    value: 'application/json'
+body:
+  type: json
+  content: |-
+    {
+      "title": "Scheduled Maintenance",
+      "message": "Campus systems will be unavailable from 10:00 PM to 11:00 PM.",
+      "type": "BOOKING_APPROVED"
+    }

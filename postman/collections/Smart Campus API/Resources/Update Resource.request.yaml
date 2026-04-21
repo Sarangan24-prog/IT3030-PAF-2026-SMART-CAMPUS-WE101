@@ -1,0 +1,23 @@
+$kind: http-request
+method: PUT
+url: '{{baseUrl}}/api/resources/:id'
+order: 4000
+headers:
+  - key: 'Authorization'
+    value: 'Bearer {{jwtToken}}'
+  - key: 'Content-Type'
+    value: 'application/json'
+pathVariables:
+  - key: id
+    value: '1'
+body:
+  type: json
+  content: |-
+    {
+      "name": "Computer Lab A",
+      "type": "LAB",
+      "location": "Engineering Building - Floor 2",
+      "capacity": 45,
+      "description": "Updated description for the lab",
+      "available": true
+    }

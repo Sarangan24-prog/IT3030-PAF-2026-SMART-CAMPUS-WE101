@@ -1,0 +1,19 @@
+$kind: http-request
+method: PUT
+url: '{{baseUrl}}/api/tickets/:id/feedback'
+order: 5000
+headers:
+  - key: 'Authorization'
+    value: 'Bearer {{jwtToken}}'
+  - key: 'Content-Type'
+    value: 'application/json'
+pathVariables:
+  - key: id
+    value: '1'
+body:
+  type: json
+  content: |-
+    {
+      "rating": 5,
+      "feedback": "Issue resolved quickly and effectively."
+    }
