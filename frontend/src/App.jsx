@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LoginPage from './pages/LoginPage';
@@ -25,10 +26,12 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   if (adminOnly && user.role !== 'ADMIN') return <Navigate to="/dashboard" />;
 
   return (
-    <div className="app-shell">
+    <div className="app-shell dashboard-shell">
       <Navbar />
-      <main className="main-content">{children}</main>
-      <Footer />
+      <div className="main-container">
+        <main className="main-content">{children}</main>
+        <Footer />
+      </div>
     </div>
   );
 };
@@ -161,9 +164,11 @@ const AppRoutes = () => {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

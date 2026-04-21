@@ -1,0 +1,17 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/tickets'
+order: 1000
+headers:
+  - key: 'Authorization'
+    value: 'Bearer {{jwtToken}}'
+  - key: 'Content-Type'
+    value: 'application/json'
+body:
+  type: json
+  content: |-
+    {
+      "title": "Projector not working",
+      "description": "The projector in Lecture Hall 3 does not turn on.",
+      "priority": "HIGH"
+    }

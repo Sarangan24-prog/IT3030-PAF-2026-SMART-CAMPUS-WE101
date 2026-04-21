@@ -1,0 +1,18 @@
+# Use this workspace to collaborate
+workspace:
+  id: f3910c9f-7a68-45d5-91d4-8e31cfbefbab
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ..\postman\collections\New Collection: 48527791-a1d2a4df-1359-408a-8b63-7a5626d4be26
+    ..\postman\collections\Smart Campus API: 48527791-52d2dbe2-4f37-460c-8521-25418d4112f4
+  environments:
+    ..\postman\environments\New Environment.environment.yaml: 48527791-d7b92a13-60e4-4acf-a011-de624b506a02
+
+# All resources in the `postman/` folder are automatically registered in Local View.
+# Point to additional files outside the `postman/` folder to register them individually. Example:
+#localResources:
+#  collections:
+#    - ../tests/E2E Test Collection/

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   getAdminStats,
   getAllUsers,
@@ -41,7 +42,9 @@ const TABS = [
 ];
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [searchParams] = useSearchParams();
+  const requestedTab = searchParams.get('tab') || 'overview';
+  const activeTab = TABS.some((tab) => tab.key === requestedTab) ? requestedTab : 'overview';
 
   return (
     <div className="admin-dashboard">
@@ -50,19 +53,6 @@ const AdminDashboard = () => {
         <p className="admin-subtitle">Manage users, bookings, tickets and notifications</p>
       </div>
 
-      <div className="admin-tabs">
-        {TABS.map(({ key, label, Icon }) => (
-          <button
-            key={key}
-            className={`tab-btn ${activeTab === key ? 'active' : ''}`}
-            onClick={() => setActiveTab(key)}
-          >
-            <Icon size={14} />
-            <span>{label}</span>
-          </button>
-        ))}
-      </div>
-       
       <div className="tab-content">
         {activeTab === 'overview'      && <OverviewTab />}
         {activeTab === 'bookings'      && <BookingsTab />}

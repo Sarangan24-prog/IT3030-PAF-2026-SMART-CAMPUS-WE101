@@ -1,0 +1,18 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/bookings'
+order: 1000
+headers:
+  - key: 'Authorization'
+    value: 'Bearer {{jwtToken}}'
+  - key: 'Content-Type'
+    value: 'application/json'
+body:
+  type: json
+  content: |-
+    {
+      "resourceId": 1,
+      "startTime": "2026-05-01T09:00:00",
+      "endTime": "2026-05-01T11:00:00",
+      "purpose": "Database lab session"
+    }

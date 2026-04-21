@@ -1,0 +1,7 @@
+$kind: http-request
+method: PUT
+url: '{{baseUrl}}/api/notifications/read-all'
+order: 4000
+headers:
+  - key: 'Authorization'
+    value: 'Bearer {{jwtToken}}'

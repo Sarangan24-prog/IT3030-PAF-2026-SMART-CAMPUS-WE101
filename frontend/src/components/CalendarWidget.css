@@ -1,0 +1,125 @@
+.calendar-widget {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 18px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+  font-family: inherit;
+  width: 100%;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.month-year {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.nav-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-btns button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.nav-btns button:hover {
+  background: var(--accent-green-light);
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  transform: translateY(-1px);
+}
+
+.calendar-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.day-names {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.day-names span {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.day-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main) !important; /* Forced visibility for dates */
+  border-radius: 8px;
+  cursor: default;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.day-cell.empty {
+  visibility: hidden;
+}
+
+.day-cell.actual:hover {
+  background: var(--accent-green-light);
+  color: var(--accent-green);
+}
+
+.day-cell.today {
+  color: var(--accent-green);
+  font-weight: 800;
+  background: var(--accent-green-light);
+}
+
+/* Circle highlights for bookings */
+[class*="highlight-"] {
+  border-radius: 50%;
+  color: #ffffff; /* Always white text on colored circles */
+  font-weight: 700;
+  z-index: 1;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.highlight-orange { background-color: #f97316; }
+.highlight-purple { background-color: #a855f7; }
+.highlight-green  { background-color: #22c55e; }
+.highlight-blue   { background-color: #3b82f6; }
+.highlight-red    { background-color: #ef4444; }
+
+@media (max-width: 480px) {
+  .calendar-widget {
+    padding: 12px;
+  }
+}

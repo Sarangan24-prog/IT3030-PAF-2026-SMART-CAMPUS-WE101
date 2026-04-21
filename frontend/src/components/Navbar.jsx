@@ -8,11 +8,14 @@ import {
   SettingsIcon,
   BellIcon,
   LogOutIcon,
-  MenuIcon,
-  CloseIcon,
   CalendarIcon,
   TagIcon,
   PinIcon,
+  MenuIcon,
+  CloseIcon,
+  UsersIcon,
+  SendIcon,
+  BuildingIcon
 } from './Icons';
 import './Navbar.css';
 
@@ -20,10 +23,36 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isAdminExpanded, setIsAdminExpanded] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
-
+  
   const isAdmin = user?.role === 'ADMIN';
+  const adminPanelTabs = [
+    { key: 'overview', label: 'Overview', icon: GridIcon },
+    { key: 'bookings', label: 'Bookings', icon: CalendarIcon },
+    { key: 'resources', label: 'Facilities', icon: BuildingIcon },
+    { key: 'users', label: 'Users', icon: UsersIcon },
+    { key: 'notifications', label: 'Notifications', icon: null },
+    { key: 'send', label: 'Send', icon: SendIcon },
+  ];
+  const currentAdminTab = new URLSearchParams(location.search).get('tab') || 'overview';
+
+  // Navigation Items Mapping
+  const navItems = isAdmin ? [
+    { path: '/admin', label: 'Admin Panel', icon: SettingsIcon, color: 'orange' },
+    { path: '/dashboard', label: 'Overview', icon: GridIcon, color: 'blue' },
+    { path: '/notifications', label: 'Inbox', icon: BellIcon, color: 'red', isInbox: true },
+  ] : [
+    { path: '/dashboard', label: 'Overview', icon: GridIcon, color: 'orange' },
+    { path: '/bookings', label: 'Bookings', icon: CalendarIcon, color: 'purple' },
+    { path: '/resources', label: 'Facilities', icon: PinIcon, color: 'green' },
+    { path: '/tickets', label: 'Support', icon: TagIcon, color: 'blue' },
+    { path: '/notifications', label: 'Inbox', icon: BellIcon, color: 'red', isInbox: true },
+  ];
+
+  // Find active index for sliding indicator
+  const activeIndex = navItems.findIndex(item => item.path === location.pathname);
 
   useEffect(() => {
     if (user) {
@@ -39,117 +68,119 @@ const Navbar = () => {
   }, [user]);
 
   useEffect(() => {
-    setMenuOpen(false);
-  }, [location.pathname]);
+    if (isAdmin && location.pathname.startsWith('/admin')) {
+      setIsAdminExpanded(true);
+    }
+  }, [location.pathname, isAdmin]);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const isActive = (path) => location.pathname === path;
+  // Toggle for mobile
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [location.pathname]);
 
   return (
-    <nav className="navbar" id="main-navbar">
-      <div className="navbar-inner">
-        <Link to={isAdmin ? '/admin' : '/dashboard'} className="navbar-brand">
-          <span className="brand-icon">
-            <GraduationCapIcon size={20} color="#ffffff" />
-          </span>
-          <span className="brand-text">Smart Campus</span>
-        </Link>
+    <>
+      <button 
+        className="mobile-toggle" 
+        onClick={() => setIsMobileOpen(!isMobileOpen)}
+        aria-label="Toggle Menu"
+      >
+        {isMobileOpen ? <CloseIcon size={24} color="#ffffff" /> : <MenuIcon size={24} color="#ffffff" />}
+      </button>
 
-        <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
-          {isAdmin ? (
-            <>
-              <Link
-                to="/admin"
-                className={`nav-link ${isActive('/admin') ? 'active' : ''}`}
-              >
-                <SettingsIcon size={15} />
-                <span>Admin Panel</span>
-              </Link>
-              <Link
-                to="/dashboard"
-                className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
-              >
-                <GridIcon size={15} />
-                <span>Dashboard</span>
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/dashboard"
-                className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
-              >
-                <GridIcon size={15} />
-                <span>Dashboard</span>
-              </Link>
-              <Link
-                to="/bookings"
-                className={`nav-link ${isActive('/bookings') ? 'active' : ''}`}
-              >
-                <CalendarIcon size={15} />
-                <span>Bookings</span>
-              </Link>
-              <Link
-                to="/resources"
-                className={`nav-link ${isActive('/resources') ? 'active' : ''}`}
-              >
-                <PinIcon size={15} />
-                <span>Facilities</span>
-              </Link>
-              <Link
-                to="/tickets"
-                className={`nav-link ${isActive('/tickets') ? 'active' : ''}`}
-              >
-                <TagIcon size={15} />
-                <span>Tickets</span>
-              </Link>
-            </>
-          )}
-
-          <Link
-            to="/notifications"
-            className={`nav-link ${isActive('/notifications') ? 'active' : ''}`}
-            id="nav-notifications"
-          >
-            <BellIcon size={15} />
-            <span>Notifications</span>
-            {unreadCount > 0 && (
-              <span className="badge" id="unread-badge">{unreadCount}</span>
-            )}
-          </Link>
-
-          <div className="mobile-user-section">
-            <span className="mobile-user-name">{user?.name}</span>
-            {isAdmin && <span className="admin-tag">ADMIN</span>}
-            <button className="logout-btn" onClick={handleLogout}>
-              <LogOutIcon size={14} />
-              <span>Sign Out</span>
-            </button>
+      <div className={`sidebar ${isMobileOpen ? 'mobile-open' : ''}`}>
+        <div className="sidebar-header">
+          <div className="logo-box">
+            <GraduationCapIcon size={28} color="#77A365" />
+          </div>
+          <div className="brand-info">
+            <span className="brand-name">CAMPUS</span>
+            <span className="brand-sub">{isAdmin ? 'ADMIN PANEL' : 'FLOW HUB'}</span>
           </div>
         </div>
 
-        <div className="navbar-user">
-          {isAdmin && <span className="admin-tag">ADMIN</span>}
-          <span className="user-name">{user?.name}</span>
-          <button className="logout-btn" onClick={handleLogout} id="logout-btn">
-            <LogOutIcon size={14} />
-            <span>Sign Out</span>
+        <nav className="sidebar-nav">
+          <ul className="nav-list">
+
+            {navItems.map((item, index) => {
+              const Icon = item.icon;
+              const isActive = index === activeIndex;
+              const isAdminPanelItem = isAdmin && item.path === '/admin';
+              const showAdminSubnav = isAdminPanelItem && isAdminExpanded;
+
+              return (
+                <li 
+                  key={item.path} 
+                  className={`${isActive ? 'active' : ''} ${showAdminSubnav ? 'has-subnav' : ''} ${item.color}`}
+                >
+                  <Link 
+                    to={item.path} 
+                    onClick={(e) => {
+                      if (isAdminPanelItem) {
+                        e.preventDefault();
+                        setIsAdminExpanded(!isAdminExpanded);
+                      }
+                    }}
+                  >
+                    <div className="nav-icon-wrap">
+                      <Icon size={20} />
+                      {item.isInbox && unreadCount > 0 && <span className="notif-dot" />}
+                    </div>
+                    <span className="nav-label">{item.label}</span>
+                    {item.isInbox && unreadCount > 0 && (
+                      <span className="count-badge">{unreadCount}</span>
+                    )}
+                  </Link>
+
+                  {showAdminSubnav && (
+                    <ul className="admin-subnav">
+                      {adminPanelTabs.map((tab) => {
+                        const TabIcon = tab.icon;
+                        return (
+                          <li key={tab.key}>
+                            <Link
+                              to={`/admin?tab=${tab.key}`}
+                              className={`admin-subnav-link ${currentAdminTab === tab.key ? 'active' : ''}`}
+                            >
+                              {TabIcon && <TabIcon size={18} />}
+                              <span>{tab.label}</span>
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        <div className="sidebar-footer">
+          <div className="user-mini-card">
+            <div className="user-avatar-mini">
+               {user?.name?.charAt(0)?.toUpperCase()}
+            </div>
+            <div className="user-text-mini">
+              <span className="mini-name">{user?.name}</span>
+              <span className="mini-role">{user?.role}</span>
+            </div>
+          </div>
+          
+          <button className="logout-action" onClick={handleLogout}>
+            <div className="logout-icon-box">
+              <LogOutIcon size={18} />
+            </div>
+            <span>LOGOUT</span>
           </button>
         </div>
-
-        <button
-          className="hamburger"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? <CloseIcon size={22} color="#e2e8f0" /> : <MenuIcon size={22} color="#e2e8f0" />}
-        </button>
       </div>
-    </nav>
+    </>
   );
 };
 
