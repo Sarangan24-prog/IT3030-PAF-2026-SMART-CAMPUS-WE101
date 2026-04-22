@@ -24,6 +24,12 @@ public class Ticket {
     private String feedback;
     private TicketStatus status = TicketStatus.OPEN;
     private List<Comment> comments = new ArrayList<>();
+    private String contactDetails;
+    private String technicianId;
+    private String technicianName;
+    private List<String> attachments = new ArrayList<>();
+    private List<StatusHistory> history = new ArrayList<>();
+    private LocalDateTime resolvedAt;
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public Ticket() {}
@@ -63,6 +69,24 @@ public class Ticket {
 
     public List<Comment> getComments() { return comments; }
     public void setComments(List<Comment> comments) { this.comments = comments; }
+
+    public String getContactDetails() { return contactDetails; }
+    public void setContactDetails(String contactDetails) { this.contactDetails = contactDetails; }
+
+    public String getTechnicianId() { return technicianId; }
+    public void setTechnicianId(String technicianId) { this.technicianId = technicianId; }
+
+    public String getTechnicianName() { return technicianName; }
+    public void setTechnicianName(String technicianName) { this.technicianName = technicianName; }
+
+    public List<String> getAttachments() { return attachments; }
+    public void setAttachments(List<String> attachments) { this.attachments = attachments; }
+
+    public List<StatusHistory> getHistory() { return history; }
+    public void setHistory(List<StatusHistory> history) { this.history = history; }
+
+    public LocalDateTime getResolvedAt() { return resolvedAt; }
+    public void setResolvedAt(LocalDateTime resolvedAt) { this.resolvedAt = resolvedAt; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

@@ -48,10 +48,15 @@ export const updateBookingStatus = (id, status, reason = '') => API.put(`/bookin
 export const createTicket = (data) => API.post('/tickets', data);
 export const getMyTickets = () => API.get('/tickets');
 
-// Tickets (admin)
+// Tickets (admin/technician)
 export const getAllTickets = () => API.get('/tickets/all');
 export const updateTicketStatus = (id, status) => API.put(`/tickets/${id}/status`, { status });
+export const assignTechnician = (id, data) => API.put(`/tickets/${id}/assign`, data);
+export const resolveTicket = (id, data) => API.put(`/tickets/${id}/resolve`, data);
 export const addTicketComment = (id, text) => API.post(`/tickets/${id}/comments`, { text });
+export const editTicketComment = (id, commentId, text) => API.put(`/tickets/${id}/comments/${commentId}`, { text });
+export const deleteTicketComment = (id, commentId) => API.delete(`/tickets/${id}/comments/${commentId}`);
+
 export const submitTicketFeedback = (id, rating, feedback = '') =>
   API.put(`/tickets/${id}/feedback`, { rating: String(rating), feedback });
 

@@ -41,6 +41,7 @@ const Navbar = () => {
   // Navigation Items Mapping
   const navItems = isAdmin ? [
     { path: '/admin', label: 'Admin Panel', icon: SettingsIcon, color: 'orange' },
+    { path: '/manage-tickets', label: 'Manage Tickets', icon: TagIcon, color: 'green' },
     { path: '/dashboard', label: 'Overview', icon: GridIcon, color: 'blue' },
     { path: '/notifications', label: 'Inbox', icon: BellIcon, color: 'red', isInbox: true },
   ] : [
