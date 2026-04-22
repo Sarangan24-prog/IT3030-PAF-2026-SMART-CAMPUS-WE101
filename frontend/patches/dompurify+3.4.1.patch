@@ -1,0 +1,9 @@
+diff --git a/node_modules/dompurify/dist/purify.es.mjs b/node_modules/dompurify/dist/purify.es.mjs
+index 63410bf..d899fdc 100644
+--- a/node_modules/dompurify/dist/purify.es.mjs
++++ b/node_modules/dompurify/dist/purify.es.mjs
+@@ -1467,4 +1467,3 @@ function createDOMPurify() {
+ var purify = createDOMPurify();
+ 
+ export { purify as default };
+-//# sourceMappingURL=purify.es.mjs.map

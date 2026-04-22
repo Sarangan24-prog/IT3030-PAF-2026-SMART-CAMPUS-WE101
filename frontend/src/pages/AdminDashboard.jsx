@@ -30,6 +30,7 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   RefreshIcon,
+  UploadIcon,
   PinIcon,
   DownloadIcon,
 } from '../components/Icons';
@@ -633,6 +634,32 @@ const ResourcesTab = () => {
     }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        alert("Image size must be less than 10MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, imageUrl: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const onTypeChange = (type) => {
+    let capacity = formData.capacity;
+    if (type === 'LECTURE_HALL') capacity = 120;
+    else if (type === 'AUDITORIUM') capacity = 300;
+    setFormData({ ...formData, type, capacity });
+  };
+
+  const onBuildingChange = (building) => {
+    setFormData({ ...formData, building });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
@@ -715,10 +742,11 @@ const ResourcesTab = () => {
                   <label>Name *</label>
                   <input required placeholder="Name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                 </div>
-                <div className="form-group">
+                 <div className="form-group">
                   <label>Type *</label>
-                  <select value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value })}>
+                  <select value={formData.type} onChange={e => onTypeChange(e.target.value)}>
                     <option value="LECTURE_HALL">Lecture Hall</option>
+                    <option value="AUDITORIUM">Auditorium</option>
                     <option value="LAB">Lab</option>
                     <option value="MEETING_ROOM">Meeting Room</option>
                     <option value="PROJECTOR">Projector</option>
@@ -733,11 +761,32 @@ const ResourcesTab = () => {
                 </div>
                 <div className="form-group">
                   <label>Building *</label>
-                  <input required value={formData.building} onChange={e => setFormData({ ...formData, building: e.target.value })} />
+                  <select required value={formData.building} onChange={e => onBuildingChange(e.target.value)}>
+                    <option value="">-- Select Building --</option>
+                    <option value="New Building">New Building</option>
+                    <option value="Main Building">Main Building</option>
+                    <option value="Engineering Block">Engineering Block</option>
+                    <option value="Science Center">Science Center</option>
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>Floor *</label>
-                  <input required value={formData.floor} onChange={e => setFormData({ ...formData, floor: e.target.value })} />
+                  <select 
+                    required 
+                    value={formData.floor} 
+                    onChange={e => setFormData({ ...formData, floor: e.target.value })}
+                  >
+                    <option value="">-- Select Floor --</option>
+                    {formData.building === 'New Building' && Array.from({ length: 12 }, (_, i) => i + 3).map(f => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                    {formData.building === 'Main Building' && Array.from({ length: 3 }, (_, i) => i + 3).map(f => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                    {formData.building !== 'New Building' && formData.building !== 'Main Building' && Array.from({ length: 10 }, (_, i) => i + 1).map(f => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>Room/Specific Location *</label>
@@ -759,8 +808,29 @@ const ResourcesTab = () => {
                   <input placeholder="Projector, Whiteboard, A/C" value={formData.amenities} onChange={e => setFormData({ ...formData, amenities: e.target.value })} />
                 </div>
                 <div className="form-group full-width">
-                  <label>Image URL (Optional)</label>
-                  <input placeholder="https://..." value={formData.imageUrl} onChange={e => setFormData({ ...formData, imageUrl: e.target.value })} />
+                  <label>Resource Image (Max 10MB) *</label>
+                  <div className="custom-file-upload">
+                    <input 
+                      id="resource-image-upload"
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleImageChange}
+                      hidden
+                    />
+                    <label htmlFor="resource-image-upload" className="file-upload-btn">
+                      <UploadIcon size={18} />
+                      <span className="file-upload-text">
+                        {formData.imageUrl ? 'Change Image' : 'Select Facility Image'}
+                      </span>
+                    </label>
+                    
+                    {formData.imageUrl && (
+                      <div className="image-preview-wrapper">
+                        <img src={formData.imageUrl} alt="Preview" className="glass-preview" />
+                        <button type="button" className="remove-img-btn" onClick={() => setFormData({...formData, imageUrl: ''})}>×</button>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="form-group full-width">
                   <label className="toggle-label">

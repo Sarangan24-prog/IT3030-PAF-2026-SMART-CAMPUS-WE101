@@ -28,15 +28,13 @@
 }
 
 .about-card {
-  /* Premium Glassmorphism */
-  background: rgba(22, 30, 48, 0.45);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 24px;
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: 28px;
   padding: 60px 50px;
-  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--card-shadow);
   animation: fadeInScale 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
@@ -107,10 +105,11 @@
 }
 
 .about-text p {
-  color: #94a3b8;
+  color: var(--text-muted);
   line-height: 1.8;
   margin-bottom: 20px;
   font-size: 15px;
+  font-weight: 500;
 }
 
 .values-list {
@@ -133,8 +132,9 @@
 .about-image-card {
   align-self: center;
   position: relative;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
   border-radius: 30px;
   padding: 50px;
   display: flex;

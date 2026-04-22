@@ -1,5 +1,5 @@
 import React from 'react';
-import { ClockIcon, UserIcon, CheckCircleIcon, RefreshIcon, XCircleIcon, TagIcon } from './Icons';
+import { UserIcon, CheckCircleIcon, RefreshIcon, XCircleIcon, TagIcon } from './Icons';
 import './TicketTimeline.css';
 
 const StatusIcon = ({ status }) => {

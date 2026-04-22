@@ -1,37 +1,39 @@
 :root, [data-theme='light'] {
-  /* Refined Day Mode (Light) - Classic Premium High-Contrast */
-  --bg-page: #f8fafc;
-  --bg-card: #ffffff;
-  --glass-border: 1px solid rgba(0, 0, 0, 0.12);
-  --text-main: #0f172a;    /* Deep Midnight Navy */
-  --text-muted: #475569;   /* Crisp Slate */
+  /* Universal Glass — Light Mode Refined */
+  --bg-page: radial-gradient(at top left, #f8fafc 0%, #cbd5e1 100%);
+  --bg-card: rgba(255, 255, 255, 0.45);
+  --glass-border: 1px solid rgba(0, 0, 0, 0.15);
+  --text-main: #020617;    /* Near Black */
+  --text-muted: #1e293b;   /* Much Darker Slate */
   --accent-green: #77A365;
-  --accent-green-light: rgba(119, 163, 101, 0.15);
-  --sidebar-bg: #ffffff;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  --accent-green-light: rgba(119, 163, 101, 0.2);
+  --sidebar-bg: rgba(255, 255, 255, 0.7);
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
   --radius-lg: 16px;
-  --text-dim: #64748b;
-  --text-bright: #0f172a;
+  --text-dim: #334155;
+  --text-bright: #000000;
   --trans: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --glass-blur: blur(14px);
 }
 
 [data-theme='dark'] {
-  /* Night Mode (Dark) — High Contrast */
-  --bg-page: radial-gradient(circle at top left, #0f172a 0%, #020617 100%);
-  --bg-card: rgba(30, 41, 59, 0.7);
-  --glass-border: 1px solid rgba(255, 255, 255, 0.08);
-  --text-main: #ffffff;
-  --text-muted: #94a3b8;
+  /* Universal Glass — Dark Mode Refined */
+  --bg-page: radial-gradient(circle at top left, #020617 0%, #000000 100%);
+  --bg-card: rgba(15, 23, 42, 0.6);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.15);
+  --text-main: #f8fafc;
+  --text-muted: #e2e8f0;   /* High visibility */
   --accent-green: #77A365;
-  --accent-green-light: rgba(119, 163, 101, 0.2);
-  --sidebar-bg: #020617;
-  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-  --card-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.4);
+  --accent-green-light: rgba(119, 163, 101, 0.3);
+  --sidebar-bg: rgba(0, 0, 0, 0.75);
+  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --card-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
   --radius-lg: 16px;
-  --text-dim: #94a3b8;
+  --text-dim: #cbd5e1;
   --text-bright: #ffffff;
   --trans: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --glass-blur: blur(20px);
 }
 
 /* ═══════════════════════════════════════════════
@@ -82,6 +84,7 @@ body {
 
 .dashboard-shell {
   flex-direction: row;
+  height: 100vh;
   overflow: hidden;
 }
 
@@ -89,6 +92,7 @@ body {
   display: flex;
   flex-direction: column;
   flex: 1;
+  height: 100vh;
   overflow-y: auto;
   position: relative;
 }

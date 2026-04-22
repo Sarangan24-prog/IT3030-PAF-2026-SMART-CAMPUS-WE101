@@ -1,8 +1,10 @@
 .calendar-widget {
   background: var(--bg-card);
-  border-radius: 14px;
-  padding: 18px;
-  border: 1px solid var(--border-color);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  border: var(--glass-border);
   box-shadow: var(--shadow);
   font-family: inherit;
   width: 100%;
