@@ -1,26 +1,30 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createTicket, getMyTickets } from '../services/api';
-import { TagIcon, CheckCircleIcon, XCircleIcon, RefreshIcon, MessageCircleIcon } from '../components/Icons';
+import { TagIcon, CheckCircleIcon, XCircleIcon, RefreshIcon, UserIcon, ImageIcon } from '../components/Icons';
+import TicketTimeline from '../components/TicketTimeline';
 import './TicketPage.css';
 
-const CATEGORIES = [
-  'Network',
-  'Equipment',
-  'Facility',
-  'Academic Support',
-  'Other',
-];
+const CATEGORIES = ['Network', 'Equipment', 'Facility', 'Academic Support', 'Other'];
 
 const STATUS_STYLES = {
   OPEN:        { bg: '#dbeafe', color: '#1d4ed8' },
   IN_PROGRESS: { bg: '#fef3c7', color: '#d97706' },
   RESOLVED:    { bg: '#dcfce7', color: '#16a34a' },
   CLOSED:      { bg: '#f1f5f9', color: '#64748b' },
+  REJECTED:    { bg: '#fee2e2', color: '#dc2626' },
+};
+
+const PRIORITY_COLORS = {
+  LOW: '#64748b',
+  MEDIUM: '#1d4ed8',
+  HIGH: '#d97706',
+  URGENT: '#dc2626',
 };
 
 const StatusIcon = ({ status }) => {
   if (status === 'RESOLVED') return <CheckCircleIcon size={13} color="#16a34a" />;
-  if (status === 'CLOSED')   return <XCircleIcon size={13} color="#64748b" />;
+  if (status === 'CLOSED') return <XCircleIcon size={13} color="#64748b" />;
+  if (status === 'REJECTED') return <XCircleIcon size={13} color="#dc2626" />;
   if (status === 'IN_PROGRESS') return <RefreshIcon size={13} color="#d97706" />;
   return <TagIcon size={13} color="#1d4ed8" />;
 };
@@ -28,16 +32,18 @@ const StatusIcon = ({ status }) => {
 const TicketPage = () => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ category: 'Network', title: '', description: '' });
+  const [form, setForm] = useState({ category: 'Network', title: '', description: '', priority: 'MEDIUM', contactDetails: '' });
+  const [images, setImages] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
 
   const fetchTickets = useCallback(async () => {
     try {
       const res = await getMyTickets();
       setTickets(res.data);
     } catch {
-      // silently fail — user sees empty list
+      // silently fail
     } finally {
       setLoading(false);
     }
@@ -45,22 +51,34 @@ const TicketPage = () => {
 
   useEffect(() => { fetchTickets(); }, [fetchTickets]);
 
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (images.length + files.length > 3) {
+      alert('You can only upload up to 3 images.');
+      return;
+    }
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => setImages(prev => [...prev, reader.result]);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (index) => setImages(prev => prev.filter((_, i) => i !== index));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title.trim()) return;
     setSubmitting(true);
     setResult(null);
     try {
-      await createTicket({
-        title: form.title,
-        description: form.description,
-        category: form.category,
-      });
+      await createTicket({ ...form, attachments: images });
       setResult({ ok: true, msg: 'Ticket raised successfully.' });
-      setForm({ category: 'Network', title: '', description: '' });
+      setForm({ category: 'Network', title: '', description: '', priority: 'MEDIUM', contactDetails: '' });
+      setImages([]);
       fetchTickets();
     } catch {
-      setResult({ ok: false, msg: 'Failed to raise ticket. Please try again.' });
+      setResult({ ok: false, msg: 'Failed to raise ticket.' });
     } finally {
       setSubmitting(false);
     }
@@ -69,9 +87,7 @@ const TicketPage = () => {
   return (
     <div className="ticket-page">
       <div className="tp-header">
-        <div className="tp-header-icon">
-          <TagIcon size={22} color="#77A365" />
-        </div>
+        <div className="tp-header-icon"><TagIcon size={22} color="#77A365" /></div>
         <div>
           <h2>Ticket Raising</h2>
           <p>Report issues and track support requests in real time</p>
@@ -79,106 +95,145 @@ const TicketPage = () => {
       </div>
 
       <div className="tp-grid">
-        {/* ── Form ── */}
         <div className="tp-form-card">
           <h3>New Support Ticket</h3>
           <form onSubmit={handleSubmit} className="tp-form">
-            <div className="tp-field">
-              <label htmlFor="tp-cat">Category</label>
-              <select
-                id="tp-cat"
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-              >
-                {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
-              </select>
+            <div className="tp-field-row">
+              <div className="tp-field">
+                <label>Category</label>
+                <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+                  {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                </select>
+              </div>
+              <div className="tp-field">
+                <label>Priority</label>
+                <select value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })}>
+                  <option value="LOW">Low</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="HIGH">High</option>
+                  <option value="URGENT">Urgent</option>
+                </select>
+              </div>
             </div>
             <div className="tp-field">
-              <label htmlFor="tp-title">Title</label>
-              <input
-                id="tp-title"
-                type="text"
-                placeholder="e.g. Projector not working in Lab 3"
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                required
-              />
+              <label>Title</label>
+              <input type="text" placeholder="Issue title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
             </div>
             <div className="tp-field">
-              <label htmlFor="tp-desc">Description</label>
-              <textarea
-                id="tp-desc"
-                rows={4}
-                placeholder="Describe the issue in detail — location, time, impact..."
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-              />
+              <label>Description</label>
+              <textarea rows={3} placeholder="Detailed description..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
             </div>
-            {result && (
-              <p className={`tp-result ${result.ok ? 'tp-ok' : 'tp-err'}`}>
-                {result.ok
-                  ? <CheckCircleIcon size={14} color="#16a34a" />
-                  : <XCircleIcon size={14} color="#dc2626" />
-                }
-                {result.msg}
-              </p>
-            )}
+            <div className="tp-field">
+              <label>Contact Details</label>
+              <input type="text" placeholder="Phone/Email" value={form.contactDetails} onChange={(e) => setForm({ ...form, contactDetails: e.target.value })} />
+            </div>
+            <div className="tp-field">
+              <label>Attachments (Max 3)</label>
+              <div className="tp-file-input">
+                <input type="file" accept="image/*" multiple onChange={handleFileChange} disabled={images.length >= 3} />
+                <div className="tp-images-preview">
+                  {images.map((img, i) => (
+                    <div key={i} className="tp-img-preview">
+                      <img src={img} alt="preview" />
+                      <button type="button" onClick={() => removeImage(i)}>×</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            {result && <p className={`tp-result ${result.ok ? 'tp-ok' : 'tp-err'}`}>{result.msg}</p>}
             <button type="submit" className="tp-submit-btn" disabled={submitting}>
               {submitting ? 'Submitting...' : 'Submit Ticket'}
             </button>
           </form>
         </div>
 
-        {/* ── History ── */}
         <div className="tp-history">
-          <h3>My Tickets</h3>
+          <h3>Support History</h3>
           {loading ? (
-            <p className="tp-loading">Loading tickets...</p>
-          ) : tickets.length === 0 ? (
-            <div className="tp-empty">
-              <div className="tp-empty-icon">
-                <TagIcon size={26} color="#94a3b8" />
-              </div>
-              <p>No tickets yet</p>
-              <span>Your support tickets will appear here</span>
-            </div>
+            <p className="tp-loading">Loading...</p>
           ) : (
             <div className="tp-list">
-              {tickets.map((t) => {
+              {tickets.length === 0 ? <p className="tp-empty">No tickets yet.</p> : tickets.map((t) => {
                 const s = STATUS_STYLES[t.status] || STATUS_STYLES.OPEN;
+                const isExpanded = expandedId === t.id;
                 return (
-                  <div key={t.id} className="tp-item">
-                    <div className="tp-item-header">
-                      <span className="tp-item-title">{t.title}</span>
-                      <span className="tp-status-badge" style={{ background: s.bg, color: s.color }}>
-                        <StatusIcon status={t.status} />
-                        {t.status?.replace('_', ' ')}
-                      </span>
+                  <div key={t.id} className={`tp-item ${isExpanded ? 'active' : ''}`}>
+                    <div className="tp-item-main" onClick={() => setExpandedId(isExpanded ? null : t.id)}>
+                      <div className="tp-item-left">
+                        <div className="tp-item-title-row">
+                          <span className="tp-item-reference">{t.referenceId}</span>
+                          <span className="tp-priority-dot" style={{ background: PRIORITY_COLORS[t.priority] }} title={`Priority: ${t.priority}`} />
+                          <span className="tp-item-title">{t.title}</span>
+                        </div>
+                        <div className="tp-item-meta">
+                          <span className="tp-status-badge" style={{ background: s.bg, color: s.color }}>
+                            <StatusIcon status={t.status} /> {t.status?.replace('_', ' ')}
+                          </span>
+                          <span className="tp-meta-sep">•</span>
+                          <span className="tp-item-date">{new Date(t.createdAt).toLocaleDateString()}</span>
+                          {t.attachments?.length > 0 && (
+                            <>
+                              <span className="tp-meta-sep">•</span>
+                              <span className="tp-item-attachment-count">
+                                <ImageIcon size={12} color="#64748b" /> {t.attachments.length}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="tp-item-right">
+                        <button className="tp-expand-btn">
+                          {isExpanded ? 'Hide Details' : 'View History'}
+                        </button>
+                      </div>
                     </div>
-                    {t.description && <p className="tp-item-desc">{t.description}</p>}
-                    {t.comments?.length > 0 && (
-                      <div className="tp-comments">
-                        <span className="tp-comments-label">
-                          <MessageCircleIcon size={12} color="#64748b" />
-                          {t.comments.length} comment{t.comments.length !== 1 ? 's' : ''}
-                        </span>
-                        {t.comments.slice(-2).map((c, i) => (
-                          <div key={i} className="tp-comment">
-                            <span>{c.text}</span>
-                            <span className="tp-comment-time">
-                              {new Date(c.createdAt).toLocaleDateString('en-US', {
-                                month: 'short', day: 'numeric',
-                              })}
-                            </span>
+
+                    {isExpanded && (
+                      <div className="tp-item-details">
+                        <div className="tp-details-grid">
+                          <div className="tp-details-info">
+                            <h4>Description</h4>
+                            <p>{t.description || "No description provided."}</p>
+                            
+                            {t.attachments?.length > 0 && (
+                              <div className="tp-details-attachments">
+                                <h4>Attachments</h4>
+                                <div className="tp-attachments-list">
+                                  {t.attachments.map((img, i) => (
+                                    <img key={i} src={img} alt="attachment" onClick={() => window.open(img)} />
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            <h4>Communication</h4>
+                            <div className="tp-mini-comments">
+                              {t.comments?.length > 0 ? t.comments.map((c, i) => (
+                                <div key={i} className="tp-mini-comment">
+                                  <strong>{c.authorName}:</strong> {c.text}
+                                </div>
+                              )) : <p className="tp-no-comments">No updates yet.</p>}
+                            </div>
                           </div>
-                        ))}
+                          
+                          <div className="tp-details-timeline">
+                            <h4>Workflow & SLA</h4>
+                            <TicketTimeline 
+                              history={t.history} 
+                              createdAt={t.createdAt} 
+                              resolvedAt={t.resolvedAt} 
+                            />
+                            {t.technicianName && (
+                              <div className="tp-tech-assigned">
+                                <UserIcon size={14} color="#1d4ed8" />
+                                <span>Assigned to Technican: <strong>{t.technicianName}</strong></span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     )}
-                    <span className="tp-item-date">
-                      {new Date(t.createdAt).toLocaleDateString('en-US', {
-                        month: 'short', day: 'numeric', year: 'numeric',
-                      })}
-                    </span>
                   </div>
                 );
               })}

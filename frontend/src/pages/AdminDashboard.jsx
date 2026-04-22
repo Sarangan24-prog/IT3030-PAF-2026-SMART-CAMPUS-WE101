@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import {
   getAdminStats,
   getAllUsers,
@@ -29,16 +31,17 @@ import {
   XCircleIcon,
   RefreshIcon,
   PinIcon,
+  DownloadIcon,
 } from '../components/Icons';
 import './AdminDashboard.css';
 //booking added 
 const TABS = [
-  { key: 'overview',       label: 'Overview',       Icon: BarChartIcon },
-  { key: 'bookings',       label: 'Bookings',       Icon: CalendarIcon },
-  { key: 'resources',      label: 'Facilities',     Icon: PinIcon },
-  { key: 'users',          label: 'Users',          Icon: UsersIcon },
-  { key: 'notifications',  label: 'Notifications',  Icon: BellIcon },
-  { key: 'send',           label: 'Send',           Icon: SendIcon },
+  { key: 'overview', label: 'Overview', Icon: BarChartIcon },
+  { key: 'bookings', label: 'Bookings', Icon: CalendarIcon },
+  { key: 'resources', label: 'Facilities', Icon: PinIcon },
+  { key: 'users', label: 'Users', Icon: UsersIcon },
+  { key: 'notifications', label: 'Notifications', Icon: BellIcon },
+  { key: 'send', label: 'Send', Icon: SendIcon },
 ];
 
 const AdminDashboard = () => {
@@ -54,12 +57,12 @@ const AdminDashboard = () => {
       </div>
 
       <div className="tab-content">
-        {activeTab === 'overview'      && <OverviewTab />}
-        {activeTab === 'bookings'      && <BookingsTab />}
-        {activeTab === 'resources'     && <ResourcesTab />}
-        {activeTab === 'users'         && <UsersTab />}
+        {activeTab === 'overview' && <OverviewTab />}
+        {activeTab === 'bookings' && <BookingsTab />}
+        {activeTab === 'resources' && <ResourcesTab />}
+        {activeTab === 'users' && <UsersTab />}
         {activeTab === 'notifications' && <NotificationsTab />}
-        {activeTab === 'send'          && <SendTab />}
+        {activeTab === 'send' && <SendTab />}
       </div>
     </div>
   );
@@ -81,9 +84,9 @@ const OverviewTab = () => {
   if (!stats) return <p className="loading-text">Failed to load stats</p>;
 
   const statCards = [
-    { label: 'Total Users',           value: stats.totalUsers,           Icon: UsersIcon },
-    { label: 'Total Notifications',   value: stats.totalNotifications,   Icon: BellIcon },
-    { label: 'Unread Notifications',  value: stats.unreadNotifications,  Icon: MessageCircleIcon },
+    { label: 'Total Users', value: stats.totalUsers, Icon: UsersIcon },
+    { label: 'Total Notifications', value: stats.totalNotifications, Icon: BellIcon },
+    { label: 'Unread Notifications', value: stats.unreadNotifications, Icon: MessageCircleIcon },
   ];
 
   return (
@@ -150,10 +153,51 @@ const UsersTab = () => {
     }
   };
 
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFontSize(22);
+    doc.setTextColor(119, 163, 101); // #77A365
+    doc.text('Smart Campus - User Directory', 14, 22);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
+    doc.text(`Total Registered Users: ${users.length}`, 14, 35);
+    
+    // Table
+    const tableHeaders = [['Name', 'Email', 'Role', 'Joined Date']];
+    const tableData = users.map(u => [
+      u.name,
+      u.email,
+      u.role,
+      new Date(u.createdAt).toLocaleDateString()
+    ]);
+    
+    autoTable(doc, {
+      startY: 45,
+      head: tableHeaders,
+      body: tableData,
+      headStyles: { fillColor: [119, 163, 101], textColor: [255, 255, 255] },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      margin: { top: 45 },
+      theme: 'striped'
+    });
+    
+    doc.save(`smart-campus-users-${new Date().toISOString().split('T')[0]}.pdf`);
+  };
+
   if (loading) return <p className="loading-text">Loading users...</p>;
 
   return (
     <div className="users-tab">
+      <div className="tab-header-actions">
+        <h3>User Management</h3>
+        <button className="download-btn" onClick={handleDownloadPDF}>
+          <DownloadIcon size={16} /> Export Users PDF
+        </button>
+      </div>
       <div className="table-wrapper">
         <table className="data-table" id="admin-users-table">
           <thead>
@@ -206,10 +250,10 @@ const NotificationsTab = () => {
   }, []);
 
   const typeConfig = {
-    BOOKING_APPROVED:     { label: 'Approved',       Icon: CheckCircleIcon, color: '#16a34a' },
-    BOOKING_REJECTED:     { label: 'Rejected',       Icon: XCircleIcon,     color: '#dc2626' },
-    TICKET_STATUS_CHANGED:{ label: 'Ticket Update',  Icon: RefreshIcon,     color: '#d97706' },
-    NEW_COMMENT:          { label: 'Comment',        Icon: MessageCircleIcon, color: '#4361ee' },
+    BOOKING_APPROVED: { label: 'Approved', Icon: CheckCircleIcon, color: '#16a34a' },
+    BOOKING_REJECTED: { label: 'Rejected', Icon: XCircleIcon, color: '#dc2626' },
+    TICKET_STATUS_CHANGED: { label: 'Ticket Update', Icon: RefreshIcon, color: '#d97706' },
+    NEW_COMMENT: { label: 'Comment', Icon: MessageCircleIcon, color: '#4361ee' },
   };
 
   if (loading) return <p className="loading-text">Loading notifications...</p>;
@@ -363,11 +407,11 @@ const SendTab = () => {
 };
 /* ─── Bookings Tab ─── */
 const BookingsTab = () => {
-  const [bookings, setBookings]     = useState([]);
-  const [loading, setLoading]       = useState(true);
-  const [filter, setFilter]         = useState('ALL');
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('ALL');
   const [rejectingId, setRejectingId] = useState(null);
-  const [reason, setReason]         = useState('');
+  const [reason, setReason] = useState('');
   const [processing, setProcessing] = useState(null);
 
   const fetchBookings = useCallback(async () => {
@@ -398,9 +442,9 @@ const BookingsTab = () => {
   };
 
   const STATUS_STYLES = {
-    PENDING:   { bg: '#fef3c7', color: '#d97706' },
-    APPROVED:  { bg: '#dcfce7', color: '#16a34a' },
-    REJECTED:  { bg: '#fee2e2', color: '#dc2626' },
+    PENDING: { bg: '#fef3c7', color: '#d97706' },
+    APPROVED: { bg: '#dcfce7', color: '#16a34a' },
+    REJECTED: { bg: '#fee2e2', color: '#dc2626' },
     CANCELLED: { bg: '#f1f5f9', color: '#64748b' },
   };
 
@@ -596,7 +640,7 @@ const ResourcesTab = () => {
       capacity: parseInt(formData.capacity, 10) || 0,
       amenities: formData.amenities ? formData.amenities.split(',').map(a => a.trim()).filter(a => a) : [],
     };
-    
+
     try {
       if (editingId) {
         await updateResource(editingId, payload);
@@ -633,7 +677,7 @@ const ResourcesTab = () => {
             </thead>
             <tbody>
               {resources.length === 0 ? (
-                <tr><td colSpan="7" style={{textAlign: 'center', padding: '20px'}}>No resources found</td></tr>
+                <tr><td colSpan="7" style={{ textAlign: 'center', padding: '20px' }}>No resources found</td></tr>
               ) : resources.map(res => (
                 <tr key={res.id}>
                   <td><strong>{res.code}</strong></td>
@@ -665,15 +709,15 @@ const ResourcesTab = () => {
               <div className="form-grid">
                 <div className="form-group">
                   <label>Code (e.g. LH-001) *</label>
-                  <input required placeholder="Code" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} />
+                  <input required placeholder="Code" value={formData.code} onChange={e => setFormData({ ...formData, code: e.target.value })} />
                 </div>
                 <div className="form-group">
                   <label>Name *</label>
-                  <input required placeholder="Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                  <input required placeholder="Name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                 </div>
                 <div className="form-group">
                   <label>Type *</label>
-                  <select value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})}>
+                  <select value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value })}>
                     <option value="LECTURE_HALL">Lecture Hall</option>
                     <option value="LAB">Lab</option>
                     <option value="MEETING_ROOM">Meeting Room</option>
@@ -685,42 +729,42 @@ const ResourcesTab = () => {
                 </div>
                 <div className="form-group">
                   <label>Capacity</label>
-                  <input type="number" min="0" value={formData.capacity} onChange={e => setFormData({...formData, capacity: e.target.value})} />
+                  <input type="number" min="0" value={formData.capacity} onChange={e => setFormData({ ...formData, capacity: e.target.value })} />
                 </div>
                 <div className="form-group">
                   <label>Building *</label>
-                  <input required value={formData.building} onChange={e => setFormData({...formData, building: e.target.value})} />
+                  <input required value={formData.building} onChange={e => setFormData({ ...formData, building: e.target.value })} />
                 </div>
                 <div className="form-group">
                   <label>Floor *</label>
-                  <input required value={formData.floor} onChange={e => setFormData({...formData, floor: e.target.value})} />
+                  <input required value={formData.floor} onChange={e => setFormData({ ...formData, floor: e.target.value })} />
                 </div>
                 <div className="form-group">
                   <label>Room/Specific Location *</label>
-                  <input required value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} />
+                  <input required value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} />
                 </div>
                 <div className="form-group">
                   <label>Status *</label>
-                  <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
+                  <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })}>
                     <option value="ACTIVE">ACTIVE</option>
                     <option value="OUT_OF_SERVICE">OUT OF SERVICE</option>
                   </select>
                 </div>
                 <div className="form-group full-width">
                   <label>Description</label>
-                  <textarea rows={2} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+                  <textarea rows={2} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
                 </div>
                 <div className="form-group full-width">
                   <label>Amenities (Comma separated)</label>
-                  <input placeholder="Projector, Whiteboard, A/C" value={formData.amenities} onChange={e => setFormData({...formData, amenities: e.target.value})} />
+                  <input placeholder="Projector, Whiteboard, A/C" value={formData.amenities} onChange={e => setFormData({ ...formData, amenities: e.target.value })} />
                 </div>
                 <div className="form-group full-width">
                   <label>Image URL (Optional)</label>
-                  <input placeholder="https://..." value={formData.imageUrl} onChange={e => setFormData({...formData, imageUrl: e.target.value})} />
+                  <input placeholder="https://..." value={formData.imageUrl} onChange={e => setFormData({ ...formData, imageUrl: e.target.value })} />
                 </div>
                 <div className="form-group full-width">
                   <label className="toggle-label">
-                    <input type="checkbox" checked={formData.bookable} onChange={e => setFormData({...formData, bookable: e.target.checked})} />
+                    <input type="checkbox" checked={formData.bookable} onChange={e => setFormData({ ...formData, bookable: e.target.checked })} />
                     <span>Is this resource bookable by students?</span>
                   </label>
                 </div>
