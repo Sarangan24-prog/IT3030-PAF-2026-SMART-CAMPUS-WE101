@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { getAllTickets, assignTechnician, resolveTicket, addTicketComment, updateTicketStatus } from '../services/api';
-import { TagIcon, UserIcon, CheckCircleIcon, RefreshIcon, MessageCircleIcon, SearchIcon, ClockIcon } from '../components/Icons';
+import { getAllTickets, assignTechnician, resolveTicket, addTicketComment } from '../services/api';
+import { TagIcon, UserIcon, RefreshIcon, SearchIcon, ClockIcon } from '../components/Icons';
 import TicketTimeline from '../components/TicketTimeline';
 import './TicketManagementPage.css';
 

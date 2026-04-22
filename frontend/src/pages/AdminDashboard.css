@@ -37,15 +37,15 @@
 .admin-topnav {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(6px);
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur);
   position: sticky;
   top: 12px;
   z-index: 30;
   border-radius: 12px;
   padding: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow);
+  border: var(--glass-border);
   margin-bottom: 24px;
 }
 
@@ -117,20 +117,21 @@
 }
 
 .stat-card {
-  background: #ffffff;
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur);
   border-radius: 12px;
   padding: 22px;
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow);
+  border: var(--glass-border);
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--card-shadow);
 }
 
 .stat-icon-box {
@@ -230,7 +231,7 @@
 /* ─── Table (shared) ─── */
 .table-wrapper {
   background: var(--bg-card);
-  backdrop-filter: blur(12px);
+  backdrop-filter: var(--glass-blur);
   border-radius: var(--radius-lg);
   box-shadow: var(--card-shadow);
   border: var(--glass-border);
@@ -248,20 +249,21 @@
 .data-table th {
   text-align: left;
   padding: 13px 18px;
-  background: #f8fafc;
+  background: rgba(15, 23, 42, 0.05);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #94a3b8;
-  border-bottom: 1px solid #e2e8f0;
-  font-weight: 700;
+  color: var(--text-muted);
+  border-bottom: var(--glass-border);
+  font-weight: 800;
 }
 
 .data-table td {
   padding: 13px 18px;
   font-size: 13.5px;
-  color: #374151;
-  border-bottom: 1px solid #f1f5f9;
+  color: var(--text-main);
+  border-bottom: var(--glass-border);
+  background: transparent;
 }
 
 .data-table tr:last-child td {
@@ -269,7 +271,7 @@
 }
 
 .data-table tr:hover {
-  background: #f8fafc;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .user-name-cell {
@@ -365,7 +367,7 @@
 
 .admin-card {
   background: var(--bg-card);
-  backdrop-filter: blur(12px);
+  backdrop-filter: var(--glass-blur);
   border-radius: var(--radius-lg);
   padding: 24px;
   border: var(--glass-border);
@@ -374,11 +376,12 @@
 }
 
 .admin-item-card {
-  background: #ffffff;
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur);
   border-radius: 12px;
   padding: 18px 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow);
+  border: var(--glass-border);
   transition: box-shadow 0.18s;
 }
 
@@ -424,7 +427,7 @@
 
 .admin-item-date {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-muted);
   display: block;
   margin-top: 10px;
 }
@@ -602,15 +605,21 @@
   font-family: inherit;
   outline: none;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  background: #f8fafc; /* Forced high-contrast solid background for light mode */
+  background: var(--bg-card); /* Glassy background */
+  backdrop-filter: blur(8px);
   color: var(--text-main);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-[data-theme='dark'] .form-group select,
-[data-theme='dark'] .form-group textarea,
-[data-theme='dark'] .form-group input:not([type="checkbox"]) {
-  background: rgba(255, 255, 255, 0.05) !important; /* Force darkness in dark mode */
+.form-group select option {
+  background: #020617 !important;
+  color: #f8fafc !important;
+  padding: 10px;
+}
+
+[data-theme='light'] .form-group select option {
+  background: #ffffff !important;
+  color: #020617 !important;
 }
 
 /* Specific Light Mode targeting to ensure no "wired" overrides */
@@ -621,16 +630,17 @@
 [data-theme='light'] .form-group select,
 [data-theme='light'] .form-group textarea,
 [data-theme='light'] .form-group input:not([type="checkbox"]) {
-  background: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  color: #020617 !important;
 }
 
 .form-group select:focus,
 .form-group textarea:focus,
 .form-group input:not([type="checkbox"]):focus {
   border-color: var(--accent-green);
-  background: var(--bg-card);
-  box-shadow: 0 0 0 4px var(--accent-green-light), inset 0 2px 4px rgba(0, 0, 0, 0.02);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 4px var(--accent-green-light);
   transform: translateY(-1px);
 }
 
@@ -728,21 +738,78 @@
   }
 }
 
-@media (max-width: 480px) {
-  .admin-item-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+/* ─── Custom File Upload ─── */
+.custom-file-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
 
-  .action-btns {
-    width: 100%;
-  }
+.file-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  border: var(--glass-border);
+  padding: 12px 24px;
+  border-radius: 12px;
+  color: var(--text-main);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: max-content;
+  box-shadow: var(--shadow);
+}
 
-  .approve-btn,
-  .reject-btn {
-    flex: 1;
-    justify-content: center;
-  }
+.file-upload-btn svg {
+  flex-shrink: 0;
+  margin-right: 10px;
+}
+
+.file-upload-text {
+  display: inline-block;
+  letter-spacing: 0.03em;
+}
+
+.file-upload-btn:hover {
+  background: rgba(119, 163, 101, 0.2);
+  border-color: var(--accent-green);
+  transform: translateY(-2px);
+}
+
+.image-preview-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.glass-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 2px solid var(--accent-green);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.remove-img-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 /* ─── Bookings Tab ─── */
 .bookings-tab {
@@ -875,6 +942,23 @@
   cursor: not-allowed;
 }
 
+@media (max-width: 480px) {
+  .admin-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .action-btns {
+    width: 100%;
+  }
+
+  .approve-btn,
+  .reject-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
 .cancel-reject-btn {
   padding: 9px 16px;
   background: #f1f5f9;
@@ -909,7 +993,7 @@
 .tab-header-actions h3 {
   margin: 0;
   font-size: 18px;
-  color: #0f172a;
+  color: var(--text-main);
 }
 
 .add-btn {

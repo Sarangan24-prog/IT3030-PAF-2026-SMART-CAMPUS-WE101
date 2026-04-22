@@ -162,7 +162,7 @@
 
 .stat-card {
   background: var(--bg-card) !important;
-  backdrop-filter: blur(12px);
+  backdrop-filter: var(--glass-blur);
   padding: 24px;
   border-radius: var(--radius-lg);
   display: flex;
@@ -204,7 +204,7 @@
 .stat-label {
   font-size: 0.85rem;
   color: var(--text-muted) !important;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .stat-value {
@@ -223,7 +223,7 @@
 
 .progress-container {
   background: var(--bg-card) !important;
-  backdrop-filter: blur(12px);
+  backdrop-filter: var(--glass-blur);
   border-radius: var(--radius-lg);
   padding: 30px;
   border: var(--glass-border);
@@ -324,7 +324,7 @@
 
 .facility-card {
   background: var(--bg-card) !important;
-  backdrop-filter: blur(12px);
+  backdrop-filter: var(--glass-blur);
   padding: 30px;
   border-radius: var(--radius-lg);
   border: var(--glass-border);

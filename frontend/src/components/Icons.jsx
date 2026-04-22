@@ -281,6 +281,14 @@ export const DownloadIcon = ({ size = 16, color = 'currentColor', strokeWidth = 
   </svg>
 );
 
+export const UploadIcon = ({ size = 16, color = 'currentColor', strokeWidth = 2 }) => (
+  <svg {...base(size, color, strokeWidth)}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="17 8 12 3 7 8" />
+    <line x1="12" y1="3" x2="12" y2="15" />
+  </svg>
+);
+
 export const FileIcon = ({ size = 16, color = 'currentColor', strokeWidth = 2 }) => (
   <svg {...base(size, color, strokeWidth)}>
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
