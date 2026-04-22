@@ -10,6 +10,7 @@ import NotificationPanel from './pages/NotificationPanel';
 import AdminDashboard from './pages/AdminDashboard';
 import BookingPage from './pages/BookingPage';
 import TicketPage from './pages/TicketPage';
+import TicketManagementPage from './pages/TicketManagementPage';
 import ResourcePage from './pages/ResourcePage';
 import OAuth2Redirect from './pages/OAuth2Redirect';
 import HomePage from './pages/HomePage';
@@ -144,6 +145,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <TicketPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/manage-tickets"
+        element={
+          <ProtectedRoute>
+            <TicketManagementPage />
           </ProtectedRoute>
         }
       />
