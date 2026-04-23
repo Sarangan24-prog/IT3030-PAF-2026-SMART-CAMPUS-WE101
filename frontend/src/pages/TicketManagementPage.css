@@ -175,7 +175,8 @@
 }
 
 .detail-header h3 {
-  font-size: 22px;
+  font-size: 24px;
+  font-weight: 800;
   color: #0f172a;
   margin: 0 0 4px;
 }
@@ -191,35 +192,123 @@
   gap: 30px;
 }
 
-.detail-desc {
-  font-size: 15px;
-  color: #334155;
-  line-height: 1.6;
-  margin-bottom: 24px;
+.detail-section {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
-.detail-attachments label {
-  display: block;
-  font-size: 12px;
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.section-header h4 {
+  margin: 0;
+  font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
-  color: #64748b;
-  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+  color: #1e293b;
 }
+
+.detail-desc {
+  font-size: 15px;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.detail-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-item label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.meta-item span {
+  font-size: 14px;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.priority-tag {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.priority-tag.priority-URGENT { background: #fee2e2; color: #dc2626; }
+.priority-tag.priority-HIGH { background: #fef3c7; color: #d97706; }
+.priority-tag.priority-MEDIUM { background: #dbeafe; color: #1d4ed8; }
+.priority-tag.priority-LOW { background: #f1f5f9; color: #64748b; }
 
 .attachment-previews {
   display: flex;
-  gap: 10px;
-  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-.attachment-previews img {
-  width: 100px;
-  height: 100px;
+.attachment-card {
+  position: relative;
+  width: 120px;
+  height: 120px;
   border-radius: 10px;
-  object-fit: cover;
-  cursor: pointer;
+  overflow: hidden;
   border: 1px solid #e2e8f0;
+  cursor: pointer;
+}
+
+.attachment-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.attachment-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.attachment-card:hover img {
+  transform: scale(1.1);
+}
+
+.attachment-card:hover .attachment-overlay {
+  opacity: 1;
 }
 
 .action-card {

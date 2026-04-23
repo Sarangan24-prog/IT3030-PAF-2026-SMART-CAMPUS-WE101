@@ -109,6 +109,10 @@ public class TicketController {
             map.put("referenceId", t.getReferenceId() != null ? t.getReferenceId() : "");
             map.put("status", t.getStatus().name());
             map.put("comments", t.getComments());
+            map.put("attachments", t.getAttachments());
+            map.put("history", t.getHistory());
+            map.put("technicianName", t.getTechnicianName());
+            map.put("resolvedAt", t.getResolvedAt() != null ? t.getResolvedAt().toString() : null);
             map.put("createdAt", t.getCreatedAt().toString());
             return map;
         }).collect(Collectors.toList());

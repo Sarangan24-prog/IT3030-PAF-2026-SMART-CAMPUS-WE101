@@ -25,6 +25,7 @@ const Navbar = () => {
   const location = useLocation();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isAdminExpanded, setIsAdminExpanded] = useState(false);
+  const [isTicketsExpanded, setIsTicketsExpanded] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   
   const isAdmin = user?.role === 'ADMIN';
@@ -36,7 +37,14 @@ const Navbar = () => {
     { key: 'notifications', label: 'Notifications', icon: null },
     { key: 'send', label: 'Send', icon: SendIcon },
   ];
+
+  const ticketsPanelTabs = [
+    { key: 'overview', label: 'Overview', icon: GridIcon, path: '/manage-tickets?view=overview' },
+    { key: 'inbox', label: 'Inbox', icon: BellIcon, path: '/manage-tickets?view=inbox' },
+  ];
+
   const currentAdminTab = new URLSearchParams(location.search).get('tab') || 'overview';
+  const currentTicketTab = new URLSearchParams(location.search).get('view') || 'overview';
 
   // Navigation Items Mapping
   const navItems = isAdmin ? [
@@ -71,6 +79,9 @@ const Navbar = () => {
   useEffect(() => {
     if (isAdmin && location.pathname.startsWith('/admin')) {
       setIsAdminExpanded(true);
+    }
+    if (isAdmin && location.pathname.startsWith('/manage-tickets')) {
+      setIsTicketsExpanded(true);
     }
   }, [location.pathname, isAdmin]);
 
@@ -113,11 +124,13 @@ const Navbar = () => {
               const isActive = index === activeIndex;
               const isAdminPanelItem = isAdmin && item.path === '/admin';
               const showAdminSubnav = isAdminPanelItem && isAdminExpanded;
+              const showTicketsSubnav = isAdmin && item.path === '/manage-tickets' && isTicketsExpanded;
+              const hasSubnav = showAdminSubnav || showTicketsSubnav;
 
               return (
                 <li 
                   key={item.path} 
-                  className={`${isActive ? 'active' : ''} ${showAdminSubnav ? 'has-subnav' : ''} ${item.color}`}
+                  className={`${isActive ? 'active' : ''} ${hasSubnav ? 'has-subnav' : ''} ${item.color}`}
                 >
                   <Link 
                     to={item.path} 
@@ -125,6 +138,12 @@ const Navbar = () => {
                       if (isAdminPanelItem) {
                         e.preventDefault();
                         setIsAdminExpanded(!isAdminExpanded);
+                        setIsTicketsExpanded(false);
+                      }
+                      if (item.path === '/manage-tickets') {
+                        e.preventDefault();
+                        setIsTicketsExpanded(!isTicketsExpanded);
+                        setIsAdminExpanded(false);
                       }
                     }}
                   >
@@ -139,14 +158,33 @@ const Navbar = () => {
                   </Link>
 
                   {showAdminSubnav && (
-                    <ul className="admin-subnav">
+                    <ul className="sidebar-subnav">
                       {adminPanelTabs.map((tab) => {
                         const TabIcon = tab.icon;
                         return (
                           <li key={tab.key}>
                             <Link
                               to={`/admin?tab=${tab.key}`}
-                              className={`admin-subnav-link ${currentAdminTab === tab.key ? 'active' : ''}`}
+                              className={`subnav-link ${currentAdminTab === tab.key ? 'active' : ''}`}
+                            >
+                              {TabIcon && <TabIcon size={18} />}
+                              <span>{tab.label}</span>
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+
+                  {showTicketsSubnav && (
+                    <ul className="sidebar-subnav">
+                      {ticketsPanelTabs.map((tab) => {
+                        const TabIcon = tab.icon;
+                        return (
+                          <li key={tab.key}>
+                            <Link
+                              to={tab.path}
+                              className={`subnav-link ${currentTicketTab === tab.key ? 'active' : ''}`}
                             >
                               {TabIcon && <TabIcon size={18} />}
                               <span>{tab.label}</span>
