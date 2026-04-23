@@ -30,6 +30,7 @@ public class Ticket {
     private List<String> attachments = new ArrayList<>();
     private List<StatusHistory> history = new ArrayList<>();
     private LocalDateTime resolvedAt;
+    private LocalDateTime firstResponseAt;
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public Ticket() {}
@@ -87,6 +88,9 @@ public class Ticket {
 
     public LocalDateTime getResolvedAt() { return resolvedAt; }
     public void setResolvedAt(LocalDateTime resolvedAt) { this.resolvedAt = resolvedAt; }
+
+    public LocalDateTime getFirstResponseAt() { return firstResponseAt; }
+    public void setFirstResponseAt(LocalDateTime firstResponseAt) { this.firstResponseAt = firstResponseAt; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

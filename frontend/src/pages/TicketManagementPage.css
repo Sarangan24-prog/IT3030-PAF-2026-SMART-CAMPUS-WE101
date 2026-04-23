@@ -148,6 +148,15 @@
 .priority-MEDIUM { color: #1d4ed8; }
 .priority-LOW { color: #64748b; }
 
+.sla-timer {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-green);
+  background: var(--accent-green-light);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
 .manage-detail-panel {
   background: white;
   border-radius: 14px;
@@ -337,4 +346,35 @@
 .tech-info strong {
   font-size: 14px;
   color: #1e293b;
+}
+
+.sla-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--bg-page);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.sla-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sla-stat label {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sla-stat span {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-main);
 }

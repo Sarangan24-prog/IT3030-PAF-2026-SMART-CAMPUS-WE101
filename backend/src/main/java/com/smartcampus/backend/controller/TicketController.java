@@ -75,6 +75,14 @@ public class TicketController {
                 notes
         );
         ticket.getHistory().add(history);
+        
+        // Track First Response: If status moves from OPEN and not by the ticket owner
+        if (ticket.getStatus() == TicketStatus.OPEN && !ticket.getUserId().equals(actor.getId())) {
+            if (ticket.getFirstResponseAt() == null) {
+                ticket.setFirstResponseAt(LocalDateTime.now());
+            }
+        }
+        
         ticket.setStatus(nextStatus);
         if (nextStatus == TicketStatus.RESOLVED) {
             ticket.setResolvedAt(LocalDateTime.now());
@@ -110,6 +118,8 @@ public class TicketController {
             map.put("status", t.getStatus().name());
             map.put("comments", t.getComments());
             map.put("createdAt", t.getCreatedAt().toString());
+            map.put("firstResponseAt", t.getFirstResponseAt() != null ? t.getFirstResponseAt().toString() : null);
+            map.put("resolvedAt", t.getResolvedAt() != null ? t.getResolvedAt().toString() : null);
             return map;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(enriched);
@@ -150,6 +160,10 @@ public class TicketController {
         ticket.setTechnicianId(techId);
         ticket.setTechnicianName(techName);
         
+        if (ticket.getFirstResponseAt() == null) {
+            ticket.setFirstResponseAt(LocalDateTime.now());
+        }
+
         String notes = "Assigned to " + techName;
         ticket.getHistory().add(new StatusHistory(ticket.getStatus(), ticket.getStatus(), admin.getId(), admin.getName(), notes));
         
@@ -205,6 +219,10 @@ public class TicketController {
                                               @RequestBody Map<String, String> body) {
         Ticket ticket = ticketRepository.findById(Objects.requireNonNull(id, "id must not be null"))
                 .orElseThrow(() -> new RuntimeException("Ticket not found"));
+
+        if (ticket.getFirstResponseAt() == null && !ticket.getUserId().equals(user.getId())) {
+            ticket.setFirstResponseAt(LocalDateTime.now());
+        }
 
         Comment comment = new Comment();
         comment.setAuthorId(user.getId());

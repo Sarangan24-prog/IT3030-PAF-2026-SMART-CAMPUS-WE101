@@ -13,6 +13,17 @@ const TicketManagementPage = () => {
   const [assignForm, setAssignForm] = useState({ technicianName: '', contactDetails: '' });
   const [resolveForm, setResolveForm] = useState({ resolutionNotes: '', resolutionType: 'Fixed' });
 
+  const formatDuration = (start, end) => {
+    if (!start) return "--";
+    const s = new Date(start);
+    const e = end ? new Date(end) : new Date();
+    const diff = Math.max(0, e - s);
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(mins / 60);
+    if (hours > 0) return `${hours}h ${mins % 60}m`;
+    return `${mins}m`;
+  };
+
   const fetchTickets = useCallback(async () => {
     try {
       const res = await getAllTickets();
@@ -123,6 +134,22 @@ const TicketManagementPage = () => {
                       <span>{t.status.replace('_', ' ')}</span>
                       <span className="dot">•</span>
                       <span className={`priority-text priority-${t.priority}`}>{t.priority}</span>
+                      {t.status === 'OPEN' && (
+                        <>
+                          <span className="dot">•</span>
+                          <span className="sla-timer" title="Time since creation">
+                            {formatDuration(t.createdAt)}
+                          </span>
+                        </>
+                      )}
+                      {t.status === 'IN_PROGRESS' && t.firstResponseAt && (
+                        <>
+                          <span className="dot">•</span>
+                          <span className="sla-timer" title="Time in progress">
+                            {formatDuration(t.firstResponseAt)}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                   <ClockIcon size={14} color="#94a3b8" />
@@ -228,7 +255,25 @@ const TicketManagementPage = () => {
                 </div>
 
                 <div className="detail-sidebar">
-                  <h4>Workflow Timeline</h4>
+                  <div className="section-header">
+                    <ClockIcon size={18} color="#77A365" />
+                    <h4>Service Level Metrics</h4>
+                  </div>
+                  <div className="sla-summary">
+                    <div className="sla-stat">
+                      <label>First Response</label>
+                      <span>{selectedTicket.firstResponseAt ? formatDuration(selectedTicket.createdAt, selectedTicket.firstResponseAt) : '--'}</span>
+                    </div>
+                    <div className="sla-stat">
+                      <label>Total Resolution</label>
+                      <span>{selectedTicket.resolvedAt ? formatDuration(selectedTicket.createdAt, selectedTicket.resolvedAt) : '--'}</span>
+                    </div>
+                  </div>
+
+                  <div className="section-header">
+                    <ClockIcon size={18} color="#77A365" />
+                    <h4>Workflow Timeline</h4>
+                  </div>
                   <TicketTimeline 
                     history={selectedTicket.history} 
                     createdAt={selectedTicket.createdAt} 
