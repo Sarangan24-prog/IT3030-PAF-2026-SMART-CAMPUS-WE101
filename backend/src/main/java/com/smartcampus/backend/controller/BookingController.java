@@ -115,8 +115,8 @@ public class BookingController {
 package com.smartcampus.backend.controller;
 
 import com.smartcampus.backend.model.*;
-import com.smartcampus.backend.repository.UserRepository;
 import com.smartcampus.backend.repository.BookingRepository;
+import com.smartcampus.backend.repository.UserRepository;
 import com.smartcampus.backend.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -136,6 +136,7 @@ public class BookingController {
 
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private BookingRepository bookingRepository;
 
@@ -165,16 +166,8 @@ public class BookingController {
             booking.setExpectedAttendees(
                 Integer.parseInt(body.getOrDefault("expectedAttendees", "0"))
             );
-
             Booking saved = bookingService.createBooking(booking);
-
-            // Generate reference ID
-           saved.setReferenceId("BK-" + saved.getId()
-    .substring(saved.getId().length() - 6).toUpperCase());
-bookingRepository.save(saved); // ← ADD THIS LINE!
-
-return ResponseEntity.ok(saved);
-
+            return ResponseEntity.ok(saved);
         } catch (RuntimeException e) {
             return ResponseEntity
                 .status(HttpStatus.CONFLICT)
@@ -231,12 +224,10 @@ return ResponseEntity.ok(saved);
         try {
             String status = body.get("status");
             String reason = body.getOrDefault("reason", "");
-
             Booking updated = bookingService.updateStatus(
                 id, status, reason, admin.getName()
             );
             return ResponseEntity.ok(updated);
-
         } catch (RuntimeException e) {
             return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -270,8 +261,15 @@ return ResponseEntity.ok(saved);
     @GetMapping("/verify/{referenceId}")
             @PathVariable String referenceId) {
         try {
+            // Try by referenceId first
             Booking booking = bookingRepository
                 .findByReferenceId(referenceId);
+
+            // If not found try by MongoDB id
+            if (booking == null) {
+                booking = bookingRepository
+                    .findById(referenceId).orElse(null);
+            }
 
             if (booking == null) {
                 return ResponseEntity
