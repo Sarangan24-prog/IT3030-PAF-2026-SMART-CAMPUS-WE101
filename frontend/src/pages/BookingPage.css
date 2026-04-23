@@ -604,3 +604,29 @@
   .bp-form-card { padding: 18px; }
   .bp-resource-grid { grid-template-columns: repeat(2, 1fr); }
 }
+/* ─── QR Code ─── */
+.bp-qr-section {
+  text-align: center;
+  padding: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  margin: 10px 0;
+}
+
+.bp-qr-label {
+  font-size: 11px;
+  color: #64748b;
+  margin: 0 0 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bp-qr-ref {
+  font-size: 12px;
+  font-weight: 700;
+  color: #77A365;
+  margin: 8px 0 0;
+  letter-spacing: 1px;
+}

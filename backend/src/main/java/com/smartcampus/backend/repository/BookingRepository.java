@@ -38,7 +38,7 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
 
     // Filter by date
     List<Booking> findByBookingDateOrderByStartTimeAsc(String bookingDate);
-
+    Booking findByReferenceId(String referenceId);
     // Count by status - for admin dashboard
     long countByStatus(BookingStatus status);
 }

@@ -110,10 +110,13 @@ public class BookingController {
         return ResponseEntity.ok(Map.of("message", "Booking deleted"));
     }
 }
-*/package com.smartcampus.backend.controller;
+*/
+
+package com.smartcampus.backend.controller;
 
 import com.smartcampus.backend.model.*;
 import com.smartcampus.backend.repository.UserRepository;
+import com.smartcampus.backend.repository.BookingRepository;
 import com.smartcampus.backend.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -133,6 +136,8 @@ public class BookingController {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private BookingRepository bookingRepository;
 
     /**
      * POST /api/bookings
@@ -164,10 +169,11 @@ public class BookingController {
             Booking saved = bookingService.createBooking(booking);
 
             // Generate reference ID
-            saved.setReferenceId("BK-" + saved.getId()
-                .substring(saved.getId().length() - 6).toUpperCase());
+           saved.setReferenceId("BK-" + saved.getId()
+    .substring(saved.getId().length() - 6).toUpperCase());
+bookingRepository.save(saved); // ← ADD THIS LINE!
 
-            return ResponseEntity.ok(saved);
+return ResponseEntity.ok(saved);
 
         } catch (RuntimeException e) {
             return ResponseEntity
@@ -255,6 +261,31 @@ public class BookingController {
             return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("error", e.getMessage()));
+        }
+    }
+    /**
+     * GET /api/bookings/verify/{referenceId}
+     * Public - verify booking by reference ID (for QR code scan)
+     */
+    @GetMapping("/verify/{referenceId}")
+    public ResponseEntity<?> verifyBooking(
+            @PathVariable String referenceId) {
+        try {
+            Booking booking = bookingRepository
+                .findByReferenceId(referenceId);
+
+            if (booking == null) {
+                return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Booking not found"));
+            }
+
+            return ResponseEntity.ok(booking);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", "Booking not found"));
         }
     }
 }
