@@ -16,6 +16,24 @@ const TicketManagementPage = () => {
   const [assignForm, setAssignForm] = useState({ technicianName: '', contactDetails: '' });
   const [resolveForm, setResolveForm] = useState({ resolutionNotes: '', resolutionType: 'Fixed' });
 
+  const formatDuration = (start, end) => {
+    if (!start) return "--";
+    const s = new Date(start);
+    const e = end ? new Date(end) : new Date();
+    const diff = Math.max(0, e - s);
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(mins / 60);
+    if (hours > 0) return `${hours}h ${mins % 60}m`;
+    return `${mins}m`;
+  };
+
+  const stats = {
+    total: tickets.length,
+    open: tickets.filter(t => t.status === 'OPEN').length,
+    inProgress: tickets.filter(t => t.status === 'IN_PROGRESS').length,
+    resolved: tickets.filter(t => t.status === 'RESOLVED').length
+  };
+
   const fetchTickets = useCallback(async () => {
     try {
       const res = await getAllTickets();
@@ -85,6 +103,25 @@ const TicketManagementPage = () => {
           </div>
           <h2>{currentView === 'inbox' ? 'Ticket Inbox' : 'Ticket Management Dashboard'}</h2>
         </div>
+
+        <div className="manage-stats">
+          <div className="stat-card" onClick={() => setFilter({ ...filter, status: 'ALL' })}>
+            <label>Total</label>
+            <strong>{stats.total}</strong>
+          </div>
+          <div className="stat-card" onClick={() => setFilter({ ...filter, status: 'OPEN' })}>
+            <label>Open</label>
+            <strong className="text-open">{stats.open}</strong>
+          </div>
+          <div className="stat-card" onClick={() => setFilter({ ...filter, status: 'IN_PROGRESS' })}>
+            <label>In Progress</label>
+            <strong className="text-progress">{stats.inProgress}</strong>
+          </div>
+          <div className="stat-card" onClick={() => setFilter({ ...filter, status: 'RESOLVED' })}>
+            <label>Resolved</label>
+            <strong className="text-resolved">{stats.resolved}</strong>
+          </div>
+        </div>
         
         <div className="manage-filters">
           <div className="filter-group">
@@ -131,6 +168,22 @@ const TicketManagementPage = () => {
                       <span>{t.status.replace('_', ' ')}</span>
                       <span className="dot">•</span>
                       <span className={`priority-text priority-${t.priority}`}>{t.priority}</span>
+                      {t.status === 'OPEN' && (
+                        <>
+                          <span className="dot">•</span>
+                          <span className="sla-timer" title="Time since creation">
+                            {formatDuration(t.createdAt)}
+                          </span>
+                        </>
+                      )}
+                      {t.status === 'IN_PROGRESS' && t.firstResponseAt && (
+                        <>
+                          <span className="dot">•</span>
+                          <span className="sla-timer" title="Time in progress">
+                            {formatDuration(t.firstResponseAt)}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                   <ClockIcon size={14} color="#94a3b8" />
