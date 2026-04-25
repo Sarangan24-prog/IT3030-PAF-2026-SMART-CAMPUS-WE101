@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { getAllTickets, assignTechnician, resolveTicket, addTicketComment } from '../services/api';
-import { TagIcon, UserIcon, RefreshIcon, SearchIcon, ClockIcon, BellIcon, ImageIcon } from '../components/Icons';
+import { TagIcon, UserIcon, RefreshIcon, SearchIcon, ClockIcon, BellIcon, ImageIcon, EditIcon, TrashIcon, XIcon, CheckIcon, CheckCircleIcon, XCircleIcon } from '../components/Icons';
+import { getAllTickets, assignTechnician, resolveTicket, addTicketComment, updateTicketStatus, editTicketComment, deleteTicketComment } from '../services/api';
 import { useLocation } from 'react-router-dom';
 import TicketTimeline from '../components/TicketTimeline';
+import { toast } from 'react-toastify';
+import { useAuth } from '../context/AuthContext';
 import './TicketManagementPage.css';
 
 const TicketManagementPage = () => {
+  const { user } = useAuth();
   const location = useLocation();
   const currentView = new URLSearchParams(location.search).get('view') || 'overview';
   const [tickets, setTickets] = useState([]);
@@ -13,8 +16,10 @@ const TicketManagementPage = () => {
   const [filter, setFilter] = useState({ status: 'ALL', priority: 'ALL', search: '' });
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [commentText, setCommentText] = useState('');
+  const [editingComment, setEditingComment] = useState(null);
   const [assignForm, setAssignForm] = useState({ technicianName: '', contactDetails: '' });
   const [resolveForm, setResolveForm] = useState({ resolutionNotes: '', resolutionType: 'Fixed' });
+  const [rejectForm, setRejectForm] = useState({ reason: '', showing: false });
 
   const formatDuration = (start, end) => {
     if (!start) return "--";
@@ -59,25 +64,50 @@ const TicketManagementPage = () => {
 
   const handleAssign = async (e) => {
     e.preventDefault();
+    if (!assignForm.technicianName.trim()) {
+      toast.error('Please provide a technician name.');
+      return;
+    }
     try {
       await assignTechnician(selectedTicket.id, assignForm);
-      alert('Technician assigned.');
+      toast.success('Technician assigned successfully!');
       fetchTickets();
       setSelectedTicket(null);
     } catch (err) {
-      alert('Assignment failed.');
+      toast.error('Assignment failed. Please try again.');
     }
   };
 
   const handleResolve = async (e) => {
     e.preventDefault();
+    if (resolveForm.resolutionNotes.trim().length < 10) {
+      toast.error('Please provide detailed resolution notes (min 10 chars).');
+      return;
+    }
     try {
       await resolveTicket(selectedTicket.id, resolveForm);
-      alert('Ticket resolved.');
+      toast.success('Ticket resolved successfully!');
       fetchTickets();
       setSelectedTicket(null);
     } catch (err) {
-      alert('Resolution failed.');
+      toast.error('Resolution failed. Please try again.');
+    }
+  };
+
+  const handleReject = async (e) => {
+    e.preventDefault();
+    if (rejectForm.reason.trim().length < 5) {
+      toast.error('Please provide a rejection reason (min 5 chars).');
+      return;
+    }
+    try {
+      await updateTicketStatus(selectedTicket.id, 'REJECTED', { notes: rejectForm.reason });
+      toast.success('Ticket rejected.');
+      setRejectForm({ reason: '', showing: false });
+      fetchTickets();
+      setSelectedTicket(null);
+    } catch (err) {
+      toast.error('Failed to reject ticket.');
     }
   };
 
@@ -88,9 +118,34 @@ const TicketManagementPage = () => {
       const res = await addTicketComment(selectedTicket.id, commentText);
       setSelectedTicket(res.data);
       setCommentText('');
+      toast.success('Comment added.');
       fetchTickets();
     } catch (err) {
-      alert('Failed to add comment.');
+      toast.error('Failed to add comment.');
+    }
+  };
+
+  const handleEditComment = async (commentId, text) => {
+    try {
+      const res = await editTicketComment(selectedTicket.id, commentId, text);
+      setSelectedTicket(res.data);
+      setEditingComment(null);
+      toast.success('Comment updated.');
+      fetchTickets();
+    } catch (err) {
+      toast.error('Failed to update comment.');
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm('Delete this comment?')) return;
+    try {
+      const res = await deleteTicketComment(selectedTicket.id, commentId);
+      setSelectedTicket(res.data);
+      toast.success('Comment deleted.');
+      fetchTickets();
+    } catch (err) {
+      toast.error('Failed to delete comment.');
     }
   };
 
@@ -246,70 +301,161 @@ const TicketManagementPage = () => {
                   
                   <div className="detail-actions">
                     {selectedTicket.status === 'OPEN' && (
-                      <div className="action-card">
-                        <h4>Assign Technician</h4>
-                        <form onSubmit={handleAssign}>
-                          <input 
-                            placeholder="Technician Name" 
-                            required 
-                            value={assignForm.technicianName}
-                            onChange={(e) => setAssignForm({ ...assignForm, technicianName: e.target.value })}
-                          />
-                          <input 
-                            placeholder="Contact Details" 
-                            value={assignForm.contactDetails}
-                            onChange={(e) => setAssignForm({ ...assignForm, contactDetails: e.target.value })}
-                          />
-                          <button type="submit">Assign & Start</button>
+                      <div className="action-card assign-card">
+                        <div className="section-header">
+                          <UserIcon size={18} color="#77A365" />
+                          <h4>Assign Technician</h4>
+                        </div>
+                        <form onSubmit={handleAssign} className="assign-form">
+                          <div className="input-group">
+                            <UserIcon size={14} color="#94a3b8" />
+                            <input 
+                              placeholder="Technician Name" 
+                              required 
+                              value={assignForm.technicianName}
+                              onChange={(e) => setAssignForm({ ...assignForm, technicianName: e.target.value })}
+                            />
+                          </div>
+                          <div className="input-group">
+                            <BellIcon size={14} color="#94a3b8" />
+                            <input 
+                              placeholder="Contact Details (Email/Phone)" 
+                              value={assignForm.contactDetails}
+                              onChange={(e) => setAssignForm({ ...assignForm, contactDetails: e.target.value })}
+                            />
+                          </div>
+                          <button type="submit" className="btn-primary">
+                            <span>Assign & Start Work</span>
+                            <RefreshIcon size={16} />
+                          </button>
                         </form>
                       </div>
                     )}
 
                     {selectedTicket.status === 'IN_PROGRESS' && (
                       <div className="action-card resolve-card">
-                        <h4>Resolve Ticket</h4>
-                        <form onSubmit={handleResolve}>
-                          <select 
-                            value={resolveForm.resolutionType}
-                            onChange={(e) => setResolveForm({ ...resolveForm, resolutionType: e.target.value })}
-                          >
-                            <option>Fixed</option>
-                            <option>Workaround</option>
-                            <option>Duplicate</option>
-                            <option>By Design</option>
-                          </select>
-                          <textarea 
-                            placeholder="Resolution notes..." 
-                            required
-                            value={resolveForm.resolutionNotes}
-                            onChange={(e) => setResolveForm({ ...resolveForm, resolutionNotes: e.target.value })}
-                          />
-                          <button type="submit">Mark as Resolved</button>
+                        <div className="section-header">
+                          <CheckCircleIcon size={18} color="#77A365" />
+                          <h4>Resolve Ticket</h4>
+                        </div>
+                        <form onSubmit={handleResolve} className="resolve-form">
+                          <div className="input-group">
+                            <TagIcon size={14} color="#94a3b8" />
+                            <select 
+                              value={resolveForm.resolutionType}
+                              onChange={(e) => setResolveForm({ ...resolveForm, resolutionType: e.target.value })}
+                            >
+                              <option>Fixed</option>
+                              <option>Workaround</option>
+                              <option>Duplicate</option>
+                              <option>By Design</option>
+                            </select>
+                          </div>
+                          <div className="input-group">
+                            <EditIcon size={14} color="#94a3b8" />
+                            <textarea 
+                              placeholder="Resolution notes..." 
+                              required
+                              value={resolveForm.resolutionNotes}
+                              onChange={(e) => setResolveForm({ ...resolveForm, resolutionNotes: e.target.value })}
+                            />
+                          </div>
+                          <button type="submit" className="btn-primary">
+                            <span>Finalize Resolution</span>
+                            <CheckIcon size={16} />
+                          </button>
                         </form>
+                      </div>
+                    )}
+
+                    {user?.role === 'ADMIN' && (selectedTicket.status === 'OPEN' || selectedTicket.status === 'IN_PROGRESS') && (
+                      <div className="action-card reject-card">
+                        <div className="section-header">
+                          <XCircleIcon size={18} color="#ef4444" />
+                          <h4>Administrative Action</h4>
+                        </div>
+                        {!rejectForm.showing ? (
+                          <button type="button" className="btn-outline-danger" onClick={() => setRejectForm({ ...rejectForm, showing: true })}>
+                            Reject Ticket
+                          </button>
+                        ) : (
+                          <form onSubmit={handleReject} className="reject-form">
+                            <div className="input-group">
+                              <EditIcon size={14} color="#ef4444" />
+                              <textarea 
+                                placeholder="Reason for rejection..." 
+                                required
+                                value={rejectForm.reason}
+                                onChange={(e) => setRejectForm({ ...rejectForm, reason: e.target.value })}
+                              />
+                            </div>
+                            <div className="btn-row">
+                              <button type="submit" className="btn-danger">Confirm Rejection</button>
+                              <button type="button" className="btn-ghost" onClick={() => setRejectForm({ ...rejectForm, showing: false })}>Cancel</button>
+                            </div>
+                          </form>
+                        )}
                       </div>
                     )}
                   </div>
 
                   <div className="detail-comments">
-                    <h4>Communication Log</h4>
+                    <div className="section-header">
+                      <BellIcon size={18} color="#77A365" />
+                      <h4>Communication Log</h4>
+                    </div>
                     <div className="comments-list">
-                      {selectedTicket.comments?.map((c, i) => (
-                        <div key={i} className="comment-bubble">
-                          <div className="comment-meta">
-                            <strong>{c.authorName}</strong>
-                            <span>{new Date(c.createdAt).toLocaleString()}</span>
+                      {selectedTicket.comments?.length > 0 ? (
+                        selectedTicket.comments.map((c, i) => (
+                          <div key={i} className="comment-bubble">
+                            <div className="comment-meta">
+                              <div className="author-info">
+                                <div className="author-avatar">{c.authorName.charAt(0).toUpperCase()}</div>
+                                <strong>{c.authorName}</strong>
+                              </div>
+                              <span>{new Date(c.createdAt).toLocaleString()}</span>
+                            </div>
+                            <div className="comment-body">
+                              {editingComment === c.id ? (
+                                <div className="comment-edit-form">
+                                  <textarea 
+                                    defaultValue={c.text} 
+                                    id={`edit-${c.id}`}
+                                  />
+                                  <div className="edit-actions">
+                                    <button onClick={() => handleEditComment(c.id, document.getElementById(`edit-${c.id}`).value)} className="btn-icon text-success"><CheckIcon size={14} /></button>
+                                    <button onClick={() => setEditingComment(null)} className="btn-icon text-danger"><XIcon size={14} /></button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <p>{c.text}</p>
+                              )}
+                            </div>
+                            <div className="comment-actions">
+                              {user?.id === c.authorId && (
+                                <button onClick={() => setEditingComment(c.id)} className="btn-icon" title="Edit"><EditIcon size={14} color="#64748b" /></button>
+                              )}
+                              {(user?.id === c.authorId || user?.role === 'ADMIN') && (
+                                <button onClick={() => handleDeleteComment(c.id)} className="btn-icon" title="Delete"><TrashIcon size={14} color="#ef4444" /></button>
+                              )}
+                            </div>
                           </div>
-                          <p>{c.text}</p>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <div className="no-comments">No updates yet. Start the conversation!</div>
+                      )}
                     </div>
                     <form onSubmit={handleAddComment} className="comment-form">
-                      <input 
-                        placeholder="Add a comment or update..." 
-                        value={commentText}
-                        onChange={(e) => setCommentText(e.target.value)}
-                      />
-                      <button type="submit">Send</button>
+                      <div className="comment-input-wrapper">
+                        <input 
+                          placeholder="Type an update or message..." 
+                          value={commentText}
+                          onChange={(e) => setCommentText(e.target.value)}
+                        />
+                        <button type="submit" className="btn-send" disabled={!commentText.trim()}>
+                          <RefreshIcon size={18} />
+                        </button>
+                      </div>
                     </form>
                   </div>
                 </div>

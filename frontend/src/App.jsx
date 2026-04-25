@@ -17,6 +17,8 @@ import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import PublicHeader from './components/PublicHeader';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -176,6 +178,18 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <AppRoutes />
+          <ToastContainer 
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="colored"
+          />
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>

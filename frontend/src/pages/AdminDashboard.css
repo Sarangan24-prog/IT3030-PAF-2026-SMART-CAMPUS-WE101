@@ -823,11 +823,12 @@
 .empty-box {
   text-align: center;
   padding: 60px 24px;
-  color: #94a3b8;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  border: var(--glass-border);
   font-size: 14px;
 }
 
@@ -1045,11 +1046,12 @@
 
 /* ─── Send Tab ─── */
 .send-form {
-  background: #ffffff;
-  border-radius: 12px;
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-lg);
   padding: 28px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow);
+  border: var(--glass-border);
   max-width: 540px;
 }
 
@@ -1126,7 +1128,7 @@
   letter-spacing: 0 !important;
   font-size: 13.5px !important;
   font-weight: 500 !important;
-  color: #374151 !important;
+  color: var(--text-main) !important;
 }
 
 .toggle-label input[type="checkbox"] {

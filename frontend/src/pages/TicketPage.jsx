@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { createTicket, getMyTickets } from '../services/api';
-import { TagIcon, CheckCircleIcon, XCircleIcon, RefreshIcon, UserIcon, ImageIcon } from '../components/Icons';
+import { createTicket, getMyTickets, getAllResources } from '../services/api';
+import { TagIcon, CheckCircleIcon, XCircleIcon, RefreshIcon, UserIcon, ImageIcon, ChevronDownIcon, ChevronUpIcon, UploadIcon, XIcon } from '../components/Icons';
 import TicketTimeline from '../components/TicketTimeline';
+import { toast } from 'react-toastify';
 import './TicketPage.css';
 
 const CATEGORIES = ['Network', 'Equipment', 'Facility', 'Academic Support', 'Other'];
@@ -30,20 +31,26 @@ const StatusIcon = ({ status }) => {
 };
 
 const TicketPage = () => {
-  const [tickets, setTickets] = useState([]);
+  const [myTickets, setMyTickets] = useState([]);
+  const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ category: 'Network', title: '', description: '', priority: 'MEDIUM', contactDetails: '' });
   const [images, setImages] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const fetchTickets = useCallback(async () => {
     try {
-      const res = await getMyTickets();
-      setTickets(res.data);
-    } catch {
-      // silently fail
+      const [ticketsRes, resourcesRes] = await Promise.all([
+        getMyTickets(),
+        getAllResources()
+      ]);
+      setMyTickets(ticketsRes.data);
+      setResources(resourcesRes.data);
+    } catch (err) {
+      console.error("Failed to fetch ticket data", err);
     } finally {
       setLoading(false);
     }
@@ -53,11 +60,29 @@ const TicketPage = () => {
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
+    
+    // Check total count
     if (images.length + files.length > 3) {
-      alert('You can only upload up to 3 images.');
+      toast.warning('You can only upload up to 3 images.');
       return;
     }
-    files.forEach(file => {
+
+    const validFiles = [];
+    for (const file of files) {
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        toast.error(`"${file.name}" is not an image file.`);
+        continue;
+      }
+      // Check file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`"${file.name}" is too large. Max size is 5MB.`);
+        continue;
+      }
+      validFiles.push(file);
+    }
+
+    validFiles.forEach(file => {
       const reader = new FileReader();
       reader.onloadend = () => setImages(prev => [...prev, reader.result]);
       reader.readAsDataURL(file);
@@ -66,18 +91,40 @@ const TicketPage = () => {
 
   const removeImage = (index) => setImages(prev => prev.filter((_, i) => i !== index));
 
+  const validateForm = () => {
+    const newErrors = {};
+    if (form.title.trim().length < 5) newErrors.title = 'Title must be at least 5 characters.';
+    if (form.description.trim().length < 20) newErrors.description = 'Please provide a more detailed description (min 20 chars).';
+    
+    const contact = form.contactDetails.trim();
+    if (contact) {
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact);
+      const isPhone = /^\+?[\d\s-]{10,}$/.test(contact);
+      if (!isEmail && !isPhone) newErrors.contactDetails = 'Please enter a valid email or phone number.';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.title.trim()) return;
+    if (!validateForm()) {
+      toast.error('Please fix the errors in the form.');
+      return;
+    }
     setSubmitting(true);
     setResult(null);
     try {
       await createTicket({ ...form, attachments: images });
+      toast.success('Ticket raised successfully!');
       setResult({ ok: true, msg: 'Ticket raised successfully.' });
-      setForm({ category: 'Network', title: '', description: '', priority: 'MEDIUM', contactDetails: '' });
+      setForm({ category: 'Network', title: '', description: '', priority: 'MEDIUM', contactDetails: '', location: '' });
       setImages([]);
+      setErrors({});
       fetchTickets();
     } catch {
+      toast.error('Failed to raise ticket.');
       setResult({ ok: false, msg: 'Failed to raise ticket.' });
     } finally {
       setSubmitting(false);
@@ -116,29 +163,83 @@ const TicketPage = () => {
               </div>
             </div>
             <div className="tp-field">
+              <label>Location / Resource</label>
+              <select 
+                value={form.location} 
+                onChange={(e) => setForm({ ...form, location: e.target.value })}
+                className={errors.location ? 'field-error' : ''}
+              >
+                <option value="">Select Resource/Location</option>
+                {resources.map(r => (
+                  <option key={r.id} value={r.name}>{r.name} ({r.type})</option>
+                ))}
+                <option value="General Campus">General Campus</option>
+              </select>
+            </div>
+            <div className="tp-field">
               <label>Title</label>
-              <input type="text" placeholder="Issue title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+              <input 
+                type="text" 
+                placeholder="Issue title" 
+                value={form.title} 
+                onChange={(e) => setForm({ ...form, title: e.target.value })} 
+                className={errors.title ? 'field-error' : ''}
+                required 
+              />
+              {errors.title && <span className="error-msg">{errors.title}</span>}
             </div>
             <div className="tp-field">
               <label>Description</label>
-              <textarea rows={3} placeholder="Detailed description..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+              <textarea 
+                rows={3} 
+                placeholder="Detailed description..." 
+                value={form.description} 
+                onChange={(e) => setForm({ ...form, description: e.target.value })} 
+                className={errors.description ? 'field-error' : ''}
+              />
+              {errors.description && <span className="error-msg">{errors.description}</span>}
             </div>
             <div className="tp-field">
               <label>Contact Details</label>
-              <input type="text" placeholder="Phone/Email" value={form.contactDetails} onChange={(e) => setForm({ ...form, contactDetails: e.target.value })} />
+              <input 
+                type="text" 
+                placeholder="Phone/Email" 
+                value={form.contactDetails} 
+                onChange={(e) => setForm({ ...form, contactDetails: e.target.value })} 
+                className={errors.contactDetails ? 'field-error' : ''}
+              />
+              {errors.contactDetails && <span className="error-msg">{errors.contactDetails}</span>}
             </div>
             <div className="tp-field">
               <label>Attachments (Max 3)</label>
-              <div className="tp-file-input">
-                <input type="file" accept="image/*" multiple onChange={handleFileChange} disabled={images.length >= 3} />
-                <div className="tp-images-preview">
-                  {images.map((img, i) => (
-                    <div key={i} className="tp-img-preview">
-                      <img src={img} alt="preview" />
-                      <button type="button" onClick={() => removeImage(i)}>×</button>
-                    </div>
-                  ))}
-                </div>
+              <div className="tp-attachment-container">
+                <label className={`tp-upload-zone ${images.length >= 3 ? 'disabled' : ''}`}>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    multiple 
+                    onChange={handleFileChange} 
+                    disabled={images.length >= 3} 
+                    hidden 
+                  />
+                  <div className="tp-upload-content">
+                    <UploadIcon size={24} color={images.length >= 3 ? '#94a3b8' : '#77A365'} />
+                    <span>{images.length >= 3 ? 'Maximum reached' : 'Click to upload images'}</span>
+                  </div>
+                </label>
+                
+                {images.length > 0 && (
+                  <div className="tp-images-preview">
+                    {images.map((img, i) => (
+                      <div key={i} className="tp-img-preview">
+                        <img src={img} alt="preview" />
+                        <button type="button" className="tp-remove-img" onClick={() => removeImage(i)}>
+                          <XIcon size={12} color="white" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
             {result && <p className={`tp-result ${result.ok ? 'tp-ok' : 'tp-err'}`}>{result.msg}</p>}
@@ -154,7 +255,11 @@ const TicketPage = () => {
             <p className="tp-loading">Loading...</p>
           ) : (
             <div className="tp-list">
-              {tickets.length === 0 ? <p className="tp-empty">No tickets yet.</p> : tickets.map((t) => {
+              {myTickets.length === 0 ? (
+                <div className="tp-empty">
+                  <p>No tickets yet. Raise your first ticket above!</p>
+                </div>
+              ) : myTickets.map((t) => {
                 const s = STATUS_STYLES[t.status] || STATUS_STYLES.OPEN;
                 const isExpanded = expandedId === t.id;
                 return (
@@ -184,7 +289,8 @@ const TicketPage = () => {
                       </div>
                       <div className="tp-item-right">
                         <button className="tp-expand-btn">
-                          {isExpanded ? 'Hide Details' : 'View History'}
+                          <span>{isExpanded ? 'Hide Details' : 'View History'}</span>
+                          {isExpanded ? <ChevronUpIcon size={16} /> : <ChevronDownIcon size={16} />}
                         </button>
                       </div>
                     </div>
@@ -196,6 +302,11 @@ const TicketPage = () => {
                             <h4>Description</h4>
                             <p>{t.description || "No description provided."}</p>
                             
+                            <div className="tp-meta-details-row">
+                              <span className="tp-meta-label">Location:</span> 
+                              <span className="tp-meta-val">{t.location || 'General Campus'}</span>
+                            </div>
+
                             {t.attachments?.length > 0 && (
                               <div className="tp-details-attachments">
                                 <h4>Attachments</h4>

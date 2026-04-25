@@ -572,6 +572,7 @@ const NotificationsTab = () => {
     BOOKING_REJECTED: { label: 'Rejected', Icon: XCircleIcon, color: '#dc2626' },
     TICKET_STATUS_CHANGED: { label: 'Ticket Update', Icon: RefreshIcon, color: '#d97706' },
     NEW_COMMENT: { label: 'Comment', Icon: MessageCircleIcon, color: '#4361ee' },
+    NEW_BOOKING_REQUEST: { label: 'New Booking', Icon: CalendarIcon, color: '#3b82f6' },
   };
 
   if (loading) return <p className="loading-text">Loading notifications...</p>;
