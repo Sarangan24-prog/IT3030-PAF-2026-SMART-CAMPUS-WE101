@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createTicket, getMyTickets } from '../services/api';
-import { TagIcon, CheckCircleIcon, XCircleIcon, RefreshIcon, UserIcon, ImageIcon, ChevronDownIcon, ChevronUpIcon } from '../components/Icons';
+import { TagIcon, CheckCircleIcon, XCircleIcon, RefreshIcon, UserIcon, ImageIcon, ChevronDownIcon, ChevronUpIcon, UploadIcon, XIcon } from '../components/Icons';
 import TicketTimeline from '../components/TicketTimeline';
 import { toast } from 'react-toastify';
 import './TicketPage.css';
@@ -193,16 +193,34 @@ const TicketPage = () => {
             </div>
             <div className="tp-field">
               <label>Attachments (Max 3)</label>
-              <div className="tp-file-input">
-                <input type="file" accept="image/*" multiple onChange={handleFileChange} disabled={images.length >= 3} />
-                <div className="tp-images-preview">
-                  {images.map((img, i) => (
-                    <div key={i} className="tp-img-preview">
-                      <img src={img} alt="preview" />
-                      <button type="button" onClick={() => removeImage(i)}>×</button>
-                    </div>
-                  ))}
-                </div>
+              <div className="tp-attachment-container">
+                <label className={`tp-upload-zone ${images.length >= 3 ? 'disabled' : ''}`}>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    multiple 
+                    onChange={handleFileChange} 
+                    disabled={images.length >= 3} 
+                    hidden 
+                  />
+                  <div className="tp-upload-content">
+                    <UploadIcon size={24} color={images.length >= 3 ? '#94a3b8' : '#77A365'} />
+                    <span>{images.length >= 3 ? 'Maximum reached' : 'Click to upload images'}</span>
+                  </div>
+                </label>
+                
+                {images.length > 0 && (
+                  <div className="tp-images-preview">
+                    {images.map((img, i) => (
+                      <div key={i} className="tp-img-preview">
+                        <img src={img} alt="preview" />
+                        <button type="button" className="tp-remove-img" onClick={() => removeImage(i)}>
+                          <XIcon size={12} color="white" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
             {result && <p className={`tp-result ${result.ok ? 'tp-ok' : 'tp-err'}`}>{result.msg}</p>}
