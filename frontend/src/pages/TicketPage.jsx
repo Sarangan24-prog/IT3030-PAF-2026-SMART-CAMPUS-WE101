@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createTicket, getMyTickets } from '../services/api';
-import { TagIcon, CheckCircleIcon, XCircleIcon, RefreshIcon, UserIcon, ImageIcon } from '../components/Icons';
+import { TagIcon, CheckCircleIcon, XCircleIcon, RefreshIcon, UserIcon, ImageIcon, ChevronDownIcon, ChevronUpIcon } from '../components/Icons';
 import TicketTimeline from '../components/TicketTimeline';
 import './TicketPage.css';
 
@@ -184,7 +184,8 @@ const TicketPage = () => {
                       </div>
                       <div className="tp-item-right">
                         <button className="tp-expand-btn">
-                          {isExpanded ? 'Hide Details' : 'View History'}
+                          <span>{isExpanded ? 'Hide Details' : 'View History'}</span>
+                          {isExpanded ? <ChevronUpIcon size={16} /> : <ChevronDownIcon size={16} />}
                         </button>
                       </div>
                     </div>
