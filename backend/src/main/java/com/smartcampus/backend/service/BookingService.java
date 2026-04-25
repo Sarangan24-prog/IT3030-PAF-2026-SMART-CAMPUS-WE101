@@ -39,7 +39,16 @@ public class BookingService {
 
         booking.setStatus(BookingStatus.PENDING);
         booking.setCreatedAt(LocalDateTime.now());
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+
+        // Notify that a new booking request is pending
+        String message = "New booking request from " + saved.getUserName() 
+            + " for " + saved.getResourceType() + " on " + saved.getBookingDate();
+        notificationService.createNotification(
+            saved.getUserId(), message, NotificationType.NEW_BOOKING_REQUEST, saved.getId()
+        );
+
+        return saved;
     }
 
     // ── Get bookings for one user ─────────────────────────
