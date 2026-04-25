@@ -9,6 +9,7 @@ import NotificationPanel from './pages/NotificationPanel';
 import AdminDashboard from './pages/AdminDashboard';
 import OAuth2Redirect from './pages/OAuth2Redirect';
 import BookingPage from './pages/BookingPage';
+import VerifyBookingPage from './pages/VerifyBookingPage';
 import './App.css';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -78,9 +79,14 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+  path="/verify/:referenceId"
+  element={<VerifyBookingPage />}
+/>
 
       <Route path="*" element={<Navigate to={homeRoute} />} />
     </Routes>
+    
   );
 };
 

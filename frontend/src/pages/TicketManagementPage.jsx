@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getAllTickets, assignTechnician, resolveTicket, addTicketComment } from '../services/api';
-import { TagIcon, UserIcon, RefreshIcon, SearchIcon, ClockIcon } from '../components/Icons';
+import { TagIcon, UserIcon, RefreshIcon, SearchIcon, ClockIcon, BellIcon, ImageIcon } from '../components/Icons';
+import { useLocation } from 'react-router-dom';
 import TicketTimeline from '../components/TicketTimeline';
 import './TicketManagementPage.css';
 
 const TicketManagementPage = () => {
+  const location = useLocation();
+  const currentView = new URLSearchParams(location.search).get('view') || 'overview';
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState({ status: 'ALL', priority: 'ALL', search: '' });
@@ -12,6 +15,24 @@ const TicketManagementPage = () => {
   const [commentText, setCommentText] = useState('');
   const [assignForm, setAssignForm] = useState({ technicianName: '', contactDetails: '' });
   const [resolveForm, setResolveForm] = useState({ resolutionNotes: '', resolutionType: 'Fixed' });
+
+  const formatDuration = (start, end) => {
+    if (!start) return "--";
+    const s = new Date(start);
+    const e = end ? new Date(end) : new Date();
+    const diff = Math.max(0, e - s);
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(mins / 60);
+    if (hours > 0) return `${hours}h ${mins % 60}m`;
+    return `${mins}m`;
+  };
+
+  const stats = {
+    total: tickets.length,
+    open: tickets.filter(t => t.status === 'OPEN').length,
+    inProgress: tickets.filter(t => t.status === 'IN_PROGRESS').length,
+    resolved: tickets.filter(t => t.status === 'RESOLVED').length
+  };
 
   const fetchTickets = useCallback(async () => {
     try {
@@ -27,6 +48,9 @@ const TicketManagementPage = () => {
   useEffect(() => { fetchTickets(); }, [fetchTickets]);
 
   const filteredTickets = tickets.filter(t => {
+    // Tab filtering: Inbox only shows OPEN tickets
+    if (currentView === 'inbox' && t.status !== 'OPEN') return false;
+    
     if (filter.status !== 'ALL' && t.status !== filter.status) return false;
     if (filter.priority !== 'ALL' && t.priority !== filter.priority) return false;
     if (filter.search && !t.title.toLowerCase().includes(filter.search.toLowerCase()) && !t.referenceId.toLowerCase().includes(filter.search.toLowerCase())) return false;
@@ -74,8 +98,29 @@ const TicketManagementPage = () => {
     <div className="manage-page">
       <div className="manage-header">
         <div className="manage-title">
-          <div className="manage-icon"><RefreshIcon size={24} color="#77A365" /></div>
-          <h2>Ticket Management Dashboard</h2>
+          <div className="manage-icon">
+            {currentView === 'inbox' ? <BellIcon size={24} color="#77A365" /> : <RefreshIcon size={24} color="#77A365" />}
+          </div>
+          <h2>{currentView === 'inbox' ? 'Ticket Inbox' : 'Ticket Management Dashboard'}</h2>
+        </div>
+
+        <div className="manage-stats">
+          <div className="stat-card" onClick={() => setFilter({ ...filter, status: 'ALL' })}>
+            <label>Total</label>
+            <strong>{stats.total}</strong>
+          </div>
+          <div className="stat-card" onClick={() => setFilter({ ...filter, status: 'OPEN' })}>
+            <label>Open</label>
+            <strong className="text-open">{stats.open}</strong>
+          </div>
+          <div className="stat-card" onClick={() => setFilter({ ...filter, status: 'IN_PROGRESS' })}>
+            <label>In Progress</label>
+            <strong className="text-progress">{stats.inProgress}</strong>
+          </div>
+          <div className="stat-card" onClick={() => setFilter({ ...filter, status: 'RESOLVED' })}>
+            <label>Resolved</label>
+            <strong className="text-resolved">{stats.resolved}</strong>
+          </div>
         </div>
         
         <div className="manage-filters">
@@ -123,6 +168,22 @@ const TicketManagementPage = () => {
                       <span>{t.status.replace('_', ' ')}</span>
                       <span className="dot">•</span>
                       <span className={`priority-text priority-${t.priority}`}>{t.priority}</span>
+                      {t.status === 'OPEN' && (
+                        <>
+                          <span className="dot">•</span>
+                          <span className="sla-timer" title="Time since creation">
+                            {formatDuration(t.createdAt)}
+                          </span>
+                        </>
+                      )}
+                      {t.status === 'IN_PROGRESS' && t.firstResponseAt && (
+                        <>
+                          <span className="dot">•</span>
+                          <span className="sla-timer" title="Time in progress">
+                            {formatDuration(t.firstResponseAt)}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                   <ClockIcon size={14} color="#94a3b8" />
@@ -142,14 +203,40 @@ const TicketManagementPage = () => {
 
               <div className="detail-tabs">
                 <div className="detail-main-info">
-                  <p className="detail-desc">{selectedTicket.description}</p>
+                  <div className="detail-section">
+                    <div className="section-header">
+                      <TagIcon size={18} color="#77A365" />
+                      <h4>Incident Ticket Details</h4>
+                    </div>
+                    <p className="detail-desc">{selectedTicket.description}</p>
+                    <div className="detail-meta-grid">
+                      <div className="meta-item">
+                        <label>Category</label>
+                        <span>{selectedTicket.category}</span>
+                      </div>
+                      <div className="meta-item">
+                        <label>Priority</label>
+                        <span className={`priority-tag priority-${selectedTicket.priority}`}>{selectedTicket.priority}</span>
+                      </div>
+                      <div className="meta-item">
+                        <label>Reported By</label>
+                        <span>{selectedTicket.userName}</span>
+                      </div>
+                    </div>
+                  </div>
                   
                   {selectedTicket.attachments?.length > 0 && (
-                    <div className="detail-attachments">
-                      <label>Attachments</label>
+                    <div className="detail-section">
+                      <div className="section-header">
+                        <ImageIcon size={18} color="#77A365" />
+                        <h4>Attachments</h4>
+                      </div>
                       <div className="attachment-previews">
                         {selectedTicket.attachments.map((img, i) => (
-                          <img key={i} src={img} alt="attachment" onClick={() => window.open(img)} />
+                          <div key={i} className="attachment-card" onClick={() => window.open(img)}>
+                            <img src={img} alt="attachment" />
+                            <div className="attachment-overlay">View Image</div>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -228,7 +315,10 @@ const TicketManagementPage = () => {
                 </div>
 
                 <div className="detail-sidebar">
-                  <h4>Workflow Timeline</h4>
+                  <div className="section-header">
+                    <ClockIcon size={18} color="#77A365" />
+                    <h4>Technician Updates</h4>
+                  </div>
                   <TicketTimeline 
                     history={selectedTicket.history} 
                     createdAt={selectedTicket.createdAt} 

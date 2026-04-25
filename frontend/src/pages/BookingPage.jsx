@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import QRCode from 'react-qr-code';
 import { createBooking, getMyBookings, cancelBooking } from '../services/api';
 import {
   CalendarIcon, CheckCircleIcon, XCircleIcon, RefreshIcon,
@@ -388,6 +389,20 @@ const BookingPage = () => {
                         <span className="bp-item-ref">{b.referenceId}</span>
                       )}
                     </div>
+                   {b.status === 'APPROVED' && (
+  <div className="bp-qr-section">
+    <p className="bp-qr-label">Scan to verify booking</p>
+    <QRCode
+      value={`http://localhost:3000/verify/${b.id}`}
+      size={100}
+    />
+    <p className="bp-qr-ref">
+      {b.referenceId ? b.referenceId : 'BK-' + b.id.slice(-6).toUpperCase()}
+    </p>
+  </div>
+
+
+)}
 
                     {/* Show rejection reason */}
                     {b.status === 'REJECTED' && b.adminReason && (

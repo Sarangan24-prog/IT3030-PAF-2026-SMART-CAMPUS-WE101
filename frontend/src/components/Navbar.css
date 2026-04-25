@@ -216,7 +216,7 @@
   font-weight: 700;
 }
 
-.admin-subnav {
+.sidebar-subnav {
   list-style: none;
   margin: 0 0 0 34px; 
   padding: 0;
@@ -231,13 +231,13 @@
   border-left: 2px solid var(--glass-border);
 }
 
-.has-subnav .admin-subnav {
+.has-subnav .sidebar-subnav {
   max-height: 500px;
   opacity: 1;
   padding: 10px 0 15px;
 }
 
-.admin-subnav-link {
+.subnav-link {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -252,24 +252,24 @@
   position: relative;
 }
 
-.admin-subnav-link svg {
+.subnav-link svg {
   flex-shrink: 0;
   opacity: 0.8;
   color: inherit;
 }
 
-.admin-subnav-link:hover {
+.subnav-link:hover {
   background: var(--accent-green-light);
   color: var(--accent-green);
 }
 
-.admin-subnav-link.active {
+.subnav-link.active {
   background: var(--accent-green-light);
   color: var(--accent-green);
   font-weight: 700;
 }
 
-.admin-subnav-link.active::before {
+.subnav-link.active::before {
   content: '';
   position: absolute;
   left: -2px;
