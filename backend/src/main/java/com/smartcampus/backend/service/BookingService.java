@@ -36,9 +36,18 @@ public class BookingService {
             );
         }
 
-        booking.setStatus(BookingStatus.PENDING);
-        booking.setCreatedAt(LocalDateTime.now());
-        return bookingRepository.save(booking);
+       booking.setStatus(BookingStatus.PENDING);
+booking.setCreatedAt(LocalDateTime.now());
+
+// Save first to get ID
+Booking saved = bookingRepository.save(booking);
+
+// Generate and save referenceId
+saved.setReferenceId("BK-" + saved.getId()
+    .substring(saved.getId().length() - 6).toUpperCase());
+bookingRepository.save(saved); // save again with referenceId
+
+return saved;
     }
 
     // ── Get bookings for one user ─────────────────────────

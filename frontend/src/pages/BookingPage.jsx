@@ -96,6 +96,7 @@ const BookingPage = () => {
         title:             form.title,
         description:       form.description,
         resourceType:      form.resourceType,
+        
         bookingDate:       form.bookingDate,
         timeSlot:          form.timeSlot,
         startTime:         form.startTime,
