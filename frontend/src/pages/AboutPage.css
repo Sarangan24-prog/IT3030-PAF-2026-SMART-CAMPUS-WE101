@@ -159,7 +159,7 @@
   border-radius: 50%;
 }
 
-.stat-box {
+.about-page .stat-box {
   position: absolute;
   bottom: -15px;
   right: -15px;
@@ -172,14 +172,14 @@
   box-shadow: 0 10px 30px rgba(217, 119, 6, 0.4);
 }
 
-.stat-number {
+.about-page .stat-number {
   font-size: 22px;
   font-weight: 800;
   color: #ffffff;
   line-height: 1;
 }
 
-.stat-label {
+.about-page .stat-label {
   font-size: 9px;
   color: rgba(255, 255, 255, 0.9);
   text-transform: uppercase;

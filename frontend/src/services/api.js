@@ -32,6 +32,7 @@ export const updateUserRole = (id, role) => API.put(`/users/${id}/role`, { role 
 
 // Admin
 export const getAdminStats = () => API.get('/admin/stats');
+export const getResourceAnalytics = () => API.get('/admin/resource-analytics');
 export const getAdminNotifications = () => API.get('/admin/notifications');
 export const sendNotification = (data) => API.post('/admin/notifications', data);
 export const broadcastNotification = (data) => API.post('/admin/notifications/broadcast', data);

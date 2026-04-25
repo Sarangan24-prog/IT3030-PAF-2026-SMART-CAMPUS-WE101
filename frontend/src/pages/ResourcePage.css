@@ -85,104 +85,113 @@
 .filter-card {
   background: var(--bg-card);
   backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border: var(--glass-border);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: var(--shadow);
-}
-
-/* Override glass-panel for sidebar specifically */
-.resources-sidebar .glass-panel {
-  background: var(--bg-card);
-  backdrop-filter: var(--glass-blur);
-  border: var(--glass-border);
+  border-radius: 16px;
+  padding: 24px;
   box-shadow: var(--shadow);
 }
 
 .filter-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid #edf0e8;
-  color: #0f172a;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--glass-border);
+  color: var(--text-main);
 }
 
 .filter-header h2 {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   margin: 0;
-  color: #0f172a;
+  color: var(--text-main);
+  letter-spacing: -0.3px;
 }
 
-.filter-group {
-  margin-bottom: 16px;
+.filter-card .filter-group {
+  margin-bottom: 22px;
 }
 
-.filter-group label {
+.filter-card .filter-group:last-child {
+  margin-bottom: 0;
+}
+
+.filter-card .filter-group label {
   display: block;
-  font-size: 12px;
+  font-size: 13.5px;
   color: var(--text-muted);
-  margin: 3px 0 0;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  font-weight: 800;
+  margin: 0 0 8px 4px;
+  font-weight: 600;
+  text-transform: none; /* Classic, user-friendly capitalization */
+  letter-spacing: 0.2px;
 }
 
-.search-input-wrapper {
+.filter-card .search-input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.search-input-wrapper svg {
+.filter-card .search-input-wrapper svg {
   position: absolute;
-  left: 11px;
-  color: #94a3b8;
+  left: 14px;
+  color: var(--text-muted);
+  opacity: 0.7;
   pointer-events: none;
+  z-index: 1;
 }
 
-.search-input-wrapper input {
+.filter-card .search-input-wrapper input {
   width: 100%;
-  padding: 9px 10px 9px 34px;
-  background: var(--bg-card);
-  backdrop-filter: blur(8px);
+  padding: 11px 14px 11px 40px;
+  background: var(--sidebar-bg);
   border: var(--glass-border);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--text-main);
-  font-size: 13.5px;
+  font-size: 14px;
   font-family: inherit;
-  transition: all 0.2s;
+  transition: var(--trans);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-.search-input-wrapper input:focus,
-.filter-group select:focus,
-.filter-group input[type="number"]:focus {
-  border-color: #77A365;
+.filter-card .search-input-wrapper input:focus,
+.filter-card .filter-group select:focus,
+.filter-card .filter-group input[type="number"]:focus {
+  border-color: var(--accent-green);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(119, 163, 101, 0.15);
-  background: #ffffff;
+  box-shadow: 0 0 0 4px var(--accent-green-light);
 }
 
-.filter-group select,
-.filter-group input[type="number"] {
+.filter-card .filter-group select,
+.filter-card .filter-group input[type="number"] {
   width: 100%;
-  padding: 9px 12px;
-  background: var(--bg-card);
-  backdrop-filter: blur(8px);
+  padding: 11px 14px;
+  background: var(--sidebar-bg);
   border: var(--glass-border);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--text-main);
-  font-size: 13.5px;
+  font-size: 14px;
   font-family: inherit;
-  transition: all 0.2s;
+  transition: var(--trans);
   appearance: auto;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+  cursor: pointer;
 }
 
-.filter-group select option {
-  background: #1e293b;
-  color: #ffffff;
+.filter-card .filter-group input[type="number"] {
+  cursor: text;
+}
+
+.filter-card .filter-group select option {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+[data-theme='dark'] .filter-group select option {
+  background: #0f172a;
+  color: #f8fafc;
 }
 
 /* ─── Main Grid ─── */

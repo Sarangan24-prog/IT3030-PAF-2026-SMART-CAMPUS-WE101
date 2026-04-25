@@ -15,7 +15,8 @@ import {
   CloseIcon,
   UsersIcon,
   SendIcon,
-  BuildingIcon
+  BuildingIcon,
+  BarChartIcon
 } from './Icons';
 import './Navbar.css';
 
@@ -32,6 +33,7 @@ const Navbar = () => {
   const adminPanelTabs = [
     { key: 'overview', label: 'Overview', icon: GridIcon },
     { key: 'bookings', label: 'Bookings', icon: CalendarIcon },
+    { key: 'analytics', label: 'Analytics', icon: BarChartIcon },
     { key: 'resources', label: 'Facilities', icon: BuildingIcon },
     { key: 'users', label: 'Users', icon: UsersIcon },
     { key: 'notifications', label: 'Notifications', icon: null },

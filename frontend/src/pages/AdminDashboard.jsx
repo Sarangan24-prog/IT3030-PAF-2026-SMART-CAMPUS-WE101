@@ -33,12 +33,14 @@ import {
   UploadIcon,
   PinIcon,
   DownloadIcon,
+  MonitorIcon,
 } from '../components/Icons';
 import './AdminDashboard.css';
 //booking added 
 const TABS = [
   { key: 'overview', label: 'Overview', Icon: BarChartIcon },
   { key: 'bookings', label: 'Bookings', Icon: CalendarIcon },
+  { key: 'analytics', label: 'Analytics', Icon: MonitorIcon },
   { key: 'resources', label: 'Facilities', Icon: PinIcon },
   { key: 'users', label: 'Users', Icon: UsersIcon },
   { key: 'notifications', label: 'Notifications', Icon: BellIcon },
@@ -60,6 +62,7 @@ const AdminDashboard = () => {
       <div className="tab-content">
         {activeTab === 'overview' && <OverviewTab />}
         {activeTab === 'bookings' && <BookingsTab />}
+        {activeTab === 'analytics' && <ResourceAnalyticsTab />}
         {activeTab === 'resources' && <ResourcesTab />}
         {activeTab === 'users' && <UsersTab />}
         {activeTab === 'notifications' && <NotificationsTab />}
@@ -67,6 +70,320 @@ const AdminDashboard = () => {
       </div>
     </div>
   );
+};
+
+/* ─── Resource Analytics Tab ─── */
+const ResourceAnalyticsTab = () => {
+  const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+
+  const loadAnalytics = useCallback(async () => {
+    setLoading(true);
+    setLoadError('');
+
+    try {
+      const [resourcesRes, bookingsRes] = await Promise.all([
+        getAllResources(),
+        getAllBookings(),
+      ]);
+      setAnalytics(buildResourceAnalytics(resourcesRes.data || [], bookingsRes.data || []));
+    } catch (err) {
+      console.error(err);
+      const status = err?.response?.status;
+      setLoadError(status ? `Failed to load resource analytics (${status})` : 'Failed to load resource analytics');
+      setAnalytics(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadAnalytics();
+  }, [loadAnalytics]);
+
+  if (loading) return <p className="loading-text">Loading resource intelligence...</p>;
+  if (!analytics) return <p className="loading-text">{loadError || 'Failed to load resource analytics'}</p>;
+
+  const summary = analytics.summary || {};
+  const typeEntries = Object.entries(analytics.byType || {});
+  const buildingEntries = Object.entries(analytics.byBuilding || {});
+  const bookingStatusEntries = Object.entries(analytics.bookingsByStatus || {});
+  const topResources = analytics.topResources || [];
+  const recentBookings = analytics.recentBookings || [];
+  const maxType = Math.max(...typeEntries.map(([, value]) => value), 1);
+  const maxBuilding = Math.max(...buildingEntries.map(([, value]) => value), 1);
+  const maxResourceBookings = Math.max(...topResources.map((item) => item.bookingCount), 1);
+  const totalBookings = summary.totalBookings || 0;
+  const approvedRatio = totalBookings ? Math.round(((summary.approvedBookings || 0) / totalBookings) * 100) : 0;
+  const serviceLoad = (summary.pendingBookings || 0) + (summary.outOfServiceResources || 0);
+
+  const metricCards = [
+    { label: 'Resource Health', value: `${summary.healthScore || 0}%`, hint: 'Active inventory', tone: 'green' },
+    { label: 'Utilization Signal', value: `${summary.utilizationScore || 0}%`, hint: 'Approved demand vs capacity', tone: 'blue' },
+    { label: 'Bookable Ratio', value: `${summary.bookableRatio || 0}%`, hint: 'Available for requests', tone: 'amber' },
+    { label: 'Total Capacity', value: summary.totalCapacity || 0, hint: 'Seats and device capacity', tone: 'violet' },
+  ];
+
+  return (
+    <div className="resource-analytics-tab">
+      <section className="analytics-hero-panel">
+        <div>
+          <p className="analytics-kicker">Resource Intelligence Core</p>
+          <h3>Campus resource performance</h3>
+          <p>
+            Live operational analytics for facilities, capacity, booking demand, and service readiness.
+          </p>
+        </div>
+        <div className="analytics-orbit" aria-hidden="true">
+          <span />
+          <strong>{summary.totalResources || 0}</strong>
+          <small>Resources</small>
+        </div>
+      </section>
+
+      <section className="analytics-command-strip">
+        <div className="command-node">
+          <span>Readiness</span>
+          <strong>{summary.healthScore || 0}%</strong>
+          <small>{summary.activeResources || 0} of {summary.totalResources || 0} resources active</small>
+        </div>
+        <div className="command-node">
+          <span>Approval Flow</span>
+          <strong>{approvedRatio}%</strong>
+          <small>{summary.approvedBookings || 0} approved from {totalBookings} requests</small>
+        </div>
+        <div className="command-node">
+          <span>Attention Queue</span>
+          <strong>{serviceLoad}</strong>
+          <small>{summary.pendingBookings || 0} pending, {summary.outOfServiceResources || 0} offline</small>
+        </div>
+        <button className="analytics-refresh-btn" onClick={loadAnalytics} disabled={loading}>
+          <RefreshIcon size={15} />
+          Refresh
+        </button>
+      </section>
+
+      <div className="analytics-metric-grid">
+        {metricCards.map((card) => (
+          <div key={card.label} className={`analytics-metric-card ${card.tone}`}>
+            <span>{card.label}</span>
+            <strong>{card.value}</strong>
+            <small>{card.hint}</small>
+          </div>
+        ))}
+      </div>
+
+      <div className="analytics-grid">
+        <section className="analytics-panel inventory-panel">
+          <div className="analytics-panel-heading">
+            <h4>Inventory Matrix</h4>
+            <span>{summary.activeResources || 0} active</span>
+          </div>
+          <div className="status-rings">
+            <div className="status-ring active">
+              <strong>{summary.activeResources || 0}</strong>
+              <span>Active</span>
+            </div>
+            <div className="status-ring warning">
+              <strong>{summary.outOfServiceResources || 0}</strong>
+              <span>Out of service</span>
+            </div>
+            <div className="status-ring neutral">
+              <strong>{summary.bookableResources || 0}</strong>
+              <span>Bookable</span>
+            </div>
+          </div>
+          <div className="capacity-band-list">
+            {(analytics.capacityBands || []).map((band) => (
+              <div key={band.label} className="capacity-band-row">
+                <span>{band.label}</span>
+                <div>
+                  <i style={{ width: `${band.count ? Math.max((band.count / Math.max(summary.totalResources || 1, 1)) * 100, 6) : 0}%` }} />
+                </div>
+                <strong>{band.count}</strong>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="analytics-panel">
+          <div className="analytics-panel-heading">
+            <h4>Type Distribution</h4>
+            <span>{typeEntries.length} classes</span>
+          </div>
+          <div className="type-bars">
+            {typeEntries.map(([type, value]) => (
+              <div key={type} className="type-bar-row">
+                <span>{formatLabel(type)}</span>
+                <div>
+                  <i style={{ width: `${value ? Math.max((value / maxType) * 100, 8) : 0}%` }} />
+                </div>
+                <strong>{value}</strong>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="analytics-panel booking-signal-panel">
+          <div className="analytics-panel-heading">
+            <h4>Booking Signal</h4>
+            <span>{totalBookings} requests</span>
+          </div>
+          <div className="booking-signal-grid">
+            {bookingStatusEntries.map(([status, value]) => (
+              <div key={status} className={`booking-signal ${status.toLowerCase()}`}>
+                <strong>{value}</strong>
+                <span>{formatLabel(status)}</span>
+                <i style={{ height: `${value ? Math.max((value / Math.max(totalBookings, 1)) * 100, 10) : 0}%` }} />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="analytics-panel">
+          <div className="analytics-panel-heading">
+            <h4>Building Load</h4>
+            <span>{buildingEntries.length} zones</span>
+          </div>
+          <div className="building-load-list">
+            {buildingEntries.map(([building, value]) => (
+              <div key={building} className="building-load-row">
+                <span>{building}</span>
+                <div>
+                  <i style={{ width: `${value ? Math.max((value / maxBuilding) * 100, 8) : 0}%` }} />
+                </div>
+                <strong>{value}</strong>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <div className="analytics-grid analytics-grid-lower">
+        <section className="analytics-panel">
+          <div className="analytics-panel-heading">
+            <h4>High Demand Resources</h4>
+            <span>Top 5</span>
+          </div>
+          <div className="top-resource-list">
+            {topResources.map((resource, index) => (
+              <div key={resource.id || resource.code || resource.name} className="top-resource-row">
+                <span className="resource-rank">{index + 1}</span>
+                <div className="top-resource-main">
+                  <strong>{resource.name}</strong>
+                  <small>{resource.code} - {formatLabel(resource.type)} - {resource.building || 'Unassigned'}</small>
+                  <div><i style={{ width: `${resource.bookingCount ? Math.max((resource.bookingCount / maxResourceBookings) * 100, 8) : 0}%` }} /></div>
+                </div>
+                <span className="resource-count">{resource.bookingCount}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="analytics-panel">
+          <div className="analytics-panel-heading">
+            <h4>Recent Resource Flow</h4>
+            <span>Latest bookings</span>
+          </div>
+          <div className="recent-flow-list">
+            {recentBookings.map((booking) => (
+              <div key={booking.id} className="recent-flow-row">
+                <div>
+                  <strong>{booking.resourceName || 'Resource'}</strong>
+                  <small>{booking.userName} - {booking.bookingDate || 'Date pending'} - {booking.timeSlot}</small>
+                </div>
+                <span className={`flow-status ${String(booking.status).toLowerCase()}`}>
+                  {formatLabel(booking.status)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+};
+
+const formatLabel = (value) => String(value || '')
+  .replaceAll('_', ' ')
+  .toLowerCase()
+  .replace(/\b\w/g, (letter) => letter.toUpperCase());
+
+const buildResourceAnalytics = (resources, bookings) => {
+  const countBy = (items, getKey) => items.reduce((acc, item) => {
+    const key = getKey(item);
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+
+  const totalResources = resources.length;
+  const activeResources = resources.filter((item) => item.status === 'ACTIVE').length;
+  const outOfServiceResources = resources.filter((item) => item.status === 'OUT_OF_SERVICE').length;
+  const bookableResources = resources.filter((item) => item.bookable === true).length;
+  const totalCapacity = resources.reduce((sum, item) => sum + (Number(item.capacity) || 0), 0);
+  const approvedBookings = bookings.filter((item) => item.status === 'APPROVED').length;
+  const pendingBookings = bookings.filter((item) => item.status === 'PENDING').length;
+  const rejectedBookings = bookings.filter((item) => item.status === 'REJECTED').length;
+  const cancelledBookings = bookings.filter((item) => item.status === 'CANCELLED').length;
+  const bookingCounts = countBy(bookings.filter((item) => item.resourceId), (item) => item.resourceId);
+
+  return {
+    summary: {
+      totalResources,
+      activeResources,
+      outOfServiceResources,
+      bookableResources,
+      totalCapacity,
+      totalBookings: bookings.length,
+      approvedBookings,
+      pendingBookings,
+      rejectedBookings,
+      cancelledBookings,
+      healthScore: totalResources ? Math.round((activeResources / totalResources) * 100) : 0,
+      bookableRatio: totalResources ? Math.round((bookableResources / totalResources) * 100) : 0,
+      utilizationScore: activeResources ? Math.min(100, Math.round((approvedBookings / (activeResources * 8)) * 100)) : 0,
+    },
+    byType: countBy(resources, (item) => item.type || 'UNCLASSIFIED'),
+    byStatus: countBy(resources, (item) => item.status || 'UNKNOWN'),
+    byBuilding: countBy(resources, (item) => item.building || 'Unassigned'),
+    bookingsByStatus: {
+      APPROVED: approvedBookings,
+      PENDING: pendingBookings,
+      REJECTED: rejectedBookings,
+      CANCELLED: cancelledBookings,
+    },
+    capacityBands: [
+      { label: 'Small', count: resources.filter((item) => (Number(item.capacity) || 0) <= 40).length },
+      { label: 'Medium', count: resources.filter((item) => (Number(item.capacity) || 0) >= 41 && (Number(item.capacity) || 0) <= 120).length },
+      { label: 'Large', count: resources.filter((item) => (Number(item.capacity) || 0) >= 121 && (Number(item.capacity) || 0) <= 300).length },
+      { label: 'Arena', count: resources.filter((item) => (Number(item.capacity) || 0) >= 301).length },
+    ],
+    topResources: resources
+      .map((item) => ({
+        id: item.id,
+        code: item.code,
+        name: item.name,
+        building: item.building,
+        type: item.type || 'UNCLASSIFIED',
+        capacity: Number(item.capacity) || 0,
+        bookingCount: bookingCounts[item.id] || 0,
+      }))
+      .sort((a, b) => b.bookingCount - a.bookingCount)
+      .slice(0, 5),
+    recentBookings: [...bookings]
+      .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+      .slice(0, 6)
+      .map((item) => ({
+        id: item.id,
+        referenceId: item.referenceId || 'N/A',
+        resourceName: item.resourceName || item.resourceType,
+        userName: item.userName || 'Unknown',
+        status: item.status || 'UNKNOWN',
+        bookingDate: item.bookingDate,
+        timeSlot: item.timeSlot || `${item.startTime || 'TBA'} - ${item.endTime || 'TBA'}`,
+      })),
+  };
 };
 
 /* ─── Overview Tab ─── */
