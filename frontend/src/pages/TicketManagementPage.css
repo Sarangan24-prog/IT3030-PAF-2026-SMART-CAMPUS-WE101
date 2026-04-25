@@ -672,3 +672,135 @@
   .manage-content { grid-template-columns: 1fr; }
   .detail-tabs { grid-template-columns: 1fr; }
 }
+
+/* ─── Rejection & Comment Actions ─── */
+.btn-outline-danger {
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.btn-outline-danger:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.reject-form .btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.btn-danger {
+  flex: 1;
+  padding: 12px;
+  background: #ef4444;
+  border: none;
+  color: white;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+.btn-ghost:hover {
+  background: #f1f5f9;
+}
+
+.reject-card .input-group textarea {
+  min-height: 80px;
+  border: none;
+  background: transparent;
+  width: 100%;
+  padding: 12px 0;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.comment-bubble {
+  position: relative;
+}
+
+.comment-actions {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.comment-bubble:hover .comment-actions {
+  opacity: 1;
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.btn-icon:hover {
+  background: #f1f5f9;
+}
+
+.comment-edit-form {
+  margin-top: 12px;
+}
+
+.comment-edit-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--accent-green-light);
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  background: #fff;
+  outline: none;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.text-success { color: var(--accent-green) !important; }
+.text-danger { color: #ef4444 !important; }
+
+.priority-tag.priority-REJECTED {
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fee2e2;
+}

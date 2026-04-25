@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { createTicket, getMyTickets } from '../services/api';
+import { createTicket, getMyTickets, getAllResources } from '../services/api';
 import { TagIcon, CheckCircleIcon, XCircleIcon, RefreshIcon, UserIcon, ImageIcon, ChevronDownIcon, ChevronUpIcon, UploadIcon, XIcon } from '../components/Icons';
 import TicketTimeline from '../components/TicketTimeline';
 import { toast } from 'react-toastify';
@@ -31,7 +31,8 @@ const StatusIcon = ({ status }) => {
 };
 
 const TicketPage = () => {
-  const [tickets, setTickets] = useState([]);
+  const [myTickets, setMyTickets] = useState([]);
+  const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ category: 'Network', title: '', description: '', priority: 'MEDIUM', contactDetails: '' });
   const [images, setImages] = useState([]);
@@ -42,10 +43,14 @@ const TicketPage = () => {
 
   const fetchTickets = useCallback(async () => {
     try {
-      const res = await getMyTickets();
-      setTickets(res.data);
-    } catch {
-      // silently fail
+      const [ticketsRes, resourcesRes] = await Promise.all([
+        getMyTickets(),
+        getAllResources()
+      ]);
+      setMyTickets(ticketsRes.data);
+      setResources(resourcesRes.data);
+    } catch (err) {
+      console.error("Failed to fetch ticket data", err);
     } finally {
       setLoading(false);
     }
@@ -114,7 +119,7 @@ const TicketPage = () => {
       await createTicket({ ...form, attachments: images });
       toast.success('Ticket raised successfully!');
       setResult({ ok: true, msg: 'Ticket raised successfully.' });
-      setForm({ category: 'Network', title: '', description: '', priority: 'MEDIUM', contactDetails: '' });
+      setForm({ category: 'Network', title: '', description: '', priority: 'MEDIUM', contactDetails: '', location: '' });
       setImages([]);
       setErrors({});
       fetchTickets();
@@ -156,6 +161,20 @@ const TicketPage = () => {
                   <option value="URGENT">Urgent</option>
                 </select>
               </div>
+            </div>
+            <div className="tp-field">
+              <label>Location / Resource</label>
+              <select 
+                value={form.location} 
+                onChange={(e) => setForm({ ...form, location: e.target.value })}
+                className={errors.location ? 'field-error' : ''}
+              >
+                <option value="">Select Resource/Location</option>
+                {resources.map(r => (
+                  <option key={r.id} value={r.name}>{r.name} ({r.type})</option>
+                ))}
+                <option value="General Campus">General Campus</option>
+              </select>
             </div>
             <div className="tp-field">
               <label>Title</label>
@@ -236,7 +255,11 @@ const TicketPage = () => {
             <p className="tp-loading">Loading...</p>
           ) : (
             <div className="tp-list">
-              {tickets.length === 0 ? <p className="tp-empty">No tickets yet.</p> : tickets.map((t) => {
+              {myTickets.length === 0 ? (
+                <div className="tp-empty">
+                  <p>No tickets yet. Raise your first ticket above!</p>
+                </div>
+              ) : myTickets.map((t) => {
                 const s = STATUS_STYLES[t.status] || STATUS_STYLES.OPEN;
                 const isExpanded = expandedId === t.id;
                 return (
@@ -279,6 +302,11 @@ const TicketPage = () => {
                             <h4>Description</h4>
                             <p>{t.description || "No description provided."}</p>
                             
+                            <div className="tp-meta-details-row">
+                              <span className="tp-meta-label">Location:</span> 
+                              <span className="tp-meta-val">{t.location || 'General Campus'}</span>
+                            </div>
+
                             {t.attachments?.length > 0 && (
                               <div className="tp-details-attachments">
                                 <h4>Attachments</h4>
