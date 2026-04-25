@@ -60,6 +60,10 @@ const TicketManagementPage = () => {
 
   const handleAssign = async (e) => {
     e.preventDefault();
+    if (!assignForm.technicianName.trim()) {
+      toast.error('Please provide a technician name.');
+      return;
+    }
     try {
       await assignTechnician(selectedTicket.id, assignForm);
       toast.success('Technician assigned successfully!');
@@ -72,6 +76,10 @@ const TicketManagementPage = () => {
 
   const handleResolve = async (e) => {
     e.preventDefault();
+    if (resolveForm.resolutionNotes.trim().length < 10) {
+      toast.error('Please provide detailed resolution notes (min 10 chars).');
+      return;
+    }
     try {
       await resolveTicket(selectedTicket.id, resolveForm);
       toast.success('Ticket resolved successfully!');

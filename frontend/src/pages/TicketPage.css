@@ -358,3 +358,25 @@
   .tp-grid { grid-template-columns: 1fr; }
   .tp-form-card { position: static; }
 }
+
+.tp-field input.field-error,
+.tp-field textarea.field-error {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.tp-field input.field-error:focus,
+.tp-field textarea.field-error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+
+.error-msg {
+  font-size: 11px;
+  color: #ef4444;
+  font-weight: 600;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

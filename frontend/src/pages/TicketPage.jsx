@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { createTicket, getMyTickets } from '../services/api';
 import { TagIcon, CheckCircleIcon, XCircleIcon, RefreshIcon, UserIcon, ImageIcon, ChevronDownIcon, ChevronUpIcon } from '../components/Icons';
 import TicketTimeline from '../components/TicketTimeline';
+import { toast } from 'react-toastify';
 import './TicketPage.css';
 
 const CATEGORIES = ['Network', 'Equipment', 'Facility', 'Academic Support', 'Other'];
@@ -37,6 +38,7 @@ const TicketPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const fetchTickets = useCallback(async () => {
     try {
@@ -53,11 +55,29 @@ const TicketPage = () => {
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
+    
+    // Check total count
     if (images.length + files.length > 3) {
-      alert('You can only upload up to 3 images.');
+      toast.warning('You can only upload up to 3 images.');
       return;
     }
-    files.forEach(file => {
+
+    const validFiles = [];
+    for (const file of files) {
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        toast.error(`"${file.name}" is not an image file.`);
+        continue;
+      }
+      // Check file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`"${file.name}" is too large. Max size is 5MB.`);
+        continue;
+      }
+      validFiles.push(file);
+    }
+
+    validFiles.forEach(file => {
       const reader = new FileReader();
       reader.onloadend = () => setImages(prev => [...prev, reader.result]);
       reader.readAsDataURL(file);
@@ -66,18 +86,40 @@ const TicketPage = () => {
 
   const removeImage = (index) => setImages(prev => prev.filter((_, i) => i !== index));
 
+  const validateForm = () => {
+    const newErrors = {};
+    if (form.title.trim().length < 5) newErrors.title = 'Title must be at least 5 characters.';
+    if (form.description.trim().length < 20) newErrors.description = 'Please provide a more detailed description (min 20 chars).';
+    
+    const contact = form.contactDetails.trim();
+    if (contact) {
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact);
+      const isPhone = /^\+?[\d\s-]{10,}$/.test(contact);
+      if (!isEmail && !isPhone) newErrors.contactDetails = 'Please enter a valid email or phone number.';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.title.trim()) return;
+    if (!validateForm()) {
+      toast.error('Please fix the errors in the form.');
+      return;
+    }
     setSubmitting(true);
     setResult(null);
     try {
       await createTicket({ ...form, attachments: images });
+      toast.success('Ticket raised successfully!');
       setResult({ ok: true, msg: 'Ticket raised successfully.' });
       setForm({ category: 'Network', title: '', description: '', priority: 'MEDIUM', contactDetails: '' });
       setImages([]);
+      setErrors({});
       fetchTickets();
     } catch {
+      toast.error('Failed to raise ticket.');
       setResult({ ok: false, msg: 'Failed to raise ticket.' });
     } finally {
       setSubmitting(false);
@@ -117,15 +159,37 @@ const TicketPage = () => {
             </div>
             <div className="tp-field">
               <label>Title</label>
-              <input type="text" placeholder="Issue title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+              <input 
+                type="text" 
+                placeholder="Issue title" 
+                value={form.title} 
+                onChange={(e) => setForm({ ...form, title: e.target.value })} 
+                className={errors.title ? 'field-error' : ''}
+                required 
+              />
+              {errors.title && <span className="error-msg">{errors.title}</span>}
             </div>
             <div className="tp-field">
               <label>Description</label>
-              <textarea rows={3} placeholder="Detailed description..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+              <textarea 
+                rows={3} 
+                placeholder="Detailed description..." 
+                value={form.description} 
+                onChange={(e) => setForm({ ...form, description: e.target.value })} 
+                className={errors.description ? 'field-error' : ''}
+              />
+              {errors.description && <span className="error-msg">{errors.description}</span>}
             </div>
             <div className="tp-field">
               <label>Contact Details</label>
-              <input type="text" placeholder="Phone/Email" value={form.contactDetails} onChange={(e) => setForm({ ...form, contactDetails: e.target.value })} />
+              <input 
+                type="text" 
+                placeholder="Phone/Email" 
+                value={form.contactDetails} 
+                onChange={(e) => setForm({ ...form, contactDetails: e.target.value })} 
+                className={errors.contactDetails ? 'field-error' : ''}
+              />
+              {errors.contactDetails && <span className="error-msg">{errors.contactDetails}</span>}
             </div>
             <div className="tp-field">
               <label>Attachments (Max 3)</label>
