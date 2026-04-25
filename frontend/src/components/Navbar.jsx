@@ -60,6 +60,7 @@ const Navbar = () => {
     { path: '/resources', label: 'Facilities', icon: PinIcon, color: 'green' },
     { path: '/tickets', label: 'Support', icon: TagIcon, color: 'blue' },
     { path: '/notifications', label: 'Inbox', icon: BellIcon, color: 'red', isInbox: true },
+    { path: '/notification-preferences', label: 'Notif Settings', icon: SettingsIcon, color: 'gray' },
   ];
 
   // Find active index for sliding indicator

@@ -5,7 +5,9 @@ import com.smartcampus.backend.model.Role;
 import com.smartcampus.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -44,5 +46,23 @@ public class UserService {
     @SuppressWarnings("null")
     public User saveUser(User user) {
         return userRepository.save(user);
+    }
+
+    public Map<String, Boolean> getNotificationPreferences(String userId) {
+        User user = userRepository.findById(Objects.requireNonNull(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Map<String, Boolean> prefs = user.getNotificationPreferences();
+        if (prefs == null || prefs.isEmpty()) {
+            return new HashMap<>(Map.of("BOOKINGS", true, "TICKETS", true, "COMMENTS", true));
+        }
+        return prefs;
+    }
+
+    public Map<String, Boolean> updateNotificationPreferences(String userId, Map<String, Boolean> preferences) {
+        User user = userRepository.findById(Objects.requireNonNull(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setNotificationPreferences(preferences);
+        userRepository.save(user);
+        return preferences;
     }
 }
