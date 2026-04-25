@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { searchResources } from '../services/api';
-import { SearchIcon, FilterIcon, BuildingIcon, UsersIcon, CheckCircleIcon, XCircleIcon, MonitorIcon } from '../components/Icons';
+import { SearchIcon, FilterIcon, BuildingIcon } from '../components/Icons';
 import './ResourcePage.css';
 
 const ResourcePage = () => {
@@ -14,6 +14,19 @@ const ResourcePage = () => {
   });
 
   const [selectedResource, setSelectedResource] = useState(null);
+
+  const getResourceImageUrl = (resource) => {
+    if (!resource) return '';
+    const candidate =
+      resource.imageUrl ||
+      resource.imageURL ||
+      resource.image ||
+      resource.thumbnailUrl ||
+      resource.thumbnail ||
+      '';
+
+    return typeof candidate === 'string' ? candidate.trim() : '';
+  };
 
   const fetchResources = async () => {
     setLoading(true);
@@ -41,22 +54,6 @@ const ResourcePage = () => {
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const getFallbackImage = (type) => {
-    switch (type) {
-      case 'LECTURE_HALL': return 'https://images.unsplash.com/photo-1577415124269-b9140d10b214?auto=format&fit=crop&q=80&w=800';
-      case 'LAB': return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800';
-      case 'MEETING_ROOM': return 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800';
-      default: return 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=800';
-    }
-  };
-
-  const getTypeIcon = (type) => {
-    switch (type) {
-      case 'LAB': return <MonitorIcon size={16} />;
-      default: return <BuildingIcon size={16} />;
-    }
   };
 
   return (
@@ -94,6 +91,7 @@ const ResourcePage = () => {
               <select name="type" value={filters.type} onChange={handleFilterChange}>
                 <option value="">All Types</option>
                 <option value="LECTURE_HALL">Lecture Hall</option>
+                <option value="AUDITORIUM">Auditorium</option>
                 <option value="LAB">Laboratory</option>
                 <option value="MEETING_ROOM">Meeting Room</option>
                 <option value="PROJECTOR">Projector</option>
@@ -137,40 +135,42 @@ const ResourcePage = () => {
             <div className="resources-grid">
               {resources.map((res) => (
                 <div 
-                  className="resource-card" 
+                  className={`resource-card minimalist${res.imageUrl ? ' has-image' : ''}`}
                   key={res.id}
                   onClick={() => setSelectedResource(res)}
                 >
-                  <div className="card-image-wrapper">
-                    <img 
-                      src={res.imageUrl || getFallbackImage(res.type)} 
-                      alt={res.name} 
-                      loading="lazy"
-                    />
-                    <div className="card-badge">{res.code}</div>
-                  </div>
-                  <div className="card-content">
-                    <h3>{res.name}</h3>
-                    <div className="card-meta">
-                      <span className="meta-tag">
-                        {getTypeIcon(res.type)} {res.type.replaceAll('_', ' ')}
-                      </span>
-                      {res.capacity > 0 && (
-                        <span className="meta-tag capacity">
-                          <UsersIcon size={14} /> {res.capacity} Seats
-                        </span>
-                      )}
+                  {res.imageUrl ? (
+                    <div className="card-image-banner">
+                      <img src={res.imageUrl} alt={res.name || 'Resource'} loading="lazy" />
+                      <div className="card-image-overlay">
+                        <span className="card-image-badge">{res.code}</span>
+                      </div>
                     </div>
+                  ) : (
+                    <div className="facility-avatar">
+                      {(res.name || 'Resource').charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div className="card-content-minimal">
+                    <h3>{res.name}</h3>
+                    {!res.imageUrl && <span className="resource-code">{res.code}</span>}
+                    <span className="facility-type-label">{res.type.replaceAll('_', ' ')}</span>
                     
-                    <div className="card-footer">
-                      <span className="location-text">
-                        <BuildingIcon size={14} /> {res.building} - {res.floor}
-                      </span>
-                      {res.bookable ? (
-                         <span className="status-indicator active"><CheckCircleIcon size={14} /> Bookable</span>
-                      ) : (
-                         <span className="status-indicator inactive"><XCircleIcon size={14} /> Not Bookable</span>
-                      )}
+                    <div className="minimal-stats">
+                      <div className="m-stat">
+                        <span className="m-val">{res.capacity || '0'}</span>
+                        <span className="m-lbl">Capacity</span>
+                      </div>
+                      <div className="m-stat">
+                        <span className="m-val">{(res.building || 'N/A').split(' ')[0]}</span>
+                        <span className="m-lbl">Location</span>
+                      </div>
+                      <div className="m-stat">
+                        <span className={`m-val status-${res.bookable ? 'active' : 'inactive'}`}>
+                          {res.bookable ? 'Yes' : 'No'}
+                        </span>
+                        <span className="m-lbl">Bookable</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -198,9 +198,24 @@ const ResourcePage = () => {
           <div className="resource-modal" onClick={e => e.stopPropagation()}>
             <button className="close-modal-btn" onClick={() => setSelectedResource(null)}>&times;</button>
             
-            <div className="modal-header-image" style={{ backgroundImage: `url(${selectedResource.imageUrl || getFallbackImage(selectedResource.type)})` }}>
-              <div className="modal-badge">{selectedResource.code}</div>
-            </div>
+            {getResourceImageUrl(selectedResource) ? (
+              <div className="modal-image-banner">
+                <img src={getResourceImageUrl(selectedResource)} alt={selectedResource.name || 'Resource'} />
+                <div className="modal-image-badge-overlay">
+                  <span className="modal-code">{selectedResource.code}</span>
+                </div>
+              </div>
+            ) : (
+              <div className="modal-header-minimal">
+                <div className="facility-avatar large">
+                  {(selectedResource.name || 'R').charAt(0).toUpperCase()}
+                </div>
+                <div className="modal-title-box">
+                  <span className="modal-code">{selectedResource.code}</span>
+                  <h2>{selectedResource.name}</h2>
+                </div>
+              </div>
+            )}
             
             <div className="modal-body">
               <h2>{selectedResource.name}</h2>

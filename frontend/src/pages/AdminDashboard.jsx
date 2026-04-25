@@ -636,17 +636,29 @@ const ResourcesTab = () => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        alert("Image size must be less than 10MB");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, imageUrl: reader.result });
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert(`❌ Unsupported file type: "${file.type || 'unknown'}". Please upload a JPG, PNG, GIF, or WebP image.`);
+      e.target.value = '';
+      return;
     }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('❌ Image size must be less than 10MB.');
+      e.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({ ...prev, imageUrl: reader.result }));
+    };
+    reader.onerror = () => {
+      alert('❌ Failed to read image file. Please try again.');
+    };
+    reader.readAsDataURL(file);
   };
 
   const onTypeChange = (type) => {
@@ -677,7 +689,14 @@ const ResourcesTab = () => {
       setShowModal(false);
       fetchResources();
     } catch (err) {
-      alert('Failed to save resource. Please check the data.');
+      const status = err?.response?.status;
+      if (status === 413) {
+        alert('❌ Image too large! Please use an image smaller than 10MB.');
+      } else if (status === 400) {
+        alert(`❌ Validation Error: ${err?.response?.data?.message || 'Please check all required fields.'}`);
+      } else {
+        alert(`❌ Failed to save resource: ${err?.response?.data?.error || err.message || 'Unknown error'}`);
+      }
     }
   };
 
@@ -813,9 +832,9 @@ const ResourcesTab = () => {
                     <input 
                       id="resource-image-upload"
                       type="file" 
-                      accept="image/*" 
+                      accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/bmp"
                       onChange={handleImageChange}
-                      hidden
+                      style={{ display: 'none' }}
                     />
                     <label htmlFor="resource-image-upload" className="file-upload-btn">
                       <UploadIcon size={18} />
