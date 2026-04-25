@@ -220,6 +220,18 @@ export const ChevronLeftIcon = ({ size = 16, color = 'currentColor', strokeWidth
   </svg>
 );
 
+export const ChevronDownIcon = ({ size = 16, color = 'currentColor', strokeWidth = 2 }) => (
+  <svg {...base(size, color, strokeWidth)}>
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
+export const ChevronUpIcon = ({ size = 16, color = 'currentColor', strokeWidth = 2 }) => (
+  <svg {...base(size, color, strokeWidth)}>
+    <polyline points="18 15 12 9 6 15" />
+  </svg>
+);
+
 export const GraduationCapIcon = ({ size = 16, color = 'currentColor', strokeWidth = 2 }) => (
   <svg {...base(size, color, strokeWidth)}>
     <path d="M22 10v6M2 10l10-5 10 5-10 5z" />

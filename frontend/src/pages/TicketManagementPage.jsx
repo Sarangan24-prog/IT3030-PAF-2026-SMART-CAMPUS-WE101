@@ -3,6 +3,7 @@ import { getAllTickets, assignTechnician, resolveTicket, addTicketComment } from
 import { TagIcon, UserIcon, RefreshIcon, SearchIcon, ClockIcon, BellIcon, ImageIcon } from '../components/Icons';
 import { useLocation } from 'react-router-dom';
 import TicketTimeline from '../components/TicketTimeline';
+import { toast } from 'react-toastify';
 import './TicketManagementPage.css';
 
 const TicketManagementPage = () => {
@@ -61,11 +62,11 @@ const TicketManagementPage = () => {
     e.preventDefault();
     try {
       await assignTechnician(selectedTicket.id, assignForm);
-      alert('Technician assigned.');
+      toast.success('Technician assigned successfully!');
       fetchTickets();
       setSelectedTicket(null);
     } catch (err) {
-      alert('Assignment failed.');
+      toast.error('Assignment failed. Please try again.');
     }
   };
 
@@ -73,11 +74,11 @@ const TicketManagementPage = () => {
     e.preventDefault();
     try {
       await resolveTicket(selectedTicket.id, resolveForm);
-      alert('Ticket resolved.');
+      toast.success('Ticket resolved successfully!');
       fetchTickets();
       setSelectedTicket(null);
     } catch (err) {
-      alert('Resolution failed.');
+      toast.error('Resolution failed. Please try again.');
     }
   };
 
@@ -88,9 +89,10 @@ const TicketManagementPage = () => {
       const res = await addTicketComment(selectedTicket.id, commentText);
       setSelectedTicket(res.data);
       setCommentText('');
+      toast.success('Comment added.');
       fetchTickets();
     } catch (err) {
-      alert('Failed to add comment.');
+      toast.error('Failed to add comment.');
     }
   };
 
@@ -246,21 +248,33 @@ const TicketManagementPage = () => {
                   
                   <div className="detail-actions">
                     {selectedTicket.status === 'OPEN' && (
-                      <div className="action-card">
-                        <h4>Assign Technician</h4>
-                        <form onSubmit={handleAssign}>
-                          <input 
-                            placeholder="Technician Name" 
-                            required 
-                            value={assignForm.technicianName}
-                            onChange={(e) => setAssignForm({ ...assignForm, technicianName: e.target.value })}
-                          />
-                          <input 
-                            placeholder="Contact Details" 
-                            value={assignForm.contactDetails}
-                            onChange={(e) => setAssignForm({ ...assignForm, contactDetails: e.target.value })}
-                          />
-                          <button type="submit">Assign & Start</button>
+                      <div className="action-card assign-card">
+                        <div className="section-header">
+                          <UserIcon size={18} color="#77A365" />
+                          <h4>Assign Technician</h4>
+                        </div>
+                        <form onSubmit={handleAssign} className="assign-form">
+                          <div className="input-group">
+                            <UserIcon size={14} color="#94a3b8" />
+                            <input 
+                              placeholder="Technician Name" 
+                              required 
+                              value={assignForm.technicianName}
+                              onChange={(e) => setAssignForm({ ...assignForm, technicianName: e.target.value })}
+                            />
+                          </div>
+                          <div className="input-group">
+                            <BellIcon size={14} color="#94a3b8" />
+                            <input 
+                              placeholder="Contact Details (Email/Phone)" 
+                              value={assignForm.contactDetails}
+                              onChange={(e) => setAssignForm({ ...assignForm, contactDetails: e.target.value })}
+                            />
+                          </div>
+                          <button type="submit" className="btn-primary">
+                            <span>Assign & Start Work</span>
+                            <RefreshIcon size={16} />
+                          </button>
                         </form>
                       </div>
                     )}
@@ -291,25 +305,41 @@ const TicketManagementPage = () => {
                   </div>
 
                   <div className="detail-comments">
-                    <h4>Communication Log</h4>
+                    <div className="section-header">
+                      <BellIcon size={18} color="#77A365" />
+                      <h4>Communication Log</h4>
+                    </div>
                     <div className="comments-list">
-                      {selectedTicket.comments?.map((c, i) => (
-                        <div key={i} className="comment-bubble">
-                          <div className="comment-meta">
-                            <strong>{c.authorName}</strong>
-                            <span>{new Date(c.createdAt).toLocaleString()}</span>
+                      {selectedTicket.comments?.length > 0 ? (
+                        selectedTicket.comments.map((c, i) => (
+                          <div key={i} className="comment-bubble">
+                            <div className="comment-meta">
+                              <div className="author-info">
+                                <div className="author-avatar">{c.authorName.charAt(0).toUpperCase()}</div>
+                                <strong>{c.authorName}</strong>
+                              </div>
+                              <span>{new Date(c.createdAt).toLocaleString()}</span>
+                            </div>
+                            <div className="comment-body">
+                              <p>{c.text}</p>
+                            </div>
                           </div>
-                          <p>{c.text}</p>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <div className="no-comments">No updates yet. Start the conversation!</div>
+                      )}
                     </div>
                     <form onSubmit={handleAddComment} className="comment-form">
-                      <input 
-                        placeholder="Add a comment or update..." 
-                        value={commentText}
-                        onChange={(e) => setCommentText(e.target.value)}
-                      />
-                      <button type="submit">Send</button>
+                      <div className="comment-input-wrapper">
+                        <input 
+                          placeholder="Type an update or message..." 
+                          value={commentText}
+                          onChange={(e) => setCommentText(e.target.value)}
+                        />
+                        <button type="submit" className="btn-send" disabled={!commentText.trim()}>
+                          <RefreshIcon size={18} />
+                        </button>
+                      </div>
                     </form>
                   </div>
                 </div>
