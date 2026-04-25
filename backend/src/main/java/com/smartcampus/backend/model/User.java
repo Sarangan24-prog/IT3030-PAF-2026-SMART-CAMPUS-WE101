@@ -5,6 +5,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Document(collection = "users")
 public class User {
@@ -25,6 +27,12 @@ public class User {
     private Role role = Role.USER;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    private Map<String, Boolean> notificationPreferences = new HashMap<>(Map.of(
+        "BOOKINGS", true,
+        "TICKETS",  true,
+        "COMMENTS", true
+    ));
 
     public User() {}
 
@@ -57,4 +65,7 @@ public class User {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public Map<String, Boolean> getNotificationPreferences() { return notificationPreferences; }
+    public void setNotificationPreferences(Map<String, Boolean> notificationPreferences) { this.notificationPreferences = notificationPreferences; }
 }

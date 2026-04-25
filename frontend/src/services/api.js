@@ -30,6 +30,10 @@ export const deleteNotification = (id) => API.delete(`/notifications/${id}`);
 export const getAllUsers = () => API.get('/users');
 export const updateUserRole = (id, role) => API.put(`/users/${id}/role`, { role });
 
+// Notification Preferences
+export const getNotificationPreferences = () => API.get('/users/me/notification-preferences');
+export const updateNotificationPreferences = (prefs) => API.put('/users/me/notification-preferences', prefs);
+
 // Admin
 export const getAdminStats = () => API.get('/admin/stats');
 export const getResourceAnalytics = () => API.get('/admin/resource-analytics');
