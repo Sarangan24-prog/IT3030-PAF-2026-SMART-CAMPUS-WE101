@@ -4,6 +4,7 @@ import com.smartcampus.backend.model.Role;
 import com.smartcampus.backend.model.User;
 import com.smartcampus.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,5 +37,24 @@ public class UserController {
         Role role = Role.valueOf(body.get("role"));
         User updatedUser = userService.updateUserRole(id, role);
         return ResponseEntity.ok(updatedUser);
+    }
+
+    /**
+     * GET /api/users/me/notification-preferences — get current user's notification preferences
+     */
+    @GetMapping("/me/notification-preferences")
+    public ResponseEntity<Map<String, Boolean>> getNotificationPreferences(
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userService.getNotificationPreferences(user.getId()));
+    }
+
+    /**
+     * PUT /api/users/me/notification-preferences — update current user's notification preferences
+     */
+    @PutMapping("/me/notification-preferences")
+    public ResponseEntity<Map<String, Boolean>> updateNotificationPreferences(
+            @AuthenticationPrincipal User user,
+            @RequestBody Map<String, Boolean> preferences) {
+        return ResponseEntity.ok(userService.updateNotificationPreferences(user.getId(), preferences));
     }
 }

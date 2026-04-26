@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import NotificationPanel from './pages/NotificationPanel';
+import NotificationPreferencesPage from './pages/NotificationPreferencesPage';
 import AdminDashboard from './pages/AdminDashboard';
 import BookingPage from './pages/BookingPage';
 import TicketPage from './pages/TicketPage';
@@ -123,6 +124,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <NotificationPanel />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notification-preferences"
+        element={
+          <ProtectedRoute>
+            <NotificationPreferencesPage />
           </ProtectedRoute>
         }
       />

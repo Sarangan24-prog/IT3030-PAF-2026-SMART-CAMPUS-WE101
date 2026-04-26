@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import {
   getNotifications,
   markNotificationRead,
@@ -13,6 +14,7 @@ import {
   MessageCircleIcon,
   CheckIcon,
   XIcon,
+  SettingsIcon,
 } from '../components/Icons';
 import './NotificationPanel.css';
 
@@ -64,11 +66,28 @@ const NotificationPanel = () => {
             <span className="unread-pill">{unreadCount} unread</span>
           )}
         </div>
-        {unreadCount > 0 && (
-          <button className="mark-all-btn" onClick={handleMarkAll} id="mark-all-read-btn">
-            Mark all as read
-          </button>
-        )}
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {unreadCount > 0 && (
+            <button className="mark-all-btn" onClick={handleMarkAll} id="mark-all-read-btn">
+              Mark all as read
+            </button>
+          )}
+          <Link
+            to="/notification-preferences"
+            style={{
+              display: 'flex', alignItems: 'center', gap: '5px',
+              padding: '8px 14px', borderRadius: '8px',
+              background: '#f1f5f9', color: '#475569',
+              fontSize: '13px', fontWeight: 500,
+              textDecoration: 'none', transition: 'all 0.18s ease',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = '#e2e8f0'}
+            onMouseLeave={e => e.currentTarget.style.background = '#f1f5f9'}
+          >
+            <SettingsIcon size={14} />
+            Preferences
+          </Link>
+        </div>
       </div>
 
       {notifications.length === 0 ? (
