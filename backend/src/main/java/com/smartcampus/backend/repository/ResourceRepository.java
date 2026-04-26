@@ -5,11 +5,15 @@ import com.smartcampus.backend.model.ResourceStatus;
 import com.smartcampus.backend.model.ResourceType;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ResourceRepository extends MongoRepository<Resource, String> {
     Optional<Resource> findByCode(String code);
     boolean existsByCode(String code);
+
+    @Query(value = "{}", fields = "{ 'imageUrl': 0 }")
+    List<Resource> findAllWithoutImageUrl();
 
     List<Resource> findByType(ResourceType type);
     List<Resource> findByLocationContainingIgnoreCase(String location);

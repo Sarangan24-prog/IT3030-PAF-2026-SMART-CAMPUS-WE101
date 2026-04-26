@@ -58,10 +58,15 @@ const DashboardPage = () => {
         </div>
         <div className="header-actions">
            <ThemeToggle />
-           <div className="header-notif">
+           <button
+              type="button"
+              className="header-notif"
+              onClick={() => navigate('/notifications')}
+              aria-label="Open notifications"
+           >
               <BellIcon size={22} color="var(--text-muted)" />
               {unreadCount > 0 && <span className="notif-badge">{unreadCount}</span>}
-           </div>
+           </button>
            <div className="header-profile">
               <img src={`https://ui-avatars.com/api/?name=${user?.name}&background=77A365&color=fff`} alt="avatar" />
               <div className="profile-info">

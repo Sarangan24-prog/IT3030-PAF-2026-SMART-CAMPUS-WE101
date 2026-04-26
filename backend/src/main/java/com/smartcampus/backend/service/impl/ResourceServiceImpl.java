@@ -36,9 +36,9 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public List<ResourceResponse> getAllResources() {
-        return resourceRepository.findAll()
+        return resourceRepository.findAllWithoutImageUrl()
                 .stream()
-                .map(ResourceMapper::toResponse)
+                .map(resource -> ResourceMapper.toResponse(resource, false))
                 .toList();
     }
 
@@ -89,7 +89,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public List<ResourceResponse> searchResources(ResourceSearchRequest request) {
-        return resourceRepository.findAll()
+        return resourceRepository.findAllWithoutImageUrl()
                 .stream()
                 .filter(resource -> matchesKeyword(resource, request.getKeyword()))
                 .filter(resource -> request.getType() == null || resource.getType() == request.getType())
@@ -99,7 +99,7 @@ public class ResourceServiceImpl implements ResourceService {
                 .filter(resource -> matchesText(resource.getBuilding(), request.getBuilding()))
                 .filter(resource -> request.getStatus() == null || resource.getStatus() == request.getStatus())
                 .filter(resource -> request.getBookable() == null || Objects.equals(resource.getBookable(), request.getBookable()))
-                .map(ResourceMapper::toResponse)
+                .map(resource -> ResourceMapper.toResponse(resource, false))
                 .toList();
     }
 

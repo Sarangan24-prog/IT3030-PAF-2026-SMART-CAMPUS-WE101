@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════════ */
 
 .admin-dashboard {
-  max-width: 1000px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 28px 20px;
   animation: fadeInUp 0.35s ease;
@@ -716,7 +716,6 @@
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 560px;
 }
 
 .data-table th {
@@ -737,6 +736,23 @@
   color: var(--text-main);
   border-bottom: var(--glass-border);
   background: transparent;
+}
+
+/* Smart Column Sizing to prevent both horizontal scroll and ugly wrapping */
+.bookings-tab .data-table th:nth-child(1), .bookings-tab .data-table td:nth-child(1), /* Ref */
+.bookings-tab .data-table th:nth-child(4), .bookings-tab .data-table td:nth-child(4), /* Date */
+.bookings-tab .data-table th:nth-child(5), .bookings-tab .data-table td:nth-child(5), /* Time */
+.bookings-tab .data-table th:nth-child(7), .bookings-tab .data-table td:nth-child(7), /* Status */
+.bookings-tab .data-table th:nth-child(8), .bookings-tab .data-table td:nth-child(8)  /* Actions */ {
+  white-space: nowrap;
+  width: 1%;
+}
+
+.bookings-tab .data-table td:nth-child(2), /* User */
+.bookings-tab .data-table td:nth-child(3), /* Resource */
+.bookings-tab .data-table td:nth-child(6)  /* Purpose */ {
+  min-width: 120px;
+  word-break: break-word;
 }
 
 .data-table tr:last-child td {
@@ -1119,6 +1135,14 @@
   transform: translateY(-1px);
 }
 
+.form-group select:disabled,
+.form-group input:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+  background: rgba(148, 163, 184, 0.12) !important;
+  color: var(--text-muted) !important;
+}
+
 .toggle-label {
   display: flex !important;
   align-items: center;
@@ -1388,12 +1412,22 @@
 
 /* Reference chip */
 .ref-chip {
+  display: inline-block;
   font-size: 12px;
   font-weight: 700;
   color: #77A365;
   background: rgba(119, 163, 101, 0.1);
-  padding: 3px 10px;
+  padding: 4px 10px;
   border-radius: 6px;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+.action-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
 }
 
 /* No action dash */

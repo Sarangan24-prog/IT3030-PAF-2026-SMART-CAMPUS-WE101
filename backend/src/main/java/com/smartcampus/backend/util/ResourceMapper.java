@@ -28,6 +28,10 @@ public class ResourceMapper {
     }
 
     public static ResourceResponse toResponse(Resource resource) {
+        return toResponse(resource, true);
+    }
+
+    public static ResourceResponse toResponse(Resource resource, boolean includeImage) {
         ResourceResponse response = new ResourceResponse();
         response.setId(resource.getId());
         response.setCode(resource.getCode());
@@ -42,7 +46,9 @@ public class ResourceMapper {
         response.setBookable(resource.getBookable());
         response.setAmenities(resource.getAmenities());
         response.setAvailabilityWindows(resource.getAvailabilityWindows());
-        response.setImageUrl(resource.getImageUrl());
+        if (includeImage) {
+            response.setImageUrl(resource.getImageUrl());
+        }
         return response;
     }
 }

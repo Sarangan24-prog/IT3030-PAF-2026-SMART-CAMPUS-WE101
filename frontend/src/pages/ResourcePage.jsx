@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { searchResources } from '../services/api';
-import { SearchIcon, FilterIcon, BuildingIcon } from '../components/Icons';
+import { getResourceById, searchResources } from '../services/api';
+import { SearchIcon, FilterIcon } from '../components/Icons';
 import './ResourcePage.css';
 
 const ResourcePage = () => {
@@ -14,6 +14,7 @@ const ResourcePage = () => {
   });
 
   const [selectedResource, setSelectedResource] = useState(null);
+  const [loadError, setLoadError] = useState('');
 
   const getResourceImageUrl = (resource) => {
     if (!resource) return '';
@@ -30,6 +31,7 @@ const ResourcePage = () => {
 
   const fetchResources = async () => {
     setLoading(true);
+    setLoadError('');
     try {
       const payload = { ...filters };
       if (payload.minCapacity === '') delete payload.minCapacity;
@@ -41,6 +43,7 @@ const ResourcePage = () => {
       setResources(res.data);
     } catch (err) {
       console.error('Failed to load resources', err);
+      setLoadError('Failed to load facilities. Please check the backend server and try again.');
     } finally {
       setLoading(false);
     }
@@ -54,6 +57,16 @@ const ResourcePage = () => {
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleResourceClick = async (resource) => {
+    setSelectedResource(resource);
+    try {
+      const res = await getResourceById(resource.id);
+      setSelectedResource(res.data);
+    } catch (err) {
+      console.error('Failed to load resource details', err);
+    }
   };
 
   return (
@@ -131,13 +144,22 @@ const ResourcePage = () => {
               <div className="spinner"></div>
               <p>Scanning facilities catalogue...</p>
             </div>
+          ) : loadError ? (
+            <div className="empty-state">
+              <SearchIcon size={48} color="#64748b" />
+              <h3>Unable to load facilities</h3>
+              <p>{loadError}</p>
+              <button className="btn-clear" onClick={fetchResources}>
+                Try again
+              </button>
+            </div>
           ) : resources.length > 0 ? (
             <div className="resources-grid">
               {resources.map((res) => (
                 <div 
                   className={`resource-card minimalist${res.imageUrl ? ' has-image' : ''}`}
                   key={res.id}
-                  onClick={() => setSelectedResource(res)}
+                  onClick={() => handleResourceClick(res)}
                 >
                   {res.imageUrl ? (
                     <div className="card-image-banner">
