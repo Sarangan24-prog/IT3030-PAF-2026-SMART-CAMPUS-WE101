@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import QRCode from 'react-qr-code';
-import { createBooking, getMyBookings, cancelBooking } from '../services/api';
+import { createBooking, getMyBookings, cancelBooking, getAllResources } from '../services/api';
 import {
   CalendarIcon, CheckCircleIcon, XCircleIcon, RefreshIcon,
   BuildingIcon, UsersIcon, MapPinIcon, SettingsIcon,
@@ -8,14 +8,16 @@ import {
 } from '../components/Icons';
 import './BookingPage.css';
 
-const RESOURCES = [
-  { type: 'Lecture Hall',    icon: 'building', color: '#3b82f6' },
-  { type: 'Laboratory',      icon: 'settings', color: '#8b5cf6' },
-  { type: 'Sports Facility', icon: 'mappin',   color: '#f59e0b' },
-  { type: 'Auditorium',      icon: 'users',    color: '#ec4899' },
-  { type: 'Meeting Room',    icon: 'message',  color: '#10b981' },
-  { type: 'Equipment',       icon: 'tag',      color: '#f97316' },
-];
+const RESOURCE_STYLES = {
+  LECTURE_HALL: { icon: 'building', color: '#3b82f6' },
+  LAB: { icon: 'settings', color: '#8b5cf6' },
+  AUDITORIUM: { icon: 'users', color: '#ec4899' },
+  MEETING_ROOM: { icon: 'message', color: '#10b981' },
+  PROJECTOR: { icon: 'tag', color: '#f97316' },
+  CAMERA: { icon: 'tag', color: '#f59e0b' },
+  MICROPHONE: { icon: 'tag', color: '#64748b' },
+  OTHER: { icon: 'mappin', color: '#77A365' },
+};
 
 const TIME_SLOTS = [
   { label: '08:00 – 10:00', start: '08:00', end: '10:00' },
@@ -49,12 +51,21 @@ const StatusIcon = ({ status }) => {
   return <RefreshIcon size={13} color="#d97706" />;
 };
 
+const formatResourceType = (type = '') =>
+  String(type || 'Resource').replaceAll('_', ' ');
+
+const getResourceStyle = (type) =>
+  RESOURCE_STYLES[type] || RESOURCE_STYLES.OTHER;
+
 const BookingPage = () => {
   const [bookings, setBookings]         = useState([]);
   const [loading, setLoading]           = useState(true);
+  const [resources, setResources]       = useState([]);
+  const [resourcesLoading, setResourcesLoading] = useState(true);
+  const [resourcesError, setResourcesError] = useState('');
   const [step, setStep]                 = useState(1);
   const [form, setForm]                 = useState({
-    resourceType: '', bookingDate: '',
+    resourceId: '', resourceName: '', resourceType: '', location: '', bookingDate: '',
     timeSlot: '', startTime: '', endTime: '',
     title: '', purpose: '', description: '',
     expectedAttendees: '',
@@ -74,7 +85,27 @@ const BookingPage = () => {
 
   useEffect(() => { fetchBookings(); }, [fetchBookings]);
 
-  const canAdvance1 = form.resourceType && form.bookingDate && form.timeSlot;
+  useEffect(() => {
+    const fetchResources = async () => {
+      setResourcesLoading(true);
+      setResourcesError('');
+      try {
+        const res = await getAllResources();
+        const bookableResources = (res.data || []).filter((resource) =>
+          resource.bookable !== false && resource.status !== 'OUT_OF_SERVICE'
+        );
+        setResources(bookableResources);
+      } catch {
+        setResourcesError('Failed to load facilities. Please try again.');
+      } finally {
+        setResourcesLoading(false);
+      }
+    };
+
+    fetchResources();
+  }, []);
+
+  const canAdvance1 = form.resourceId && form.bookingDate && form.timeSlot;
   const canSubmit   = form.title.trim() && form.purpose.trim();
   const today       = new Date().toISOString().split('T')[0];
 
@@ -87,6 +118,16 @@ const BookingPage = () => {
     }));
   };
 
+  const handleResourceSelect = (resource) => {
+    setForm(f => ({
+      ...f,
+      resourceId: resource.id,
+      resourceName: resource.name || resource.code || formatResourceType(resource.type),
+      resourceType: resource.type || '',
+      location: resource.location || resource.building || '',
+    }));
+  };
+
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setSubmitting(true);
@@ -96,6 +137,9 @@ const BookingPage = () => {
         title:             form.title,
         description:       form.description,
         resourceType:      form.resourceType,
+        resourceId:        form.resourceId,
+        resourceName:      form.resourceName,
+        location:          form.location,
         
         bookingDate:       form.bookingDate,
         timeSlot:          form.timeSlot,
@@ -134,7 +178,7 @@ const BookingPage = () => {
     setConfirmed(null);
     setError('');
     setForm({
-      resourceType: '', bookingDate: '',
+      resourceId: '', resourceName: '', resourceType: '', location: '', bookingDate: '',
       timeSlot: '', startTime: '', endTime: '',
       title: '', purpose: '', description: '',
       expectedAttendees: '',
@@ -173,22 +217,41 @@ const BookingPage = () => {
           {step === 1 && (
             <>
               <h3>Choose a Resource</h3>
-              <div className="bp-resource-grid">
-                {RESOURCES.map(r => (
-                  <button
-                    key={r.type}
-                    type="button"
-                    className={`bp-resource-card ${form.resourceType === r.type ? 'selected' : ''}`}
-                    style={{ '--rc': r.color }}
-                    onClick={() => setForm(f => ({ ...f, resourceType: r.type }))}
-                  >
-                    <div className="bp-rc-icon" style={{ background: `${r.color}22` }}>
-                      <ResourceIcon icon={r.icon} color={r.color} size={22} />
-                    </div>
-                    <span>{r.type}</span>
-                  </button>
-                ))}
-              </div>
+              {resourcesLoading ? (
+                <p className="bp-loading bp-resource-loading">Loading facilities...</p>
+              ) : resourcesError ? (
+                <div className="bp-error-banner">{resourcesError}</div>
+              ) : resources.length === 0 ? (
+                <div className="bp-empty bp-resource-empty">
+                  <div className="bp-empty-icon">
+                    <BuildingIcon size={26} color="#94a3b8" />
+                  </div>
+                  <p>No bookable facilities found</p>
+                  <span>Add a facility from Admin Facilities and turn on bookable access.</span>
+                </div>
+              ) : (
+                <div className="bp-resource-grid">
+                  {resources.map(r => {
+                    const style = getResourceStyle(r.type);
+                    const label = r.name || r.code || formatResourceType(r.type);
+                    return (
+                      <button
+                        key={r.id}
+                        type="button"
+                        className={`bp-resource-card ${form.resourceId === r.id ? 'selected' : ''}`}
+                        style={{ '--rc': style.color }}
+                        onClick={() => handleResourceSelect(r)}
+                      >
+                        <div className="bp-rc-icon" style={{ background: `${style.color}22` }}>
+                          <ResourceIcon icon={style.icon} color={style.color} size={22} />
+                        </div>
+                        <span>{label}</span>
+                        <small>{formatResourceType(r.type)}{r.building ? ` - ${r.building}` : ''}</small>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
 
               <div className="bp-field bp-field-mt">
                 <label>Booking Date</label>
@@ -234,7 +297,7 @@ const BookingPage = () => {
                   ← Back
                 </button>
                 <div className="bp-summary-chip">
-                  <span className="bp-chip-res">{form.resourceType}</span>
+                  <span className="bp-chip-res">{form.resourceName}</span>
                   <span className="bp-chip-dot">·</span>
                   <span>{form.bookingDate}</span>
                   <span className="bp-chip-dot">·</span>
@@ -319,7 +382,7 @@ const BookingPage = () => {
               <div className="bp-success-details">
                 <div className="bp-sd-row">
                   <span>Resource</span>
-                  <strong>{confirmed.resourceType}</strong>
+                  <strong>{confirmed.resourceName || confirmed.resourceType}</strong>
                 </div>
                 <div className="bp-sd-row">
                   <span>Date</span>
@@ -358,18 +421,16 @@ const BookingPage = () => {
             <div className="bp-list">
               {bookings.map(b => {
                 const s   = STATUS_STYLES[b.status] || STATUS_STYLES.PENDING;
-                const res = RESOURCES.find(r => r.type === b.resourceType);
+                const style = getResourceStyle(b.resourceType);
                 return (
                   <div key={b.id} className="bp-item">
                     <div className="bp-item-top">
-                      {res && (
-                        <span
-                          className="bp-item-res-chip"
-                          style={{ background: `${res.color}1a`, color: res.color }}
-                        >
-                          {b.resourceType}
-                        </span>
-                      )}
+                      <span
+                        className="bp-item-res-chip"
+                        style={{ background: `${style.color}1a`, color: style.color }}
+                      >
+                        {b.resourceName || formatResourceType(b.resourceType)}
+                      </span>
                       <span
                         className="bp-status-badge"
                         style={{ background: s.bg, color: s.color }}
@@ -380,7 +441,7 @@ const BookingPage = () => {
                     </div>
 
                     <div className="bp-item-title">
-                      {b.title || b.resourceType}
+                      {b.title || b.resourceName || formatResourceType(b.resourceType)}
                     </div>
 
                     <div className="bp-item-meta">

@@ -12,6 +12,7 @@ import {
   getAllBookings,
   updateBookingStatus,
   getAllResources,
+  getResourceById,
   createResource,
   updateResource,
   deleteResource
@@ -904,6 +905,8 @@ const BookingsTab = () => {
   );
 };
 /* ─── Resources Tab (Facilities Catalogue Management) ─── */
+const ROOM_RESOURCE_TYPES = ['LECTURE_HALL', 'AUDITORIUM', 'LAB', 'MEETING_ROOM'];
+
 const ResourcesTab = () => {
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -914,6 +917,7 @@ const ResourcesTab = () => {
     location: '', building: '', floor: '', status: 'ACTIVE',
     description: '', bookable: true, amenities: '', imageUrl: ''
   });
+  const canSelectBuildingFloor = ROOM_RESOURCE_TYPES.includes(formData.type);
 
   const fetchResources = useCallback(async () => {
     try {
@@ -934,12 +938,21 @@ const ResourcesTab = () => {
     setShowModal(true);
   };
 
-  const handleOpenEdit = (res) => {
+  const handleOpenEdit = async (res) => {
     setEditingId(res.id);
-    setFormData({
-      ...res,
-      amenities: res.amenities ? res.amenities.join(', ') : '',
-    });
+    try {
+      const detailRes = await getResourceById(res.id);
+      const fullResource = detailRes.data;
+      setFormData({
+        ...fullResource,
+        amenities: fullResource.amenities ? fullResource.amenities.join(', ') : '',
+      });
+    } catch {
+      setFormData({
+        ...res,
+        amenities: res.amenities ? res.amenities.join(', ') : '',
+      });
+    }
     setShowModal(true);
   };
 
@@ -983,11 +996,16 @@ const ResourcesTab = () => {
     let capacity = formData.capacity;
     if (type === 'LECTURE_HALL') capacity = 120;
     else if (type === 'AUDITORIUM') capacity = 300;
-    setFormData({ ...formData, type, capacity });
+    const nextData = { ...formData, type, capacity };
+    if (!ROOM_RESOURCE_TYPES.includes(type)) {
+      nextData.building = '';
+      nextData.floor = '';
+    }
+    setFormData(nextData);
   };
 
   const onBuildingChange = (building) => {
-    setFormData({ ...formData, building });
+    setFormData({ ...formData, building, floor: '' });
   };
 
   const handleSubmit = async (e) => {
@@ -995,6 +1013,8 @@ const ResourcesTab = () => {
     const payload = {
       ...formData,
       capacity: parseInt(formData.capacity, 10) || 0,
+      building: canSelectBuildingFloor ? formData.building : 'N/A',
+      floor: canSelectBuildingFloor ? formData.floor : 'N/A',
       amenities: formData.amenities ? formData.amenities.split(',').map(a => a.trim()).filter(a => a) : [],
     };
 
@@ -1047,7 +1067,7 @@ const ResourcesTab = () => {
                   <td><strong>{res.code}</strong></td>
                   <td>{res.name}</td>
                   <td>{res.type.replaceAll('_', ' ')}</td>
-                  <td>{res.building} - {res.floor}</td>
+                  <td>{res.building === 'N/A' && res.floor === 'N/A' ? 'N/A' : `${res.building} - ${res.floor}`}</td>
                   <td>{res.capacity > 0 ? res.capacity : 'N/A'}</td>
                   <td>
                     <span className={`status-badge ${res.status.toLowerCase().replace('_', '-')}`}>{res.status.replaceAll('_', ' ')}</span>
@@ -1098,22 +1118,30 @@ const ResourcesTab = () => {
                 </div>
                 <div className="form-group">
                   <label>Building *</label>
-                  <select required value={formData.building} onChange={e => onBuildingChange(e.target.value)}>
-                    <option value="">-- Select Building --</option>
+                  <select
+                    required={canSelectBuildingFloor}
+                    disabled={!canSelectBuildingFloor}
+                    value={canSelectBuildingFloor ? formData.building : ''}
+                    onChange={e => onBuildingChange(e.target.value)}
+                  >
+                    <option value="">{canSelectBuildingFloor ? '-- Select Building --' : 'Not required for this type'}</option>
                     <option value="New Building">New Building</option>
                     <option value="Main Building">Main Building</option>
-                    <option value="Engineering Block">Engineering Block</option>
-                    <option value="Science Center">Science Center</option>
+                    <option value="Engineering Block">Engineering Faculty</option>
+                    <option value="Science Center">Business Faculty</option>
                   </select>
                 </div>
                 <div className="form-group">
                   <label>Floor *</label>
                   <select 
-                    required 
-                    value={formData.floor} 
+                    required={canSelectBuildingFloor}
+                    disabled={!canSelectBuildingFloor || !formData.building}
+                    value={canSelectBuildingFloor ? formData.floor : ''} 
                     onChange={e => setFormData({ ...formData, floor: e.target.value })}
                   >
-                    <option value="">-- Select Floor --</option>
+                    <option value="">
+                      {canSelectBuildingFloor ? '-- Select Floor --' : 'Not required for this type'}
+                    </option>
                     {formData.building === 'New Building' && Array.from({ length: 12 }, (_, i) => i + 3).map(f => (
                       <option key={f} value={f}>{f}</option>
                     ))}
